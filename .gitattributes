@@ -1,0 +1,24 @@
+# =============================================================================
+# Infralytix — Git Line Ending Normalization
+# =============================================================================
+# Ensures consistent LF line endings across Windows, macOS, and Linux.
+# =============================================================================
+
+# Default: normalize all text files to LF on commit
+* text=auto eol=lf
+
+# Explicitly mark binary files
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.gz   binary
+*.tar  binary
+*.whl  binary
+
+# Windows batch files need CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf

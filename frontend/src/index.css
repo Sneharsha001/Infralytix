@@ -1,0 +1,150 @@
+/**
+ * Infralytix Frontend — Global CSS
+ *
+ * Layer structure:
+ *  1. @layer base      — HTML element resets and base styles
+ *  2. @layer components — Reusable component classes
+ *  3. @layer utilities  — Tailwind utilities (auto-managed)
+ *
+ * All custom CSS should use Tailwind @apply where possible.
+ * Reserve raw CSS for things Tailwind cannot express.
+ */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* ── Base Layer ──────────────────────────────────────────────────────────── */
+@layer base {
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Typography defaults */
+  body {
+    @apply font-sans text-base text-white bg-neutral-900 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Heading hierarchy */
+  h1 { @apply text-4xl font-bold tracking-tight; }
+  h2 { @apply text-3xl font-semibold tracking-tight; }
+  h3 { @apply text-2xl font-semibold; }
+  h4 { @apply text-xl font-medium; }
+  h5 { @apply text-lg font-medium; }
+  h6 { @apply text-base font-medium; }
+
+  /* Code / pre */
+  code, kbd, samp, pre {
+    @apply font-mono;
+  }
+
+  /* Focus styles — accessible keyboard navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-600;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-brand-600 text-white;
+  }
+}
+
+/* ── Component Layer ─────────────────────────────────────────────────────── */
+@layer components {
+  /* ── Glassmorphism Card ────────────────────────────────────────────────── */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-200
+           hover:bg-white/8 hover:border-white/20 hover:shadow-brand;
+  }
+
+  /* ── Gradient Text ─────────────────────────────────────────────────────── */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-400 to-brand-200 bg-clip-text text-transparent;
+  }
+
+  .gradient-text-warm {
+    @apply bg-gradient-to-r from-amber-400 to-orange-300 bg-clip-text text-transparent;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-xl
+           bg-brand-600 text-white font-medium text-sm
+           hover:bg-brand-500 active:bg-brand-700
+           transition-all duration-150
+           focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-xl
+           bg-white/8 text-white font-medium text-sm border border-white/15
+           hover:bg-white/12 hover:border-white/25 active:bg-white/5
+           transition-all duration-150
+           focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2 rounded-lg
+           text-neutral-400 font-medium text-sm
+           hover:text-white hover:bg-white/8
+           transition-all duration-150;
+  }
+
+  /* ── Form Inputs ─────────────────────────────────────────────────────────── */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl
+           bg-white/5 border border-white/10
+           text-white placeholder-neutral-500 text-sm
+           focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50
+           transition-colors duration-150;
+  }
+
+  /* ── Status Badges ──────────────────────────────────────────────────────── */
+  .badge-success { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30; }
+  .badge-warning { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30; }
+  .badge-danger  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400 ring-1 ring-red-500/30; }
+  .badge-info    { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/15 text-brand-400 ring-1 ring-brand-500/30; }
+  .badge-neutral { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/8 text-neutral-300 ring-1 ring-white/15; }
+
+  /* ── Code Block ──────────────────────────────────────────────────────────── */
+  .code-block {
+    @apply font-mono text-sm bg-neutral-950 border border-white/10 rounded-xl p-4
+           text-emerald-400 overflow-x-auto;
+  }
+
+  /* ── Divider ─────────────────────────────────────────────────────────────── */
+  .divider {
+    @apply h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-6;
+  }
+
+  /* ── Skeleton Loader ─────────────────────────────────────────────────────── */
+  .skeleton {
+    @apply bg-white/8 rounded-lg animate-pulse;
+  }
+}

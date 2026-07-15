@@ -83,6 +83,13 @@ const config: Config = {
         },
       },
 
+      // ── Opacity (Custom for glass effects) ──────────────────────────────────
+      opacity: {
+        '8': '0.08',
+        '12': '0.12',
+        '15': '0.15',
+      },
+
       // ── Border Radius ────────────────────────────────────────────────────────
       borderRadius: {
         '4xl': '2rem',

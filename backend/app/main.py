@@ -26,9 +26,9 @@ from typing import Callable
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
-from app.core.exceptions import register_exception_handlers
-from app.core.logging import get_logger, setup_logging
+from app.config.config import settings
+from app.exceptions.exceptions import register_exception_handlers
+from app.logging.logging import get_logger, setup_logging
 from app.api.v1.router import v1_router
 
 logger = get_logger(__name__)

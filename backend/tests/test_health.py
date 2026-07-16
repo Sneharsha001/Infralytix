@@ -16,7 +16,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_application
-from app.core.config import get_settings
+from app.config.config import get_settings
 
 
 # =============================================================================

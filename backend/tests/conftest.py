@@ -60,5 +60,5 @@ def clear_settings_cache() -> None:
     """
     yield
     # Import here (after env vars are set) to avoid circular import
-    from app.core.config import get_settings
+    from app.config.config import get_settings
     get_settings.cache_clear()

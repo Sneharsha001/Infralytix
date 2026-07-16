@@ -25,7 +25,7 @@ from datetime import UTC, datetime
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-from app.core.config import settings
+from app.config.config import settings
 
 logger = logging.getLogger(__name__)
 

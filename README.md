@@ -19,7 +19,7 @@
 
 ---
 
-## 📖 Project Overview
+## 📖 project overview
 
 **What is Infralytix?**  
 Infralytix is an enterprise-grade, multi-agent infrastructure automation platform. It leverages local AI (Ollama + Qwen) to understand codebases, generate infrastructure configurations, and monitor system health without exposing proprietary code to external APIs.

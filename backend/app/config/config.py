@@ -47,7 +47,11 @@ class Settings(BaseSettings):
     HOST: str = Field(default="0.0.0.0", description="Bind address")
     PORT: int = Field(default=8000, ge=1024, le=65535, description="Bind port")
 
-    # ─── Database — MySQL 8.4 ────────────────────────────────────────────────
+    # ─── Database — MySQL 8.4 (with SQLite sandbox fallback) ─────────────────
+    DB_ENGINE: Literal["mysql", "sqlite"] = Field(
+        default="mysql",
+        description="Database engine ('mysql' or 'sqlite' for local sandboxes)",
+    )
     DB_HOST: str = Field(default="localhost", description="MySQL host")
     DB_PORT: int = Field(default=3306, ge=1, le=65535, description="MySQL port")
     DB_USER: str = Field(description="MySQL username")
@@ -123,6 +127,12 @@ class Settings(BaseSettings):
         description="Log output format (json for production, text for dev)",
     )
 
+    # ─── Storage / File Uploads ───────────────────────────────────────────────
+    UPLOAD_DIR: str = Field(
+        default="uploads",
+        description="Directory for storing uploaded repository archives",
+    )
+
     # ─── AI Agents (Sprint 4+) ────────────────────────────────────────────────
     GEMINI_API_KEY: str = Field(default="", description="Google Gemini API key")
     GEMINI_MODEL: str = Field(default="gemini-1.5-pro", description="Gemini model identifier")
@@ -132,7 +142,9 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def DATABASE_URL(self) -> str:
-        """Async database URL for SQLAlchemy (aiomysql driver)."""
+        """Async database URL for SQLAlchemy (aiomysql or aiosqlite driver)."""
+        if self.DB_ENGINE == "sqlite":
+            return f"sqlite+aiosqlite:///{self.DB_NAME}.db"
         return (
             f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
@@ -142,7 +154,9 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def DATABASE_URL_SYNC(self) -> str:
-        """Sync database URL for Alembic migrations (pymysql driver)."""
+        """Sync database URL for Alembic migrations (pymysql or sqlite driver)."""
+        if self.DB_ENGINE == "sqlite":
+            return f"sqlite:///{self.DB_NAME}.db"
         return (
             f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"

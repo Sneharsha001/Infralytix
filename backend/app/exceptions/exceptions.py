@@ -153,7 +153,7 @@ async def infralytix_exception_handler(
         "Application exception",
         extra={
             "error_code": exc.error_code,
-            "message": exc.message,
+            "error_message": exc.message,
             "path": request.url.path,
             "method": request.method,
         },

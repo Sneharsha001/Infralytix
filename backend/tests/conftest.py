@@ -50,8 +50,13 @@ os.environ.setdefault("LOG_LEVEL", "DEBUG")
 # Pytest Fixtures
 # =============================================================================
 
+from collections.abc import AsyncGenerator, Generator
+from unittest.mock import AsyncMock
+from fastapi.testclient import TestClient
+
+
 @pytest.fixture(autouse=True, scope="session")
-def clear_settings_cache() -> None:
+def clear_settings_cache() -> Generator[None, None, None]:
     """
     Clear the Settings lru_cache after the entire test session.
 
@@ -62,3 +67,31 @@ def clear_settings_cache() -> None:
     # Import here (after env vars are set) to avoid circular import
     from app.config.config import get_settings
     get_settings.cache_clear()
+
+
+@pytest.fixture
+def mock_db_session() -> AsyncMock:
+    """Provide a mock AsyncSession that satisfies FastAPI dependency injection."""
+    session = AsyncMock()
+    session.commit = AsyncMock()
+    session.flush = AsyncMock()
+    session.refresh = AsyncMock()
+    session.rollback = AsyncMock()
+    return session
+
+
+@pytest.fixture
+def client(mock_db_session: AsyncMock) -> Generator[TestClient, None, None]:
+    """Create a TestClient with get_db overridden to yield mock_db_session."""
+    from app.database.session import get_db
+    from app.main import create_application
+
+    app = create_application()
+
+    async def override_get_db() -> AsyncGenerator[AsyncMock, None]:
+        yield mock_db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app, raise_server_exceptions=False) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()

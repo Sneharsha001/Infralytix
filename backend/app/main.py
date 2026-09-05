@@ -68,8 +68,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         },
     )
 
-    # Database connection pool will be initialized here in Sprint 2
-    # AI agent registry will be initialized here in Sprint 7
+    # Auto-initialize tables in local SQLite sandbox
+    if settings.DATABASE_URL.startswith("sqlite"):
+        from app.database.session import engine
+        from app.models import Base
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
     logger.info("Infralytix backend ready to accept requests")
 

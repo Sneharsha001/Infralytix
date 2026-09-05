@@ -83,7 +83,8 @@ class TextFormatter(logging.Formatter):
         timestamp = datetime.fromtimestamp(record.created, tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
         level = f"{color}{record.levelname:<8}{reset}"
         location = f"{record.name}:{record.lineno}"
-        message = self.formatMessage(record)
+        record.message = record.getMessage()
+        message = record.message
 
         formatted = f"{timestamp} | {level} | {location} | {message}"
 

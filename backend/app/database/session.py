@@ -29,15 +29,24 @@ logger = get_logger(__name__)
 # Engine and Session Factory Initialization
 # =============================================================================
 
-# The async engine manages the connection pool to MySQL
-engine: AsyncEngine = create_async_engine(
-    url=settings.DATABASE_URL,
-    echo=settings.DB_ECHO,
-    pool_size=settings.DB_POOL_SIZE,
-    max_overflow=settings.DB_MAX_OVERFLOW,
-    pool_timeout=settings.DB_POOL_TIMEOUT,
-    pool_pre_ping=True,  # Verifies connection health before checkout
-)
+def _create_engine() -> AsyncEngine:
+    url = settings.DATABASE_URL
+    if url.startswith("sqlite"):
+        return create_async_engine(
+            url=url,
+            echo=settings.DB_ECHO,
+        )
+    return create_async_engine(
+        url=url,
+        echo=settings.DB_ECHO,
+        pool_size=settings.DB_POOL_SIZE,
+        max_overflow=settings.DB_MAX_OVERFLOW,
+        pool_timeout=settings.DB_POOL_TIMEOUT,
+        pool_pre_ping=True,
+    )
+
+
+engine: AsyncEngine = _create_engine()
 
 # The session factory generates new session objects bound to the engine
 AsyncSessionLocal = async_sessionmaker(

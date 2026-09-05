@@ -49,10 +49,9 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)
 # For autogenerate support, target_metadata must be set to your Base.metadata.
 # This will be wired up in Sprint 2.
 try:
-    from app.db.base import Base  # noqa: F401
+    from app.models import Base  # noqa: F401
     target_metadata = Base.metadata
 except ImportError:
-    # Sprint 0: DB models not yet created
     logger.warning("Database models not yet available — running without autogenerate support")
     target_metadata = None
 

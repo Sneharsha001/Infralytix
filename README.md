@@ -19,7 +19,7 @@
 
 ---
 
-## 📖 Project Overview
+## 📖 project overview
 
 **What is Infralytix?**  
 Infralytix is an enterprise-grade, multi-agent infrastructure automation platform. It leverages local AI (Ollama + Qwen) to understand codebases, generate infrastructure configurations, and monitor system health without exposing proprietary code to external APIs.
@@ -315,8 +315,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ## 👤 Author
 
-**Sneha Harsha**  
-*Senior Platform Engineer & Software Architect*
+**Sneharsha**  
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://linkedin.com)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?logo=github)](https://github.com/Sneharsha001)

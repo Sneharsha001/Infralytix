@@ -14,7 +14,7 @@ Design Decisions:
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import AnyHttpUrl, Field, computed_field
+from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -87,6 +87,24 @@ class Settings(BaseSettings):
         default=["http://localhost:5173", "http://localhost:3000"],
         description="Allowed CORS origins",
     )
+
+    @field_validator("ALLOWED_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: object) -> list[str]:
+        if isinstance(v, str):
+            v_str = v.strip()
+            if v_str.startswith("[") and v_str.endswith("]"):
+                import json
+                try:
+                    parsed = json.loads(v_str)
+                    if isinstance(parsed, list):
+                        return [str(i).strip() for i in parsed]
+                except (ValueError, TypeError):
+                    return [i.strip() for i in v_str.strip("[]").split(",") if i.strip()]
+            return [i.strip() for i in v_str.split(",") if i.strip()]
+        if isinstance(v, list):
+            return [str(i).strip() for i in v]
+        return [str(v)]
 
     # ─── Rate Limiting ────────────────────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = Field(

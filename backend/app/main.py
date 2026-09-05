@@ -16,20 +16,19 @@ Middleware stack (applied in reverse order — last added = outermost):
 
 from __future__ import annotations
 
-import logging
 import time
 import uuid
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
-from typing import Callable
+from typing import cast
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.router import v1_router
 from app.config.config import settings
 from app.exceptions.exceptions import register_exception_handlers
 from app.logging.logging import get_logger, setup_logging
-from app.api.v1.router import v1_router
 
 logger = get_logger(__name__)
 
@@ -101,7 +100,7 @@ async def request_id_middleware(request: Request, call_next: Callable) -> Respon
     request.state.request_id = request_id
 
     start_time = time.perf_counter()
-    response = await call_next(request)
+    response: Response = cast(Response, await call_next(request))
     process_time_ms = (time.perf_counter() - start_time) * 1000
 
     # Attach tracing headers to every response

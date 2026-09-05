@@ -88,6 +88,9 @@ ignore = [
     "ANN102",  # Missing type annotation for `cls`
     "S101",    # Use of assert (allowed in tests)
     "B008",    # Do not perform function call in argument defaults (FastAPI Depends)
+    "S104",    # Possible binding to all interfaces (standard for dockerized server host)
+    "N802",    # Function name should be lowercase (used for uppercase @computed_field settings)
+    "N818",    # Exception name should be named with an Error suffix
 ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -34,7 +34,7 @@ from app.schemas.cost import (
     CostEstimateResponse,
 )
 from app.services.cost_ai_service import CostAIService
-from app.services.cost_service import CostCalculatorService
+from app.services.cost_comparison_service import CostComparisonService
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -90,9 +90,9 @@ async def create_estimate(
     await db.commit()
 
     try:
-        # 1. Deterministic price calculation
-        calculator = CostCalculatorService()
-        estimates = calculator.compute(body)
+        # 1. Price calculation (wired with live AWS pricing service + multi-cloud fallback)
+        calculator = CostComparisonService()
+        estimates = await calculator.compute_async(body)
 
         if not estimates:
             raise HTTPException(

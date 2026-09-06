@@ -1,0 +1,385 @@
+{
+  "formatVersion": "v1.0",
+  "disclaimer": "This pricing list is for informational purposes only.",
+  "offerCode": "AmazonEC2",
+  "version": "20260904231117",
+  "publicationDate": "2026-09-04T23:11:17Z",
+  "products": {
+    "SKU-T3-MICRO": {
+      "sku": "SKU-T3-MICRO",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "t3.micro",
+        "vcpu": "2",
+        "memory": "1 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-T3-MEDIUM": {
+      "sku": "SKU-T3-MEDIUM",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "t3.medium",
+        "vcpu": "2",
+        "memory": "4 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-T3-LARGE": {
+      "sku": "SKU-T3-LARGE",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "t3.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-M5-LARGE": {
+      "sku": "SKU-M5-LARGE",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-M5-XLARGE": {
+      "sku": "SKU-M5-XLARGE",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.xlarge",
+        "vcpu": "4",
+        "memory": "16 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-M5-2XLARGE": {
+      "sku": "SKU-M5-2XLARGE",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.2xlarge",
+        "vcpu": "8",
+        "memory": "32 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-C5-XLARGE": {
+      "sku": "SKU-C5-XLARGE",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "c5.xlarge",
+        "vcpu": "4",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-WINDOWS-IGNORED": {
+      "sku": "SKU-WINDOWS-IGNORED",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Windows",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-DEDICATED-IGNORED": {
+      "sku": "SKU-DEDICATED-IGNORED",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Dedicated",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-PREINSTALLED-IGNORED": {
+      "sku": "SKU-PREINSTALLED-IGNORED",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "SQL Server Enterprise",
+        "capacitystatus": "Used",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-UNUSED-CAPACITY-IGNORED": {
+      "sku": "SKU-UNUSED-CAPACITY-IGNORED",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "UnusedCapacityReservation",
+        "licenseModel": "No License required",
+        "regionCode": "us-east-1"
+      }
+    },
+    "SKU-BYOL-IGNORED": {
+      "sku": "SKU-BYOL-IGNORED",
+      "productFamily": "Compute Instance",
+      "attributes": {
+        "servicecode": "AmazonEC2",
+        "location": "US East (N. Virginia)",
+        "instanceType": "m5.large",
+        "vcpu": "2",
+        "memory": "8 GiB",
+        "operatingSystem": "Linux",
+        "tenancy": "Shared",
+        "preInstalledSw": "NA",
+        "capacitystatus": "Used",
+        "licenseModel": "Bring your own license",
+        "regionCode": "us-east-1"
+      }
+    }
+  },
+  "terms": {
+    "OnDemand": {
+      "SKU-T3-MICRO": {
+        "SKU-T3-MICRO.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-T3-MICRO",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-T3-MICRO.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-T3-MICRO.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.0104 per On Demand Linux t3.micro Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.0104000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-T3-MEDIUM": {
+        "SKU-T3-MEDIUM.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-T3-MEDIUM",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-T3-MEDIUM.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-T3-MEDIUM.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.0416 per On Demand Linux t3.medium Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.0416000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-T3-LARGE": {
+        "SKU-T3-LARGE.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-T3-LARGE",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-T3-LARGE.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-T3-LARGE.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.0832 per On Demand Linux t3.large Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.0832000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-M5-LARGE": {
+        "SKU-M5-LARGE.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-M5-LARGE",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-M5-LARGE.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-M5-LARGE.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.096 per On Demand Linux m5.large Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.0960000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-M5-XLARGE": {
+        "SKU-M5-XLARGE.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-M5-XLARGE",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-M5-XLARGE.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-M5-XLARGE.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.192 per On Demand Linux m5.xlarge Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.1920000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-M5-2XLARGE": {
+        "SKU-M5-2XLARGE.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-M5-2XLARGE",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-M5-2XLARGE.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-M5-2XLARGE.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.384 per On Demand Linux m5.2xlarge Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.3840000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-C5-XLARGE": {
+        "SKU-C5-XLARGE.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-C5-XLARGE",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-C5-XLARGE.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-C5-XLARGE.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.170 per On Demand Linux c5.xlarge Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.1700000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      },
+      "SKU-WINDOWS-IGNORED": {
+        "SKU-WINDOWS-IGNORED.JRTCKXETXF": {
+          "offerTermCode": "JRTCKXETXF",
+          "sku": "SKU-WINDOWS-IGNORED",
+          "effectiveDate": "2026-09-01T00:00:00Z",
+          "priceDimensions": {
+            "SKU-WINDOWS-IGNORED.JRTCKXETXF.6YS6EN2CT7": {
+              "rateCode": "SKU-WINDOWS-IGNORED.JRTCKXETXF.6YS6EN2CT7",
+              "description": "$0.188 per On Demand Windows m5.large Instance Hour",
+              "beginRange": "0",
+              "endRange": "Inf",
+              "unit": "Hrs",
+              "pricePerUnit": {
+                "USD": "0.1880000000"
+              },
+              "appliesTo": []
+            }
+          },
+          "termAttributes": {}
+        }
+      }
+    }
+  }
+}

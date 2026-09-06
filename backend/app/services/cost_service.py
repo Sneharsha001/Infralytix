@@ -107,15 +107,25 @@ _AZURE_CATALOGUE: list[_InstanceSpec] = [
     _InstanceSpec("E8s_v3", 8,  64.0,  0.5040),
 ]
 
+import httpx
+
+from app.logging.logging import get_logger
+from app.services.pricing.aws_pricing_service import (
+    _CACHE as _AWS_CACHE,
+    aws_pricing_service,
+)
+from app.services.pricing.region_mapping import (
+    resolve_aws_region,
+    resolve_azure_region,
+    resolve_gcp_region,
+)
+
+logger = get_logger(__name__)
+
 # Storage pricing: USD per GB per month
 _AWS_STORAGE_PRICE_PER_GB    = 0.08   # gp3
 _GCP_STORAGE_PRICE_PER_GB    = 0.04   # pd-balanced
 _AZURE_STORAGE_PRICE_PER_GB  = 0.0576 # Premium SSD LRS P4+
-
-# Region name mappings for display
-_AWS_REGIONS    = {"us": "us-east-1",    "eu": "eu-west-1",    "asia": "ap-southeast-1"}
-_GCP_REGIONS    = {"us": "us-central1",  "eu": "europe-west1", "asia": "asia-east1"}
-_AZURE_REGIONS  = {"us": "eastus",       "eu": "westeurope",   "asia": "southeastasia"}
 
 
 # ---------------------------------------------------------------------------
@@ -156,14 +166,58 @@ class CostCalculatorService:
         results.sort(key=lambda e: e.total_monthly_usd)
         return results
 
+    async def compute_async(
+        self,
+        request: CostEstimateRequest,
+        client: httpx.AsyncClient | None = None,
+    ) -> list[ProviderEstimate]:
+        """
+        Return a ProviderEstimate for each requested provider asynchronously.
+
+        Integrates real live/cached AWS Pricing Service for the AWS leg, with
+        graceful fallback to deterministic static catalogues.
+        """
+        results: list[ProviderEstimate] = []
+
+        if "aws" in request.providers:
+            results.append(await self._aws_estimate_async(request, client=client))
+        if "gcp" in request.providers:
+            results.append(self._gcp_estimate(request))
+        if "azure" in request.providers:
+            results.append(self._azure_estimate(request))
+
+        results.sort(key=lambda e: e.total_monthly_usd)
+        return results
+
     # ── Per-Provider Estimators ───────────────────────────────────────────
 
     def _aws_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
-        instance = _select_instance(
-            _AWS_CATALOGUE, req.cpu_cores, req.memory_gb
-        )
-        region = _AWS_REGIONS.get(req.region_preference, "us-east-1")
-        compute_cost = round(instance.price_per_hour_usd * req.hours_per_month, 4)
+        region = resolve_aws_region(req.region_preference)
+        # Check if aws_pricing_service cache has live parsed instances for this region
+        if region in _AWS_CACHE:
+            _, cached_instances = _AWS_CACHE[region]
+            if cached_instances:
+                selected_inst = aws_pricing_service.select_instance(
+                    cached_instances, req.cpu_cores, req.memory_gb
+                )
+                instance_type = selected_inst.instance_type
+                vcpus = selected_inst.vcpus
+                memory_gb = selected_inst.memory_gb
+                price_per_hour = selected_inst.price_per_hour_usd
+            else:
+                instance = _select_instance(_AWS_CATALOGUE, req.cpu_cores, req.memory_gb)
+                instance_type = instance.instance_type
+                vcpus = instance.vcpus
+                memory_gb = instance.memory_gb
+                price_per_hour = instance.price_per_hour_usd
+        else:
+            instance = _select_instance(_AWS_CATALOGUE, req.cpu_cores, req.memory_gb)
+            instance_type = instance.instance_type
+            vcpus = instance.vcpus
+            memory_gb = instance.memory_gb
+            price_per_hour = instance.price_per_hour_usd
+
+        compute_cost = round(price_per_hour * req.hours_per_month, 4)
         storage = _build_storage(
             "gp3",
             _AWS_STORAGE_PRICE_PER_GB,
@@ -174,26 +228,70 @@ class CostCalculatorService:
             provider_display="Amazon Web Services",
             region=region,
             instance=InstanceOption(
-                instance_type=instance.instance_type,
-                vcpus=instance.vcpus,
-                memory_gb=instance.memory_gb,
-                price_per_hour_usd=instance.price_per_hour_usd,
+                instance_type=instance_type,
+                vcpus=vcpus,
+                memory_gb=memory_gb,
+                price_per_hour_usd=price_per_hour,
             ),
             compute_monthly_usd=compute_cost,
             storage=storage,
             total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
             notes=[
-                "On-demand pricing (no reserved instance discount applied)",
-                f"Region: {region} (Linux AMI)",
-                "Data transfer costs not included",
+                "On-demand pricing (Linux AMI)",
+                f"Region: {region}",
+                "Data transfer costs not included; EBS gp3 storage baseline ($0.08/GB-mo)",
             ],
         )
+
+    async def _aws_estimate_async(
+        self,
+        req: CostEstimateRequest,
+        client: httpx.AsyncClient | None = None,
+    ) -> ProviderEstimate:
+        """Evaluate AWS using live/cached AWSPricingService with fallback."""
+        region = resolve_aws_region(req.region_preference)
+        try:
+            res = await aws_pricing_service.get_instance_price(
+                region_code=region,
+                vcpus=req.cpu_cores,
+                memory_gb=float(req.memory_gb),
+                hours_per_month=req.hours_per_month,
+                storage_gb=req.storage_gb,
+                storage_price_per_gb=_AWS_STORAGE_PRICE_PER_GB,
+                client=client,
+            )
+            storage = _build_storage("gp3", _AWS_STORAGE_PRICE_PER_GB, req.storage_gb)
+            return ProviderEstimate(
+                provider="aws",
+                provider_display="Amazon Web Services",
+                region=region,
+                instance=InstanceOption(
+                    instance_type=res.instance_type,
+                    vcpus=res.vcpus,
+                    memory_gb=res.memory_gb,
+                    price_per_hour_usd=res.price_per_hour_usd,
+                ),
+                compute_monthly_usd=res.monthly_cost_low,
+                storage=storage,
+                total_monthly_usd=res.total_monthly_usd,
+                notes=[
+                    "On-demand pricing (real AWS Price List Offer Index)",
+                    f"Region: {region} (Linux Shared)",
+                    "Data transfer costs not included; EBS gp3 storage baseline ($0.08/GB-mo)",
+                ],
+            )
+        except Exception as exc:
+            logger.warning(
+                "aws_pricing_async_fetch_failed_falling_back",
+                extra={"error": str(exc), "region": region},
+            )
+            return self._aws_estimate(req)
 
     def _gcp_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
         instance = _select_instance(
             _GCP_CATALOGUE, req.cpu_cores, req.memory_gb
         )
-        region = _GCP_REGIONS.get(req.region_preference, "us-central1")
+        region = resolve_gcp_region(req.region_preference)
         compute_cost = round(instance.price_per_hour_usd * req.hours_per_month, 4)
         storage = _build_storage(
             "pd-balanced",
@@ -224,7 +322,7 @@ class CostCalculatorService:
         instance = _select_instance(
             _AZURE_CATALOGUE, req.cpu_cores, req.memory_gb
         )
-        region = _AZURE_REGIONS.get(req.region_preference, "eastus")
+        region = resolve_azure_region(req.region_preference)
         compute_cost = round(instance.price_per_hour_usd * req.hours_per_month, 4)
         storage = _build_storage(
             "Premium SSD LRS",
@@ -250,6 +348,7 @@ class CostCalculatorService:
                 "Azure Hybrid Benefit not applied",
             ],
         )
+
 
 
 # ---------------------------------------------------------------------------

@@ -172,6 +172,24 @@ def create_application() -> FastAPI:
     # ── Register Routers ──────────────────────────────────────────────────────
     application.include_router(v1_router, prefix="/api/v1")
 
+    # ── Root & Convenience Endpoints ──────────────────────────────────────────
+    @application.get("/", tags=["Root"])
+    async def root() -> dict[str, str]:
+        """Root status and API discovery."""
+        return {
+            "name": settings.APP_NAME,
+            "version": settings.APP_VERSION,
+            "status": "online",
+            "docs": "/api/v1/docs",
+            "health": "/api/v1/health",
+        }
+
+    @application.get("/docs", include_in_schema=False)
+    async def docs_redirect() -> Response:
+        """Redirect convenience /docs to versioned /api/v1/docs."""
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/api/v1/docs")
+
     return application
 
 

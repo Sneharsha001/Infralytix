@@ -19,14 +19,37 @@ no logging side effects. It is pure and fully unit-testable.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 
+import httpx
+
+from app.logging.logging import get_logger
 from app.schemas.cost import (
     CostEstimateRequest,
     InstanceOption,
     ProviderEstimate,
     StorageEstimate,
 )
+from app.services.pricing.aws_pricing_service import (
+    _CACHE as _AWS_CACHE,
+)
+from app.services.pricing.aws_pricing_service import (
+    aws_pricing_service,
+)
+from app.services.pricing.azure_pricing_service import (
+    _CACHE as _AZURE_CACHE,
+)
+from app.services.pricing.azure_pricing_service import (
+    azure_pricing_service,
+)
+from app.services.pricing.region_mapping import (
+    resolve_aws_region,
+    resolve_azure_region,
+    resolve_gcp_region,
+)
+
+logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Static Price Catalogues
@@ -107,20 +130,7 @@ _AZURE_CATALOGUE: list[_InstanceSpec] = [
     _InstanceSpec("E8s_v3", 8,  64.0,  0.5040),
 ]
 
-import httpx
 
-from app.logging.logging import get_logger
-from app.services.pricing.aws_pricing_service import (
-    _CACHE as _AWS_CACHE,
-    aws_pricing_service,
-)
-from app.services.pricing.region_mapping import (
-    resolve_aws_region,
-    resolve_azure_region,
-    resolve_gcp_region,
-)
-
-logger = get_logger(__name__)
 
 # Storage pricing: USD per GB per month
 _AWS_STORAGE_PRICE_PER_GB    = 0.08   # gp3
@@ -174,17 +184,28 @@ class CostCalculatorService:
         """
         Return a ProviderEstimate for each requested provider asynchronously.
 
-        Integrates real live/cached AWS Pricing Service for the AWS leg, with
+        Integrates real live/cached AWS and Azure Pricing Services, executing
+        remote network requests concurrently via asyncio.gather, with
         graceful fallback to deterministic static catalogues.
         """
         results: list[ProviderEstimate] = []
+        remote_tasks: list[asyncio.Task[ProviderEstimate]] = []
 
         if "aws" in request.providers:
-            results.append(await self._aws_estimate_async(request, client=client))
+            remote_tasks.append(
+                asyncio.create_task(self._aws_estimate_async(request, client=client))
+            )
+        if "azure" in request.providers:
+            remote_tasks.append(
+                asyncio.create_task(self._azure_estimate_async(request, client=client))
+            )
+
+        if remote_tasks:
+            resolved = await asyncio.gather(*remote_tasks)
+            results.extend(resolved)
+
         if "gcp" in request.providers:
             results.append(self._gcp_estimate(request))
-        if "azure" in request.providers:
-            results.append(self._azure_estimate(request))
 
         results.sort(key=lambda e: e.total_monthly_usd)
         return results
@@ -319,11 +340,32 @@ class CostCalculatorService:
         )
 
     def _azure_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
-        instance = _select_instance(
-            _AZURE_CATALOGUE, req.cpu_cores, req.memory_gb
-        )
         region = resolve_azure_region(req.region_preference)
-        compute_cost = round(instance.price_per_hour_usd * req.hours_per_month, 4)
+        # Check if azure_pricing_service cache has live parsed instances for this region
+        if region in _AZURE_CACHE:
+            _, cached_instances = _AZURE_CACHE[region]
+            if cached_instances:
+                selected_inst = azure_pricing_service.select_instance(
+                    cached_instances, req.cpu_cores, req.memory_gb
+                )
+                instance_type = selected_inst.arm_sku_name
+                vcpus = selected_inst.vcpus
+                memory_gb = selected_inst.memory_gb
+                price_per_hour = selected_inst.price_per_hour_usd
+            else:
+                instance = _select_instance(_AZURE_CATALOGUE, req.cpu_cores, req.memory_gb)
+                instance_type = instance.instance_type
+                vcpus = instance.vcpus
+                memory_gb = instance.memory_gb
+                price_per_hour = instance.price_per_hour_usd
+        else:
+            instance = _select_instance(_AZURE_CATALOGUE, req.cpu_cores, req.memory_gb)
+            instance_type = instance.instance_type
+            vcpus = instance.vcpus
+            memory_gb = instance.memory_gb
+            price_per_hour = instance.price_per_hour_usd
+
+        compute_cost = round(price_per_hour * req.hours_per_month, 4)
         storage = _build_storage(
             "Premium SSD LRS",
             _AZURE_STORAGE_PRICE_PER_GB,
@@ -334,20 +376,74 @@ class CostCalculatorService:
             provider_display="Microsoft Azure",
             region=region,
             instance=InstanceOption(
-                instance_type=instance.instance_type,
-                vcpus=instance.vcpus,
-                memory_gb=instance.memory_gb,
-                price_per_hour_usd=instance.price_per_hour_usd,
+                instance_type=instance_type,
+                vcpus=vcpus,
+                memory_gb=memory_gb,
+                price_per_hour_usd=price_per_hour,
             ),
             compute_monthly_usd=compute_cost,
             storage=storage,
             total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
             notes=[
-                "Pay-as-you-go pricing (no reserved instance discount applied)",
-                f"Region: {region} (Linux VM)",
-                "Azure Hybrid Benefit not applied",
+                "Pay-as-you-go pricing (Linux VM)",
+                f"Region: {region}",
+                (
+                    "Azure Hybrid Benefit not applied; "
+                    "Premium SSD Managed Disks baseline ($0.0576/GB-mo)"
+                ),
             ],
         )
+
+    async def _azure_estimate_async(
+        self,
+        req: CostEstimateRequest,
+        client: httpx.AsyncClient | None = None,
+    ) -> ProviderEstimate:
+        """Evaluate Azure using live/cached AzurePricingService with fallback."""
+        region = resolve_azure_region(req.region_preference)
+        try:
+            res = await azure_pricing_service.get_instance_price(
+                region_code=region,
+                vcpus=req.cpu_cores,
+                memory_gb=float(req.memory_gb),
+                hours_per_month=req.hours_per_month,
+                storage_gb=req.storage_gb,
+                storage_price_per_gb=_AZURE_STORAGE_PRICE_PER_GB,
+                client=client,
+            )
+            storage = _build_storage(
+                "Premium SSD LRS",
+                _AZURE_STORAGE_PRICE_PER_GB,
+                req.storage_gb,
+            )
+            return ProviderEstimate(
+                provider="azure",
+                provider_display="Microsoft Azure",
+                region=region,
+                instance=InstanceOption(
+                    instance_type=res.instance_type,
+                    vcpus=res.vcpus,
+                    memory_gb=res.memory_gb,
+                    price_per_hour_usd=res.price_per_hour_usd,
+                ),
+                compute_monthly_usd=res.monthly_cost_low,
+                storage=storage,
+                total_monthly_usd=res.total_monthly_usd,
+                notes=[
+                    "Pay-as-you-go pricing (real Azure Retail Prices API)",
+                    f"Region: {region} (Linux Consumption)",
+                    (
+                        "Azure Hybrid Benefit not applied; "
+                        "Premium SSD Managed Disks baseline ($0.0576/GB-mo)"
+                    ),
+                ],
+            )
+        except Exception as exc:
+            logger.warning(
+                "azure_pricing_async_fetch_failed_falling_back",
+                extra={"error": str(exc), "region": region},
+            )
+            return self._azure_estimate(req)
 
 
 

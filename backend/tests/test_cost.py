@@ -109,6 +109,143 @@ def unauth_client() -> TestClient:
         yield c
 
 
+@pytest.fixture(autouse=True)
+def mock_cloud_pricing_services() -> Any:
+    """Ensure no live network calls to AWS or Azure pricing APIs during cost tests."""
+    from datetime import UTC, datetime
+
+    from app.services.pricing.aws_pricing_service import (
+        _CACHE as _AWS_CACHE,
+    )
+    from app.services.pricing.aws_pricing_service import (
+        AWSEC2InstancePrice,
+    )
+    from app.services.pricing.azure_pricing_service import (
+        _CACHE as _AZURE_CACHE,
+    )
+    from app.services.pricing.azure_pricing_service import (
+        AzureVMInstancePrice,
+    )
+
+    mock_aws_instances = [
+        AWSEC2InstancePrice(
+            sku="AWS-T3-MICRO",
+            instance_type="t3.micro",
+            vcpus=1,
+            memory_gb=1.0,
+            price_per_hour_usd=0.0104,
+            region_code="us-east-1",
+        ),
+        AWSEC2InstancePrice(
+            sku="AWS-T3-SMALL",
+            instance_type="t3.small",
+            vcpus=2,
+            memory_gb=2.0,
+            price_per_hour_usd=0.0208,
+            region_code="us-east-1",
+        ),
+        AWSEC2InstancePrice(
+            sku="AWS-T3-MEDIUM",
+            instance_type="t3.medium",
+            vcpus=2,
+            memory_gb=4.0,
+            price_per_hour_usd=0.0416,
+            region_code="us-east-1",
+        ),
+        AWSEC2InstancePrice(
+            sku="AWS-T3-XLARGE",
+            instance_type="t3.xlarge",
+            vcpus=4,
+            memory_gb=16.0,
+            price_per_hour_usd=0.1664,
+            region_code="us-east-1",
+        ),
+        AWSEC2InstancePrice(
+            sku="AWS-T3-2XLARGE",
+            instance_type="t3.2xlarge",
+            vcpus=8,
+            memory_gb=32.0,
+            price_per_hour_usd=0.3328,
+            region_code="us-east-1",
+        ),
+    ]
+
+    mock_azure_instances = [
+        AzureVMInstancePrice(
+            arm_sku_name="Standard_B1s",
+            sku_name="B1s",
+            meter_name="B1s",
+            product_name="Virtual Machines BS Series",
+            vcpus=1,
+            memory_gb=1.0,
+            price_per_hour_usd=0.0104,
+            region_code="eastus",
+        ),
+        AzureVMInstancePrice(
+            arm_sku_name="Standard_B2s",
+            sku_name="B2s",
+            meter_name="B2s",
+            product_name="Virtual Machines BS Series",
+            vcpus=2,
+            memory_gb=4.0,
+            price_per_hour_usd=0.0416,
+            region_code="eastus",
+        ),
+        AzureVMInstancePrice(
+            arm_sku_name="Standard_D2s_v3",
+            sku_name="D2s v3",
+            meter_name="D2s v3",
+            product_name="Virtual Machines Dsv3 Series",
+            vcpus=2,
+            memory_gb=8.0,
+            price_per_hour_usd=0.096,
+            region_code="eastus",
+        ),
+        AzureVMInstancePrice(
+            arm_sku_name="Standard_D4s_v5",
+            sku_name="D4s v5",
+            meter_name="D4s v5",
+            product_name="Virtual Machines Dsv5 Series",
+            vcpus=4,
+            memory_gb=16.0,
+            price_per_hour_usd=0.192,
+            region_code="eastus",
+        ),
+        AzureVMInstancePrice(
+            arm_sku_name="Standard_D8s_v5",
+            sku_name="D8s v5",
+            meter_name="D8s v5",
+            product_name="Virtual Machines Dsv5 Series",
+            vcpus=8,
+            memory_gb=32.0,
+            price_per_hour_usd=0.384,
+            region_code="eastus",
+        ),
+    ]
+
+    now = datetime.now(UTC)
+    _AWS_CACHE["us-east-1"] = (now, mock_aws_instances)
+    _AZURE_CACHE["eastus"] = (now, mock_azure_instances)
+
+    with (
+        patch(
+            "app.services.pricing.aws_pricing_service.aws_pricing_service.fetch_price_list",
+            new_callable=AsyncMock,
+            return_value=mock_aws_instances,
+        ),
+        patch(
+            "app.services.pricing.azure_pricing_service.azure_pricing_service.fetch_price_list",
+            new_callable=AsyncMock,
+            return_value=mock_azure_instances,
+        ),
+    ):
+        yield
+
+    _AWS_CACHE.clear()
+    _AZURE_CACHE.clear()
+
+
+
 # =============================================================================
 # Minimal valid request body
 # =============================================================================

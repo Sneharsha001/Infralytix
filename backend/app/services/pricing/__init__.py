@@ -9,9 +9,21 @@ from app.services.pricing.aws_pricing_service import (
     AWSEstimateResult,
     AWSPricingService,
     aws_pricing_service,
-    clear_cache,
     parse_memory_gb,
     parse_vcpu,
+)
+from app.services.pricing.aws_pricing_service import (
+    clear_cache as clear_aws_cache,
+)
+from app.services.pricing.azure_pricing_service import (
+    AzureEstimateResult,
+    AzurePricingService,
+    AzureVMInstancePrice,
+    azure_pricing_service,
+    parse_azure_sku_spec,
+)
+from app.services.pricing.azure_pricing_service import (
+    clear_cache as clear_azure_cache,
 )
 from app.services.pricing.region_mapping import (
     PROVIDER_REGION_MAPPINGS,
@@ -26,10 +38,16 @@ __all__ = [
     "AWSEC2InstancePrice",
     "AWSEstimateResult",
     "AWSPricingService",
+    "AzureEstimateResult",
+    "AzurePricingService",
+    "AzureVMInstancePrice",
     "PROVIDER_REGION_MAPPINGS",
     "VALID_REGION_PREFERENCES",
     "aws_pricing_service",
-    "clear_cache",
+    "azure_pricing_service",
+    "clear_aws_cache",
+    "clear_azure_cache",
+    "parse_azure_sku_spec",
     "parse_memory_gb",
     "parse_vcpu",
     "resolve_aws_region",

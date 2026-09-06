@@ -266,17 +266,37 @@ VALID_REQUEST: dict[str, Any] = {
 # =============================================================================
 
 class TestAuthGuards:
-    """Unauthenticated requests must be rejected with 401."""
+    """Protected endpoints require auth, but public cost estimation does not."""
 
-    def test_estimate_requires_auth(self, unauth_client: TestClient) -> None:
-        response = unauth_client.post("/api/v1/cost/estimate", json=VALID_REQUEST)
-        assert response.status_code == 401
+    def test_estimate_unauthenticated_allowed(self, unauth_client: TestClient) -> None:
+        """Cost estimation does not require authentication per spec."""
+        with patch(
+            "app.api.v1.endpoints.cost.CostAIService.suggest",
+            new_callable=AsyncMock,
+            return_value="Rule-based suggestion for public user.",
+        ):
+            response = unauth_client.post("/api/v1/cost/estimate", json=VALID_REQUEST)
+        assert response.status_code == 200
+        data = response.json()
+        assert "result" in data
+        assert len(data["result"]["providers"]) == 3
+
+    def test_cost_comparison_alias_unauthenticated_allowed(
+        self, unauth_client: TestClient
+    ) -> None:
+        """Direct /cost-comparison alias also allows unauthenticated calls."""
+        response = unauth_client.post("/api/v1/cost-comparison", json=VALID_REQUEST)
+        assert response.status_code == 200
+        data = response.json()
+        assert "estimates" in data or "result" in data
 
     def test_list_requires_auth(self, unauth_client: TestClient) -> None:
+        """Saved estimate history is private to the authenticated user."""
         response = unauth_client.get("/api/v1/cost/estimates")
         assert response.status_code == 401
 
     def test_get_by_id_requires_auth(self, unauth_client: TestClient) -> None:
+        """Retrieving saved estimate runs requires authentication."""
         fake_id = str(uuid.uuid4())
         response = unauth_client.get(f"/api/v1/cost/estimates/{fake_id}")
         assert response.status_code == 401

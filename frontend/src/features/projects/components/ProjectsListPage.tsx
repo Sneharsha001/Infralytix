@@ -152,7 +152,8 @@ export const ProjectsListPage: React.FC = () => {
       {!isLoading && projects.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => {
-            const analysis = project.latest_run?.output_data
+            const rawData = project.latest_run?.output_data
+            const analysis = rawData && 'total_loc' in rawData ? rawData : undefined
             const hasRun = !!project.latest_run
             const isCompleted = project.latest_run?.status === 'completed'
 

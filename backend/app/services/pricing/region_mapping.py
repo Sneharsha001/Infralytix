@@ -12,27 +12,38 @@ from __future__ import annotations
 from typing import Final
 
 # Canonical high-level region preferences accepted by the platform
-VALID_REGION_PREFERENCES: Final[tuple[str, ...]] = ("us", "eu", "asia")
+VALID_REGION_PREFERENCES: Final[tuple[str, ...]] = (
+    "us", "us-east", "us-west", "eu", "eu-west", "asia"
+)
 
 # Provider regional identifier mapping
 # Maps loose geographic preferences to default primary datacenter regions:
-#   - AWS: us-east-1 (N. Virginia), eu-west-1 (Ireland), ap-southeast-1 (Singapore)
-#   - GCP: us-central1 (Iowa), europe-west1 (Belgium), asia-east1 (Taiwan)
-#   - Azure: eastus (Virginia), westeurope (Netherlands), southeastasia (Singapore)
+#   - AWS: us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland), ap-southeast-1 (Singapore)
+#   - GCP: us-central1 (Iowa), us-east4 (N. Virginia), us-west1 (Oregon), europe-west1 (Belgium), asia-east1 (Taiwan)
+#   - Azure: eastus (Virginia), westus2 (Washington), westeurope (Netherlands), southeastasia (Singapore)
 PROVIDER_REGION_MAPPINGS: Final[dict[str, dict[str, str]]] = {
     "aws": {
         "us": "us-east-1",
+        "us-east": "us-east-1",
+        "us-west": "us-west-2",
         "eu": "eu-west-1",
+        "eu-west": "eu-west-1",
         "asia": "ap-southeast-1",
     },
     "gcp": {
         "us": "us-central1",
+        "us-east": "us-east4",
+        "us-west": "us-west1",
         "eu": "europe-west1",
+        "eu-west": "europe-west1",
         "asia": "asia-east1",
     },
     "azure": {
         "us": "eastus",
+        "us-east": "eastus",
+        "us-west": "westus2",
         "eu": "westeurope",
+        "eu-west": "westeurope",
         "asia": "southeastasia",
     },
 }

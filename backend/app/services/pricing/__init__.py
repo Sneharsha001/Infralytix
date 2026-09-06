@@ -25,6 +25,11 @@ from app.services.pricing.azure_pricing_service import (
 from app.services.pricing.azure_pricing_service import (
     clear_cache as clear_azure_cache,
 )
+from app.services.pricing.gcp_pricing_service import (
+    GCPInstancePrice,
+    GCPPricingService,
+    gcp_pricing_service,
+)
 from app.services.pricing.region_mapping import (
     PROVIDER_REGION_MAPPINGS,
     VALID_REGION_PREFERENCES,
@@ -41,6 +46,9 @@ __all__ = [
     "AzureEstimateResult",
     "AzurePricingService",
     "AzureVMInstancePrice",
+    "GCPInstancePrice",
+    "GCPPricingService",
+    "gcp_pricing_service",
     "PROVIDER_REGION_MAPPINGS",
     "VALID_REGION_PREFERENCES",
     "aws_pricing_service",

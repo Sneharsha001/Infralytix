@@ -76,6 +76,34 @@ async def get_current_user(
     return user
 
 
+async def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_bearer),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """
+    Extract and authenticate current user if Bearer token is provided.
+    Returns None if no token is provided or if token is invalid/expired.
+    Does not raise 401.
+    """
+    if not credentials or not credentials.credentials:
+        return None
+
+    try:
+        token = credentials.credentials
+        payload = auth_service.decode_token(token, expected_type="access")
+        sub = payload.get("sub")
+        if not sub:
+            return None
+        user_id = uuid.UUID(sub)
+        repo = UserRepository(db)
+        user = await repo.get_by_id(user_id)
+        if not user or not user.is_active:
+            return None
+        return user
+    except Exception:
+        return None
+
+
 def require_role(*allowed_roles: UserRole) -> Callable[..., Any]:
     """
     Generate an RBAC dependency that permits only specified roles.

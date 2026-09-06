@@ -32,7 +32,8 @@ export const DashboardPage: React.FC = () => {
   }, [])
 
   const totalLoc = projects.reduce((acc, p) => {
-    return acc + (p.latest_run?.output_data?.total_loc || 0)
+    const data = p.latest_run?.output_data
+    return acc + (data && 'total_loc' in data ? (data.total_loc || 0) : 0)
   }, 0)
 
   const totalAnalyzed = projects.filter(
@@ -125,7 +126,10 @@ export const DashboardPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {projects.slice(0, 3).map((p) => {
-              const analysis = p.latest_run?.output_data
+              const analysis =
+                p.latest_run?.output_data && 'total_loc' in p.latest_run.output_data
+                  ? p.latest_run.output_data
+                  : undefined
               return (
                 <div key={p.id} className="glass-card p-5 flex flex-col justify-between">
                   <div>

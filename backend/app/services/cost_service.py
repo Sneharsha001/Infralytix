@@ -52,13 +52,10 @@ from app.services.pricing.region_mapping import (
 logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
-# Static Price Catalogues
+# Static Price Catalogues (GCP-only fallback)
 # ---------------------------------------------------------------------------
-# Format: (instance_type, vcpus, memory_gb, price_per_hour_usd)
-# Sources:
-#   AWS    : https://aws.amazon.com/ec2/pricing/on-demand/ (us-east-1, Linux)
-#   GCP    : https://cloud.google.com/compute/vm-instance-pricing (us-central1)
-#   Azure  : https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/ (eastus)
+# Note: Static catalogue fallback is strictly GCP-only when GCP_API_KEY is unset.
+# AWS and Azure evaluate against their official live pricing APIs directly.
 
 @dataclass(frozen=True)
 class _InstanceSpec:
@@ -67,28 +64,6 @@ class _InstanceSpec:
     memory_gb: float
     price_per_hour_usd: float
 
-
-_AWS_CATALOGUE: list[_InstanceSpec] = [
-    _InstanceSpec("t3.micro",    1,   1.0,  0.0104),
-    _InstanceSpec("t3.small",    2,   2.0,  0.0208),
-    _InstanceSpec("t3.medium",   2,   4.0,  0.0416),
-    _InstanceSpec("t3.large",    2,   8.0,  0.0832),
-    _InstanceSpec("t3.xlarge",   4,  16.0,  0.1664),
-    _InstanceSpec("t3.2xlarge",  8,  32.0,  0.3328),
-    _InstanceSpec("m5.large",    2,   8.0,  0.0960),
-    _InstanceSpec("m5.xlarge",   4,  16.0,  0.1920),
-    _InstanceSpec("m5.2xlarge",  8,  32.0,  0.3840),
-    _InstanceSpec("m5.4xlarge", 16,  64.0,  0.7680),
-    _InstanceSpec("m5.8xlarge", 32, 128.0,  1.5360),
-    _InstanceSpec("c5.large",    2,   4.0,  0.0850),
-    _InstanceSpec("c5.xlarge",   4,   8.0,  0.1700),
-    _InstanceSpec("c5.2xlarge",  8,  16.0,  0.3400),
-    _InstanceSpec("c5.4xlarge", 16,  32.0,  0.6800),
-    _InstanceSpec("r5.large",    2,  16.0,  0.1260),
-    _InstanceSpec("r5.xlarge",   4,  32.0,  0.2520),
-    _InstanceSpec("r5.2xlarge",  8,  64.0,  0.5040),
-    _InstanceSpec("r5.4xlarge", 16, 128.0,  1.0080),
-]
 
 _GCP_CATALOGUE: list[_InstanceSpec] = [
     _InstanceSpec("e2-micro",       2,   1.0,  0.0084),
@@ -107,27 +82,6 @@ _GCP_CATALOGUE: list[_InstanceSpec] = [
     _InstanceSpec("c2-standard-8",  8,  32.0,  0.4176),
     _InstanceSpec("c2-standard-16",16,  64.0,  0.8352),
     _InstanceSpec("m2-ultramem-208", 208, 5888.0, 24.1726),
-]
-
-_AZURE_CATALOGUE: list[_InstanceSpec] = [
-    _InstanceSpec("B1s",   1,   1.0,  0.0104),
-    _InstanceSpec("B1ms",  1,   2.0,  0.0207),
-    _InstanceSpec("B2s",   2,   4.0,  0.0416),
-    _InstanceSpec("B2ms",  2,   8.0,  0.0832),
-    _InstanceSpec("B4ms",  4,  16.0,  0.1664),
-    _InstanceSpec("B8ms",  8,  32.0,  0.3328),
-    _InstanceSpec("B16ms",16,  64.0,  0.6656),
-    _InstanceSpec("D2s_v3", 2,   8.0,  0.0960),
-    _InstanceSpec("D4s_v3", 4,  16.0,  0.1920),
-    _InstanceSpec("D8s_v3", 8,  32.0,  0.3840),
-    _InstanceSpec("D16s_v3",16,  64.0,  0.7680),
-    _InstanceSpec("D32s_v3",32, 128.0,  1.5360),
-    _InstanceSpec("F2s_v2", 2,   4.0,  0.0846),
-    _InstanceSpec("F4s_v2", 4,   8.0,  0.1692),
-    _InstanceSpec("F8s_v2", 8,  16.0,  0.3384),
-    _InstanceSpec("E2s_v3", 2,  16.0,  0.1260),
-    _InstanceSpec("E4s_v3", 4,  32.0,  0.2520),
-    _InstanceSpec("E8s_v3", 8,  64.0,  0.5040),
 ]
 
 
@@ -161,7 +115,7 @@ class CostCalculatorService:
 
         Returns:
             List of ProviderEstimate objects (one per requested provider),
-            sorted by total_monthly_usd ascending.
+            sorted by total_monthly_usd ascending (available providers first).
         """
         results: list[ProviderEstimate] = []
 
@@ -172,8 +126,7 @@ class CostCalculatorService:
         if "azure" in request.providers:
             results.append(self._azure_estimate(request))
 
-        # Sort cheapest-first for consistent UX
-        results.sort(key=lambda e: e.total_monthly_usd)
+        results.sort(key=lambda e: (0 if self._is_available(e) else 1, e.total_monthly_usd))
         return results
 
     async def compute_async(
@@ -185,8 +138,8 @@ class CostCalculatorService:
         Return a ProviderEstimate for each requested provider asynchronously.
 
         Integrates real live/cached AWS and Azure Pricing Services, executing
-        remote network requests concurrently via asyncio.gather, with
-        graceful fallback to deterministic static catalogues.
+        remote network requests concurrently via asyncio.gather, without
+        silent static fallbacks.
         """
         results: list[ProviderEstimate] = []
         remote_tasks: list[asyncio.Task[ProviderEstimate]] = []
@@ -207,60 +160,65 @@ class CostCalculatorService:
         if "gcp" in request.providers:
             results.append(self._gcp_estimate(request))
 
-        results.sort(key=lambda e: e.total_monthly_usd)
+        results.sort(key=lambda e: (0 if self._is_available(e) else 1, e.total_monthly_usd))
         return results
+
+    @staticmethod
+    def _is_available(est: ProviderEstimate) -> bool:
+        """Check if an estimate was successfully priced."""
+        return not any(
+            "unavailable" in n.lower() or "failed" in n.lower()
+            for n in est.notes
+        ) and est.total_monthly_usd > 0.0
 
     # ── Per-Provider Estimators ───────────────────────────────────────────
 
     def _aws_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
         region = resolve_aws_region(req.region_preference)
-        # Check if aws_pricing_service cache has live parsed instances for this region
         if region in _AWS_CACHE:
             _, cached_instances = _AWS_CACHE[region]
             if cached_instances:
                 selected_inst = aws_pricing_service.select_instance(
                     cached_instances, req.cpu_cores, req.memory_gb
                 )
-                instance_type = selected_inst.instance_type
-                vcpus = selected_inst.vcpus
-                memory_gb = selected_inst.memory_gb
                 price_per_hour = selected_inst.price_per_hour_usd
-            else:
-                instance = _select_instance(_AWS_CATALOGUE, req.cpu_cores, req.memory_gb)
-                instance_type = instance.instance_type
-                vcpus = instance.vcpus
-                memory_gb = instance.memory_gb
-                price_per_hour = instance.price_per_hour_usd
-        else:
-            instance = _select_instance(_AWS_CATALOGUE, req.cpu_cores, req.memory_gb)
-            instance_type = instance.instance_type
-            vcpus = instance.vcpus
-            memory_gb = instance.memory_gb
-            price_per_hour = instance.price_per_hour_usd
+                compute_cost = round(price_per_hour * req.hours_per_month, 4)
+                storage = _build_storage("gp3", _AWS_STORAGE_PRICE_PER_GB, req.storage_gb)
+                return ProviderEstimate(
+                    provider="aws",
+                    provider_display="Amazon Web Services",
+                    region=region,
+                    instance=InstanceOption(
+                        instance_type=selected_inst.instance_type,
+                        vcpus=selected_inst.vcpus,
+                        memory_gb=selected_inst.memory_gb,
+                        price_per_hour_usd=price_per_hour,
+                    ),
+                    compute_monthly_usd=compute_cost,
+                    storage=storage,
+                    total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
+                    notes=[
+                        "On-demand pricing (real AWS Price List Offer Index)",
+                        f"Region: {region} (Linux Shared)",
+                        "Data transfer costs not included; EBS gp3 storage baseline ($0.08/GB-mo)",
+                    ],
+                )
 
-        compute_cost = round(price_per_hour * req.hours_per_month, 4)
-        storage = _build_storage(
-            "gp3",
-            _AWS_STORAGE_PRICE_PER_GB,
-            req.storage_gb,
-        )
         return ProviderEstimate(
             provider="aws",
             provider_display="Amazon Web Services",
             region=region,
             instance=InstanceOption(
-                instance_type=instance_type,
-                vcpus=vcpus,
-                memory_gb=memory_gb,
-                price_per_hour_usd=price_per_hour,
+                instance_type="unavailable",
+                vcpus=0,
+                memory_gb=0.0,
+                price_per_hour_usd=0.0,
             ),
-            compute_monthly_usd=compute_cost,
-            storage=storage,
-            total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
+            compute_monthly_usd=0.0,
+            storage=_build_storage("gp3", 0.0, 0),
+            total_monthly_usd=0.0,
             notes=[
-                "On-demand pricing (Linux AMI)",
-                f"Region: {region}",
-                "Data transfer costs not included; EBS gp3 storage baseline ($0.08/GB-mo)",
+                "Pricing unavailable: cache empty; asynchronous live fetch required",
             ],
         )
 
@@ -269,7 +227,7 @@ class CostCalculatorService:
         req: CostEstimateRequest,
         client: httpx.AsyncClient | None = None,
     ) -> ProviderEstimate:
-        """Evaluate AWS using live/cached AWSPricingService with fallback."""
+        """Evaluate AWS using live/cached AWSPricingService without silent fallback."""
         region = resolve_aws_region(req.region_preference)
         try:
             res = await aws_pricing_service.get_instance_price(
@@ -303,10 +261,26 @@ class CostCalculatorService:
             )
         except Exception as exc:
             logger.warning(
-                "aws_pricing_async_fetch_failed_falling_back",
+                "aws_pricing_async_fetch_failed",
                 extra={"error": str(exc), "region": region},
             )
-            return self._aws_estimate(req)
+            return ProviderEstimate(
+                provider="aws",
+                provider_display="Amazon Web Services",
+                region=region,
+                instance=InstanceOption(
+                    instance_type="unavailable",
+                    vcpus=0,
+                    memory_gb=0.0,
+                    price_per_hour_usd=0.0,
+                ),
+                compute_monthly_usd=0.0,
+                storage=_build_storage("gp3", 0.0, 0),
+                total_monthly_usd=0.0,
+                notes=[
+                    f"Pricing unavailable: Live AWS Price List API call failed ({exc})",
+                ],
+            )
 
     def _gcp_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
         instance = _select_instance(
@@ -341,56 +315,57 @@ class CostCalculatorService:
 
     def _azure_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
         region = resolve_azure_region(req.region_preference)
-        # Check if azure_pricing_service cache has live parsed instances for this region
         if region in _AZURE_CACHE:
             _, cached_instances = _AZURE_CACHE[region]
             if cached_instances:
                 selected_inst = azure_pricing_service.select_instance(
                     cached_instances, req.cpu_cores, req.memory_gb
                 )
-                instance_type = selected_inst.arm_sku_name
-                vcpus = selected_inst.vcpus
-                memory_gb = selected_inst.memory_gb
                 price_per_hour = selected_inst.price_per_hour_usd
-            else:
-                instance = _select_instance(_AZURE_CATALOGUE, req.cpu_cores, req.memory_gb)
-                instance_type = instance.instance_type
-                vcpus = instance.vcpus
-                memory_gb = instance.memory_gb
-                price_per_hour = instance.price_per_hour_usd
-        else:
-            instance = _select_instance(_AZURE_CATALOGUE, req.cpu_cores, req.memory_gb)
-            instance_type = instance.instance_type
-            vcpus = instance.vcpus
-            memory_gb = instance.memory_gb
-            price_per_hour = instance.price_per_hour_usd
+                compute_cost = round(price_per_hour * req.hours_per_month, 4)
+                storage = _build_storage(
+                    "Premium SSD LRS",
+                    _AZURE_STORAGE_PRICE_PER_GB,
+                    req.storage_gb,
+                )
+                return ProviderEstimate(
+                    provider="azure",
+                    provider_display="Microsoft Azure",
+                    region=region,
+                    instance=InstanceOption(
+                        instance_type=selected_inst.arm_sku_name,
+                        vcpus=selected_inst.vcpus,
+                        memory_gb=selected_inst.memory_gb,
+                        price_per_hour_usd=price_per_hour,
+                    ),
+                    compute_monthly_usd=compute_cost,
+                    storage=storage,
+                    total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
+                    notes=[
+                        "Pay-as-you-go pricing (real Azure Retail Prices API)",
+                        f"Region: {region} (Linux Consumption)",
+                        (
+                            "Azure Hybrid Benefit not applied; "
+                            "Premium SSD Managed Disks baseline ($0.0576/GB-mo)"
+                        ),
+                    ],
+                )
 
-        compute_cost = round(price_per_hour * req.hours_per_month, 4)
-        storage = _build_storage(
-            "Premium SSD LRS",
-            _AZURE_STORAGE_PRICE_PER_GB,
-            req.storage_gb,
-        )
         return ProviderEstimate(
             provider="azure",
             provider_display="Microsoft Azure",
             region=region,
             instance=InstanceOption(
-                instance_type=instance_type,
-                vcpus=vcpus,
-                memory_gb=memory_gb,
-                price_per_hour_usd=price_per_hour,
+                instance_type="unavailable",
+                vcpus=0,
+                memory_gb=0.0,
+                price_per_hour_usd=0.0,
             ),
-            compute_monthly_usd=compute_cost,
-            storage=storage,
-            total_monthly_usd=round(compute_cost + storage.total_cost_usd, 4),
+            compute_monthly_usd=0.0,
+            storage=_build_storage("Premium SSD LRS", 0.0, 0),
+            total_monthly_usd=0.0,
             notes=[
-                "Pay-as-you-go pricing (Linux VM)",
-                f"Region: {region}",
-                (
-                    "Azure Hybrid Benefit not applied; "
-                    "Premium SSD Managed Disks baseline ($0.0576/GB-mo)"
-                ),
+                "Pricing unavailable: cache empty; asynchronous live fetch required",
             ],
         )
 
@@ -399,7 +374,7 @@ class CostCalculatorService:
         req: CostEstimateRequest,
         client: httpx.AsyncClient | None = None,
     ) -> ProviderEstimate:
-        """Evaluate Azure using live/cached AzurePricingService with fallback."""
+        """Evaluate Azure using live/cached AzurePricingService without silent fallback."""
         region = resolve_azure_region(req.region_preference)
         try:
             res = await azure_pricing_service.get_instance_price(
@@ -440,10 +415,26 @@ class CostCalculatorService:
             )
         except Exception as exc:
             logger.warning(
-                "azure_pricing_async_fetch_failed_falling_back",
+                "azure_pricing_async_fetch_failed",
                 extra={"error": str(exc), "region": region},
             )
-            return self._azure_estimate(req)
+            return ProviderEstimate(
+                provider="azure",
+                provider_display="Microsoft Azure",
+                region=region,
+                instance=InstanceOption(
+                    instance_type="unavailable",
+                    vcpus=0,
+                    memory_gb=0.0,
+                    price_per_hour_usd=0.0,
+                ),
+                compute_monthly_usd=0.0,
+                storage=_build_storage("Premium SSD LRS", 0.0, 0),
+                total_monthly_usd=0.0,
+                notes=[
+                    f"Pricing unavailable: Live Azure Retail Prices API call failed ({exc})",
+                ],
+            )
 
 
 

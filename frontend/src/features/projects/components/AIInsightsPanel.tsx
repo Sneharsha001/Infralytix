@@ -24,11 +24,6 @@ const SEVERITY_CONFIG = {
   critical: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', dot: '#f87171', label: 'Critical' },
 }
 
-const CATEGORY_ICON: Record<string, string> = {
-  pattern: '##',
-  concern: '!',
-  recommendation: '>',
-}
 
 function InsightCard({ insight }: { insight: ArchitectureInsight }) {
   const sev = SEVERITY_CONFIG[insight.severity] ?? SEVERITY_CONFIG.info

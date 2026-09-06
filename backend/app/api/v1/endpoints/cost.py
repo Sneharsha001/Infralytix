@@ -16,6 +16,7 @@ Design notes:
 from __future__ import annotations
 
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -23,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
 from app.logging.logging import get_logger
-from app.middlewares.auth_middleware import get_current_user
+from app.middlewares.auth_middleware import get_current_user, get_optional_current_user
 from app.models.agent_run import AgentRunStatus
 from app.models.user import User
 from app.repositories.agent_run_repository import AgentRunRepository
@@ -43,7 +44,7 @@ _AGENT_TYPE = "cost"
 
 
 # ---------------------------------------------------------------------------
-# POST /cost/estimate
+# POST /cost/estimate & POST /cost/cost-comparison
 # ---------------------------------------------------------------------------
 
 
@@ -55,42 +56,52 @@ _AGENT_TYPE = "cost"
     description=(
         "Computes monthly cost estimates for AWS, GCP, and/or Azure based on the "
         "provided workload specification (vCPUs, RAM, storage, runtime hours). "
-        "Appends an AI-generated recommendation. Result is persisted and retrievable "
-        "via GET /cost/estimates."
+        "Appends an AI-generated recommendation. Authentication is optional; if "
+        "authenticated, the result is saved to the user's estimate history."
     ),
+)
+@router.post(
+    "/cost-comparison",
+    response_model=CostEstimateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Run a multi-cloud cost comparison (alias)",
+    description="Alias for /estimate.",
 )
 async def create_estimate(
     body: CostEstimateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> CostEstimateResponse:
-    """Compute and persist a multi-cloud cost estimate."""
-    run_repo = AgentRunRepository(db)
+    """Compute and optionally persist a multi-cloud cost estimate."""
+    user_label = str(current_user.id) if current_user else "anonymous"
 
     logger.info(
         "Starting cost estimate",
         extra={
-            "user_id": str(current_user.id),
+            "user_id": user_label,
             "providers": body.providers,
             "cpu": body.cpu_cores,
             "memory_gb": body.memory_gb,
         },
     )
 
-    # Create AgentRun record in RUNNING state before computation
-    # (ensures partial results are tracked even if service raises)
-    # We need a project_id — cost estimates are not tied to a specific
-    # project, so we use the user's own UUID as a stable surrogate key.
-    # The actual user_id is captured on the User FK via get_current_user.
-    cost_run = await run_repo.create(
-        project_id=current_user.id,  # surrogate: user ID as project placeholder
-        agent_type=_AGENT_TYPE,
-        status=AgentRunStatus.RUNNING,
-    )
-    await db.commit()
+    run_repo = AgentRunRepository(db) if current_user else None
+    cost_run = None
+    cost_run_id = uuid.uuid4()
+    created_at = datetime.now(UTC)
+
+    if current_user and run_repo:
+        cost_run = await run_repo.create(
+            project_id=current_user.id,
+            agent_type=_AGENT_TYPE,
+            status=AgentRunStatus.RUNNING,
+        )
+        await db.commit()
+        cost_run_id = cost_run.id
+        created_at = cost_run.created_at
 
     try:
-        # 1. Price calculation (wired with live AWS pricing service + multi-cloud fallback)
+        # 1. Price calculation across clouds
         calculator = CostComparisonService()
         estimates = await calculator.compute_async(body)
 
@@ -104,46 +115,58 @@ async def create_estimate(
         ai_service = CostAIService()
         suggestion = await ai_service.suggest(body, estimates)
 
-        # 3. Assemble result
-        cheapest = estimates[0]
+        # 3. Assemble result (cheapest among available providers)
+        available = [
+            e
+            for e in estimates
+            if not any(
+                "unavailable" in n.lower() or "failed" in n.lower()
+                for n in e.notes
+            )
+            and e.total_monthly_usd > 0.0
+        ]
+        cheapest = available[0] if available else estimates[0]
         result = CostComparisonResult(
             providers=estimates,
             cheapest_provider=cheapest.provider,
             ai_suggestion=suggestion,
         )
 
-        # 4. Persist result payload in the AgentRun record
-        output: dict[str, Any] = {
-            "result": result.model_dump(mode="json"),
-            "workload_label": body.workload_label,
-        }
-        cost_run = await run_repo.update_status(
-            cost_run,
-            status=AgentRunStatus.COMPLETED,
-            output_data=output,
-        )
-        await db.commit()
-        await db.refresh(cost_run)
+        # 4. Persist result payload in the AgentRun record if authenticated
+        if current_user and run_repo and cost_run:
+            output: dict[str, Any] = {
+                "result": result.model_dump(mode="json"),
+                "workload_label": body.workload_label,
+            }
+            cost_run = await run_repo.update_status(
+                cost_run,
+                status=AgentRunStatus.COMPLETED,
+                output_data=output,
+            )
+            await db.commit()
+            await db.refresh(cost_run)
 
     except HTTPException:
-        await run_repo.update_status(
-            cost_run,
-            status=AgentRunStatus.FAILED,
-            error_message="Invalid provider selection",
-        )
-        await db.commit()
+        if current_user and run_repo and cost_run:
+            await run_repo.update_status(
+                cost_run,
+                status=AgentRunStatus.FAILED,
+                error_message="Invalid provider selection",
+            )
+            await db.commit()
         raise
     except Exception as exc:
         logger.error(
             "Cost estimate failed",
-            extra={"error": str(exc), "user_id": str(current_user.id)},
+            extra={"error": str(exc), "user_id": user_label},
         )
-        await run_repo.update_status(
-            cost_run,
-            status=AgentRunStatus.FAILED,
-            error_message=str(exc),
-        )
-        await db.commit()
+        if current_user and run_repo and cost_run:
+            await run_repo.update_status(
+                cost_run,
+                status=AgentRunStatus.FAILED,
+                error_message=str(exc),
+            )
+            await db.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Cost estimation failed. Please try again.",
@@ -152,16 +175,16 @@ async def create_estimate(
     logger.info(
         "Cost estimate completed",
         extra={
-            "run_id": str(cost_run.id),
+            "run_id": str(cost_run_id),
             "cheapest": cheapest.provider,
             "total_usd": cheapest.total_monthly_usd,
         },
     )
 
     return CostEstimateResponse(
-        id=cost_run.id,
+        id=cost_run_id,
         result=result,
-        created_at=cost_run.created_at,
+        created_at=created_at,
         workload_label=body.workload_label,
     )
 

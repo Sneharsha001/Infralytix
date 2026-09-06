@@ -130,79 +130,7 @@ class AzureEstimateResult:
     total_monthly_usd: float = 0.0
 
 
-# Fallback catalogue used when network is offline and cache is empty
-FALLBACK_AZURE_INSTANCES: list[AzureVMInstancePrice] = [
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_B1s",
-        sku_name="B1s",
-        meter_name="B1s",
-        product_name="Virtual Machines BS Series",
-        vcpus=1,
-        memory_gb=1.0,
-        price_per_hour_usd=0.0104,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_B2s",
-        sku_name="B2s",
-        meter_name="B2s",
-        product_name="Virtual Machines BS Series",
-        vcpus=2,
-        memory_gb=4.0,
-        price_per_hour_usd=0.0416,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_D2s_v3",
-        sku_name="D2s v3",
-        meter_name="D2s v3",
-        product_name="Virtual Machines Dsv3 Series",
-        vcpus=2,
-        memory_gb=8.0,
-        price_per_hour_usd=0.096,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_D4s_v5",
-        sku_name="D4s v5",
-        meter_name="D4s v5",
-        product_name="Virtual Machines Dsv5 Series",
-        vcpus=4,
-        memory_gb=16.0,
-        price_per_hour_usd=0.192,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_D8s_v5",
-        sku_name="D8s v5",
-        meter_name="D8s v5",
-        product_name="Virtual Machines Dsv5 Series",
-        vcpus=8,
-        memory_gb=32.0,
-        price_per_hour_usd=0.384,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_E2s_v5",
-        sku_name="E2s v5",
-        meter_name="E2s v5",
-        product_name="Virtual Machines Esv5 Series",
-        vcpus=2,
-        memory_gb=16.0,
-        price_per_hour_usd=0.126,
-        region_code="eastus",
-    ),
-    AzureVMInstancePrice(
-        arm_sku_name="Standard_F2s_v2",
-        sku_name="F2s v2",
-        meter_name="F2s v2",
-        product_name="Virtual Machines FSv2 Series",
-        vcpus=2,
-        memory_gb=4.0,
-        price_per_hour_usd=0.085,
-        region_code="eastus",
-    ),
-]
+
 
 
 # ---------------------------------------------------------------------------
@@ -490,13 +418,9 @@ class AzurePricingService:
             # If cache has any stale data, return it
             if canonical_region in _CACHE:
                 return _CACHE[canonical_region][1]
+            raise
 
-        # Fallback catalogue when remote call fails and cache is empty
-        logger.warning(
-            "azure_pricing_using_fallback_catalogue",
-            extra={"region_code": canonical_region},
-        )
-        return list(FALLBACK_AZURE_INSTANCES)
+        return []
 
     def select_instance(
         self,

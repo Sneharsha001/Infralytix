@@ -136,6 +136,7 @@ class Settings(BaseSettings):
     # ─── AI Agents (Sprint 4+) ────────────────────────────────────────────────
     GEMINI_API_KEY: str = Field(default="", description="Google Gemini API key")
     GEMINI_MODEL: str = Field(default="gemini-1.5-pro", description="Gemini model identifier")
+    GCP_API_KEY: str = Field(default="", description="Google Cloud Billing Catalog API key")
 
     # ─── Computed Properties ──────────────────────────────────────────────────
 

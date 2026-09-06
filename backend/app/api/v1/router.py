@@ -17,6 +17,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints.agents import router as agents_router
 from app.api.v1.endpoints.auth import router as auth_router
 from app.api.v1.endpoints.cost import router as cost_router
+from app.api.v1.endpoints.cost_comparison import router as cost_comparison_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.projects import router as projects_router
 
@@ -53,4 +54,11 @@ v1_router.include_router(
     prefix="/cost",
     tags=["Cost Comparison"],
 )
+
+v1_router.include_router(
+    cost_comparison_router,
+    prefix="/cost-comparison",
+    tags=["Cost Comparison"],
+)
+
 

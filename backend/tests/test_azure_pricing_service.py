@@ -433,22 +433,18 @@ class TestAzureCostCalculation:
         assert estimate.total_monthly_usd == expected_total
 
     @pytest.mark.asyncio
-    async def test_network_failure_uses_fallback_catalogue(self) -> None:
+    async def test_network_failure_raises_when_cache_empty(self) -> None:
         service = AzurePricingService()
 
         mock_client = AsyncMock()
-        mock_client.get.side_effect = Exception("Connection timed out")
+        mock_client.get.side_effect = RuntimeError("Connection timed out")
 
-        estimate = await service.get_instance_price(
-            region_code="eastus",
-            vcpus=2,
-            memory_gb=4.0,
-            storage_gb=50,
-            client=mock_client,
-        )
+        with pytest.raises(RuntimeError, match="Connection timed out"):
+            await service.get_instance_price(
+                region_code="eastus",
+                vcpus=2,
+                memory_gb=4.0,
+                storage_gb=50,
+                client=mock_client,
+            )
 
-        assert estimate.instance_type == "Standard_B2s"
-        assert estimate.vcpus == 2
-        assert estimate.memory_gb == 4.0
-        assert estimate.price_per_hour_usd == 0.0416
-        assert estimate.storage_gb == 50

@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 import re
 import shutil
 import zipfile
+from pathlib import Path
 
 from app.logging.logging import get_logger
 from app.schemas.project import DependencyFile, LanguageStat, RepositoryAnalysisResult
@@ -134,8 +134,10 @@ class RepositoryAnalysisService:
                 try:
                     # Python 3.9+ commonpath verification
                     common = os.path.commonpath([str(target_resolved), str(destination)])
-                except ValueError:
-                    raise ValueError(f"Zip slip security violation detected in: {member.filename}")
+                except ValueError as err:
+                    raise ValueError(
+                        f"Zip slip security violation detected in: {member.filename}"
+                    ) from err
                 if common != str(target_resolved):
                     raise ValueError(f"Zip slip security violation detected in: {member.filename}")
 
@@ -240,7 +242,7 @@ class RepositoryAnalysisService:
         """Count non-empty lines of code in file."""
         loc = 0
         try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 for line in f:
                     if line.strip():
                         loc += 1
@@ -255,7 +257,7 @@ class RepositoryAnalysisService:
 
         try:
             if filename == "package.json":
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     data = json.load(f)
                 deps: list[str] = []
                 if isinstance(data.get("dependencies"), dict):
@@ -270,7 +272,7 @@ class RepositoryAnalysisService:
 
             if filename == "requirements.txt":
                 deps = []
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     for line in f:
                         line = line.strip()
                         if line and not line.startswith("#") and not line.startswith("-"):
@@ -285,7 +287,7 @@ class RepositoryAnalysisService:
 
             if filename == "pyproject.toml":
                 deps = []
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     content = f.read()
                 # Basic regex extraction of dependencies list
                 dep_matches = re.findall(r'["\']([a-zA-Z0-9_-]+)(?:[><=~^].*)?["\']', content)
@@ -300,7 +302,7 @@ class RepositoryAnalysisService:
 
             if filename == "go.mod":
                 deps = []
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     for line in f:
                         line = line.strip()
                         if line.startswith("require ") and not line.endswith("("):
@@ -315,7 +317,7 @@ class RepositoryAnalysisService:
 
             if filename == "cargo.toml":
                 deps = []
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     in_deps = False
                     for line in f:
                         line = line.strip()

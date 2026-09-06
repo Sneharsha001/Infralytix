@@ -14,15 +14,12 @@ All database interactions are mocked so tests run without live MySQL.
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncGenerator, Generator
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.database.session import get_db
-from app.main import create_application
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
 from app.services.auth_service import auth_service

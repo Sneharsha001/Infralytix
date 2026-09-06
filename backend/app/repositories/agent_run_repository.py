@@ -6,8 +6,8 @@ Encapsulates database operations for AgentRun entities.
 
 from __future__ import annotations
 
-from typing import Any
 import uuid
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -55,6 +55,24 @@ class AgentRunRepository:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_latest_by_type(
+        self,
+        project_id: uuid.UUID,
+        agent_type: str,
+    ) -> AgentRun | None:
+        """Fetch the most recent agent run of a given type for a project."""
+        stmt = (
+            select(AgentRun)
+            .where(
+                AgentRun.project_id == project_id,
+                AgentRun.agent_type == agent_type,
+            )
+            .order_by(AgentRun.created_at.desc())
+            .limit(1)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def update_status(
         self,

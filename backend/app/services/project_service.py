@@ -7,9 +7,9 @@ and deterministic repository intelligence analysis pipelines.
 
 from __future__ import annotations
 
-from pathlib import Path
 import shutil
 import uuid
+from pathlib import Path
 
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -170,7 +170,11 @@ class ProjectService:
             error_text = str(e)
             logger.error(
                 "Repository analysis run failed",
-                extra={"project_id": str(project_id), "run_id": str(run.id), "error_message": error_text},
+                extra={
+                    "project_id": str(project_id),
+                    "run_id": str(run.id),
+                    "error_message": error_text,
+                },
             )
             run = await self.agent_run_repo.update_status(
                 run=run,

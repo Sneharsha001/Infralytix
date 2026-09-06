@@ -13,6 +13,9 @@ from app.schemas.auth import (
 )
 from app.schemas.project import (
     AgentRunResponse,
+    AIInsightResult,
+    ArchitectureInsight,
+    CodeHealthScore,
     DependencyFile,
     LanguageStat,
     ProjectCreate,
@@ -24,6 +27,9 @@ from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 __all__ = [
     "AgentRunResponse",
+    "AIInsightResult",
+    "ArchitectureInsight",
+    "CodeHealthScore",
     "DependencyFile",
     "LanguageStat",
     "ProjectCreate",

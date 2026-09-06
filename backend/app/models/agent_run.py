@@ -7,10 +7,10 @@ Defines an execution run of an AI agent or deterministic analyzer on a project.
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, Any
 import uuid
+from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import ForeignKey, JSON, String, Text, Uuid
+from sqlalchemy import JSON, ForeignKey, String, Text, Uuid
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

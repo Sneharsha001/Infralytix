@@ -6,14 +6,13 @@ Defines separate Request and Response schemas for projects, uploads, and agent r
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from typing import Any
-import uuid
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.agent_run import AgentRunStatus
-
 
 # ─── Request Schemas ─────────────────────────────────────────────────────────
 
@@ -22,7 +21,11 @@ class ProjectCreate(BaseModel):
     """Schema for creating a new project."""
 
     name: str = Field(..., min_length=1, max_length=120, description="Project name")
-    description: str | None = Field(default=None, max_length=1000, description="Project description")
+    description: str | None = Field(
+        default=None,
+        max_length=1000,
+        description="Project description",
+    )
     repo_name: str | None = Field(default=None, max_length=120, description="Repository name")
 
 
@@ -104,3 +107,53 @@ class ProjectResponse(BaseModel):
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last modification timestamp")
     latest_run: AgentRunResponse | None = Field(default=None, description="Most recent agent run")
+
+
+# ─── AI Insight Schemas (Phase 2) ────────────────────────────────────────────
+
+
+class CodeHealthScore(BaseModel):
+    """Composite health score broken down into sub-dimensions."""
+
+    overall: int = Field(..., ge=0, le=100, description="Overall code health score (0–100)")
+    maintainability: int = Field(..., ge=0, le=100, description="Maintainability sub-score")
+    complexity: int = Field(..., ge=0, le=100, description="Complexity sub-score (higher = simpler)")
+    test_coverage_estimate: int = Field(
+        ..., ge=0, le=100, description="Estimated test coverage score"
+    )
+    documentation: int = Field(..., ge=0, le=100, description="Documentation quality score")
+
+
+class ArchitectureInsight(BaseModel):
+    """A single architectural observation, concern, or recommendation."""
+
+    category: str = Field(
+        ...,
+        description="Insight type: 'pattern', 'concern', or 'recommendation'",
+    )
+    title: str = Field(..., description="Short insight title")
+    description: str = Field(..., description="Detailed explanation")
+    severity: str = Field(
+        ...,
+        description="Severity level: 'info', 'warning', or 'critical'",
+    )
+
+
+class AIInsightResult(BaseModel):
+    """Full structured output from the Gemini AI analysis agent."""
+
+    summary: str = Field(..., description="Executive summary of the repository")
+    health_score: CodeHealthScore = Field(..., description="Composite health score breakdown")
+    insights: list[ArchitectureInsight] = Field(
+        default_factory=list,
+        description="Architectural insights and observations",
+    )
+    tech_debt_indicators: list[str] = Field(
+        default_factory=list,
+        description="Identified technical debt signals",
+    )
+    recommended_next_steps: list[str] = Field(
+        default_factory=list,
+        description="Prioritized recommended actions",
+    )
+

@@ -56,6 +56,22 @@ export const AppShell: React.FC = () => {
               Dashboard
             </NavLink>
 
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-brand-600 text-white shadow-brand'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              Projects
+            </NavLink>
+
             <div className="pt-4 pb-2 px-3 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
               Simulation Modules
             </div>

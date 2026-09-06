@@ -13,13 +13,12 @@ Verifies:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 import io
-from pathlib import Path
-import tempfile
-from unittest.mock import AsyncMock, patch
 import uuid
 import zipfile
+from datetime import UTC, datetime
+from pathlib import Path
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,7 +28,6 @@ from app.models.project import Project
 from app.models.user import User, UserRole
 from app.services.analysis_service import RepositoryAnalysisService
 from app.services.auth_service import auth_service
-
 
 # ─── Shared Fixtures ─────────────────────────────────────────────────────────
 
@@ -309,15 +307,20 @@ class TestProjectUploadAndAnalysis:
         """Uploading a repository zip runs static analysis and completes AgentRun."""
         # Create an in-memory zip representing a real project
         zip_buffer = io.BytesIO()
+        py_code = (
+            "from fastapi import FastAPI\n\n"
+            "app = FastAPI()\n\n"
+            "@app.get('/')\n"
+            "def root():\n"
+            "    return {'ok': True}\n"
+        )
+        pkg_json = (
+            '{"name": "frontend", "dependencies": '
+            '{"react": "^19.0.0", "tailwindcss": "^3.4.0"}}'
+        )
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr(
-                "main.py",
-                "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get('/')\ndef root():\n    return {'ok': True}\n",
-            )
-            zf.writestr(
-                "package.json",
-                '{"name": "frontend", "dependencies": {"react": "^19.0.0", "tailwindcss": "^3.4.0"}}',
-            )
+            zf.writestr("main.py", py_code)
+            zf.writestr("package.json", pkg_json)
             zf.writestr("Dockerfile", "FROM python:3.12-slim\nWORKDIR /app\nCOPY . .\n")
 
         zip_buffer.seek(0)

@@ -5,19 +5,18 @@ This module is the single assembly point for all v1 endpoints.
 Adding a new feature = import its router here and include it.
 
 Current routers:
-    /health     — Service liveness and readiness checks
-
-Upcoming routers (added in future sprints):
-    /auth       — Registration, login, token refresh
-    /users      — User profile management
-    /projects   — Project CRUD
-    /agents     — AI agent invocation
-    /reports    — Report retrieval
+    /health       — Service liveness and readiness checks
+    /auth         — Registration, login, token refresh
+    /projects     — Project CRUD and repository upload
+    /projects     — AI agent invocation (analyze, analysis)
+    /cost         — Multi-cloud cost comparison with AI suggestion
 """
 
 from fastapi import APIRouter
 
+from app.api.v1.endpoints.agents import router as agents_router
 from app.api.v1.endpoints.auth import router as auth_router
+from app.api.v1.endpoints.cost import router as cost_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.projects import router as projects_router
 
@@ -42,6 +41,16 @@ v1_router.include_router(
     prefix="/projects",
     tags=["Projects"],
 )
-# v1_router.include_router(users_router, prefix="/users", tags=["Users"])
-# v1_router.include_router(agents_router, prefix="/agents", tags=["Agents"])
-# v1_router.include_router(reports_router, prefix="/reports", tags=["Reports"])
+
+v1_router.include_router(
+    agents_router,
+    prefix="/projects",
+    tags=["AI Agents"],
+)
+
+v1_router.include_router(
+    cost_router,
+    prefix="/cost",
+    tags=["Cost Comparison"],
+)
+

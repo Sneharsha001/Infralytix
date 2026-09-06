@@ -1,7 +1,7 @@
-# Sprint Final Review — Multi-Cloud Cost Comparison
+# Sprint Final Review — Multi-Cloud Cost Comparison Tool
 
-**Sprint Name**: Multi-Cloud Cost Comparison  
-**Sprint Number**: Final (Feature Sprint)  
+**Sprint Name**: Multi-Cloud Cost Comparison & Workload Optimization  
+**Sprint Number**: Final  
 **Date Completed**: 2026-09-06  
 **Sprint Duration**: 1 session  
 **Status**: ✅ Complete
@@ -10,168 +10,93 @@
 
 ## Objective
 
-Implement the sole in-scope feature: a multi-cloud cost estimator (AWS / GCP / Azure) with an
-AI-generated recommendation powered by Gemini, integrated end-to-end from a FastAPI backend
-to a React 19 + TypeScript + Tailwind frontend. All existing tests must continue to pass.
-
----
-
-## Scope Restrictions Observed
-
-- Only the cost comparison feature was implemented. Auth, repository intelligence, Docker review,
-  and all other modules referenced in earlier planning documents were explicitly excluded.
-- The implementation adds net-new files only — no pre-existing logic was altered except:
-  - `app/api/v1/router.py` — added `cost_router` registration
-  - `src/App.tsx` — added `/cost` route
-  - `src/features/dashboard/DashboardPage.tsx` — added Cost Estimator link in capabilities panel
+Deliver a focused, production-ready multi-cloud cost comparison application comparing real-time infrastructure pricing across Amazon Web Services (AWS), Microsoft Azure, and Google Cloud Platform (GCP). The system queries live cloud pricing APIs concurrently, matches optimal instance types and attached block storage for user-specified compute workloads (vCPU, RAM, storage, region, duration), ranks the options cheapest-first, synthesizes architectural advice using Google Gemini, and delivers an intuitive, single-page React 19 interface.
 
 ---
 
 ## Completed Features
 
-| Artefact | Status | Notes |
+| Component / File | Status | Notes |
 |---|---|---|
-| `app/schemas/cost.py` | ✅ | Pydantic v2 request/response schemas — `CostEstimateRequest`, `ProviderEstimate`, `CostComparisonResult`, `CostEstimateResponse`, `CostEstimateListItem` |
-| `app/services/cost_service.py` | ✅ | `CostCalculatorService` — deterministic, static-table pricing (AWS/GCP/Azure); no live API calls |
-| `app/services/cost_ai_service.py` | ✅ | `CostAIService` — Gemini 1.5 Flash suggestion with graceful rule-based fallback (mirrors `ai_agent_service.py` pattern) |
-| `app/api/v1/endpoints/cost.py` | ✅ | `POST /cost/estimate`, `GET /cost/estimates`, `GET /cost/estimates/{id}`; all auth-guarded, results persisted via `AgentRunRepository` |
-| `app/api/v1/router.py` | ✅ | Cost router registered at `/cost` prefix |
-| `tests/test_cost.py` | ✅ | 27 new tests; all I/O mocked — no live Gemini calls, no live pricing APIs |
-| `src/features/cost/types.ts` | ✅ | TypeScript interfaces mirroring backend schemas |
-| `src/features/cost/api.ts` | ✅ | Axios calls to the three backend endpoints via shared `apiClient` |
-| `src/features/cost/components/ProviderBadge.tsx` | ✅ | Inline SVG brand logos for AWS / GCP / Azure |
-| `src/features/cost/components/WorkloadForm.tsx` | ✅ | CPU, RAM, storage, hours, region, provider checkboxes |
-| `src/features/cost/components/ComparisonTable.tsx` | ✅ | Provider cards sorted cheapest-first, instance breakdown, Best Value badge |
-| `src/features/cost/components/AISuggestion.tsx` | ✅ | Gemini recommendation panel with gradient glass styling |
-| `src/features/cost/components/CostEstimatorPage.tsx` | ✅ | Split layout; loading skeleton, error state, empty state |
-| `src/features/cost/index.ts` | ✅ | Barrel export |
-| `src/App.tsx` | ✅ | `/cost` route added inside existing `ProtectedRoute + AppShell` |
-| `src/features/dashboard/DashboardPage.tsx` | ✅ | "Multi-Cloud Cost Estimator →" link added to capabilities panel |
+| `backend/app/schemas/cost_comparison.py` | ✅ | Pydantic v2 schemas: `CloudResourceRequest`, `CloudCostEstimate`, and `CloudComparisonResponse`. |
+| `backend/app/services/pricing/region_mapping.py` | ✅ | Standardized regional alias dictionary mapping `us-east`, `us-west`, `eu-west`, `us`, `eu`, `asia` across AWS, Azure, and GCP. |
+| `backend/app/services/pricing/aws_pricing_service.py` | ✅ | Queries AWS Price List API dynamically per region with 24-hour in-memory caching. Matches EC2 Linux on-demand instances and calculates EBS gp3 storage ($0.08/GB-mo). |
+| `backend/app/services/pricing/azure_pricing_service.py` | ✅ | Queries live Azure Retail Prices API using OData filters (`Virtual Machines`, `armRegionName`, `Consumption`). Matches Linux PAYG VMs and calculates Managed Premium SSD storage. |
+| `backend/app/services/pricing/gcp_pricing_service.py` | ✅ | Queries live GCP Cloud Billing Catalog API (`services/6F81-5844-456A/skus`) with in-memory caching. Gracefully falls back to a curated static reference catalogue when `GCP_API_KEY` is not provided. |
+| `backend/app/services/cost_comparison_service.py` | ✅ | Orchestrates concurrent multi-cloud evaluation using `asyncio.gather` with isolated provider exception containment. Synthesizes AI suggestions using `CostAIService`. |
+| `backend/app/services/cost_ai_service.py` | ✅ | Generates contextual workload advice and cost trade-offs via Google Gemini 1.5 Flash, with deterministic heuristic fallback when the API key is missing or rate-limited. |
+| `backend/app/api/v1/endpoints/cost_comparison.py` | ✅ | Public, unauthenticated `POST /api/v1/cost-comparison` endpoint validating inputs and returning sorted estimates. |
+| `backend/app/api/v1/router.py` | ✅ | Mounted `cost_comparison_router` at `/cost-comparison`. |
+| `frontend/src/lib/api-client.ts` | ✅ | Clean Axios instance pointing to `VITE_API_BASE_URL` (proxying `/api/v1` in development). Free of auth overhead. |
+| `frontend/src/features/cost-comparison/CostComparisonPage.tsx` | ✅ | Interactive single-page interface with vCPU/RAM/storage/region/hours controls, preset workloads, live multi-cloud query loading state, cheapest-first provider cards with badge highlighting, error containment banners, and AI recommendation panel. |
+| `frontend/src/App.tsx` | ✅ | Replaced placeholder layout with single-purpose route `/` rendering `CostComparisonPage`. |
+| `backend/tests/test_cost_comparison_endpoint.py` | ✅ | Unit & integration tests for endpoint validation, schema conformance, and error handling. |
+| `backend/tests/test_cost_comparison_service.py` | ✅ | Unit tests for concurrency, partial failure resilience, singleton behavior, and GCP fallback. |
+| `backend/tests/test_azure_pricing_service.py` | ✅ | Verification tests for Azure parsing, filter queries, and cache TTL. |
 
 ---
 
-## Architecture Decisions
+## APIs Created
 
-### ADR-01: Static Price Tables (No Live Cloud APIs)
-- **Decision**: Pricing uses curated, static lookup tables sourced from public AWS/GCP/Azure
-  pricing pages (on-demand, US region, Linux, Q4 2024).
-- **Rationale**: Live pricing APIs require per-provider auth, have rate limits, are region-specific,
-  and change continuously. Static tables are always available, deterministic, and testable —
-  the same approach used by all major cloud cost calculator tools (Infracost, Cloudoptimizer).
-- **Trade-off**: Prices may drift from actuals over time. Update the price catalogues in
-  `cost_service.py` when a significant pricing event occurs.
-
-### ADR-02: AgentRun Re-use for Cost Results
-- **Decision**: Cost estimate results are saved as `AgentRun` records with `agent_type="cost"`,
-  using `current_user.id` as the surrogate `project_id`.
-- **Rationale**: Re-uses the existing repository, model, and migration stack without adding a new
-  ORM model or migration. The `project_id` column is typed as `UUID` — semantically we use it as
-  a user partition key for cost runs. Avoids over-engineering for a portfolio scope.
-
-### ADR-03: AI Suggestion as Separate Service
-- **Decision**: `CostAIService` is a separate class from `CostCalculatorService`.
-- **Rationale**: Clear separation of concerns — pricing logic is pure/synchronous while the AI
-  layer is async and may involve network I/O. Each can be unit-tested in complete isolation.
+| Endpoint | Method | Status | Description |
+|---|---|---|---|
+| `/api/v1/cost-comparison` | POST | 200 OK | Accepts `CloudResourceRequest` (vCPU, RAM, storage, region, hours), executes concurrent cloud pricing lookups, and returns `CloudComparisonResponse` sorted cheapest-first with AI recommendation. |
 
 ---
 
-## Test Results
+## Architecture Highlights
 
-```
-83 passed, 56 warnings in 14.43s
-```
+1. **Concurrent Multi-Cloud Querying**:
+   - `CostComparisonService` issues requests across AWS, Azure, and GCP simultaneously via `asyncio.gather(..., return_exceptions=True)`.
+   - Partial provider failures are caught and surfaced directly on the respective provider's card without failing the overall comparison.
 
-Breakdown by module:
+2. **Accurate Compute & Attached Storage Costing**:
+   - Both AWS and Azure incorporate matched VM compute plus high-performance persistent block storage (AWS EBS gp3 at $0.08/GB-mo, Azure Premium SSD).
+   - GCP incorporates matched compute plus pd-ssd storage.
+   - Transparent notes detail the hourly rate, monthly compute total, and storage line items.
 
-| File | Tests | Result |
-|---|---|---|
-| `test_health.py` | 12 | ✅ All passed |
-| `test_auth.py` | 18 | ✅ All passed |
-| `test_projects.py` | 11 | ✅ All passed |
-| `test_agents.py` | 13 | ✅ All passed |
-| `test_cost.py` | **29** | ✅ All passed |
-| **Total** | **83** | ✅ |
+3. **Resilient AI Recommendations**:
+   - Uses Google Gemini 1.5 Flash to highlight architectural trade-offs (e.g., ARM Graviton vs. Intel/AMD x86, burstable vs. dedicated performance).
+   - If `GEMINI_API_KEY` is not present, falls back seamlessly to a local rule-based heuristic generator.
 
-**Baseline (before this sprint)**: 56 tests. **Net new**: 27 tests.
-
----
-
-## Linting / Type Checking
-
-```
-ruff check app/services/cost_service.py app/services/cost_ai_service.py \
-           app/schemas/cost.py app/api/v1/endpoints/cost.py
-→ All checks passed!
-
-mypy app/ --ignore-missing-imports
-→ Success: no issues found in 40 source files
-```
-
-Pre-existing `E501` violations in `test_agents.py`, `ai_agent_service.py`,
-and `schemas/project.py` were present before this sprint and are not introduced
-by this implementation.
+4. **Streamlined Frontend**:
+   - Single-route React 19 SPA styled with existing CSS design tokens (`.glass-card`, `.btn-primary`, `.badge-accent`).
+   - Workload presets (`Web Server`, `Database`, `Memory Optimized`, `Compute Optimized`) allow 1-click test evaluations.
 
 ---
 
-## API Contract
+## Tests Completed
 
-```
-POST   /api/v1/cost/estimate
-  Request:  CostEstimateRequest
-  Response: CostEstimateResponse (200)
+The full backend test suite passes completely with zero failures across all 130 tests:
 
-GET    /api/v1/cost/estimates
-  Response: list[CostEstimateListItem] (200)
+```text
+============================== test session starts ==============================
+platform win32 -- Python 3.12.3, pytest-8.3.4, pluggy-1.5.0
+plugins: anyio-4.8.0, asyncio-0.25.2
+asyncio: mode=Mode.AUTO
 
-GET    /api/v1/cost/estimates/{run_id}
-  Response: CostEstimateResponse (200)
-            404 if not found / not owned
-```
+tests/test_agents.py .............                                        [ 10%]
+tests/test_auth.py ..................                                     [ 23%]
+tests/test_azure_pricing_service.py ..................................    [ 50%]
+tests/test_cost.py .............................                          [ 72%]
+tests/test_cost_comparison_endpoint.py ..                                 [ 73%]
+tests/test_cost_comparison_service.py ........                            [ 80%]
+tests/test_health.py ..............                                       [ 90%]
+tests/test_projects.py ...........                                        [100%]
 
-All three endpoints require JWT authentication (`Authorization: Bearer <token>`).
-
----
-
-## Known Limitations / Future Work
-
-| Item | Notes |
-|---|---|
-| Pricing staleness | Static tables updated as of 2024-Q4. Re-source from public pricing pages quarterly. |
-| Reserved-instance pricing | Not modelled; would significantly reduce AWS and Azure estimates. |
-| Data-transfer costs | Not included; material for cross-region workloads. |
-| Storage types | One storage class per provider. Multi-tier (e.g., S3 Glacier, GCS Coldline) not modelled. |
-| History pagination | `GET /cost/estimates` capped at 50 records; no cursor pagination yet. |
-| Frontend history page | No dedicated estimates list UI; only accessible via API. |
-
----
-
-## Files Changed
-
-### New Files
-```
-backend/
-  app/schemas/cost.py
-  app/services/cost_service.py
-  app/services/cost_ai_service.py
-  app/api/v1/endpoints/cost.py
-  tests/test_cost.py
-
-frontend/src/features/cost/
-  types.ts
-  api.ts
-  index.ts
-  components/ProviderBadge.tsx
-  components/WorkloadForm.tsx
-  components/ComparisonTable.tsx
-  components/AISuggestion.tsx
-  components/CostEstimatorPage.tsx
-
-docs/sprint-reviews/sprint-final-review.md
+====================== 130 passed, 59 warnings in 22.65s ======================
 ```
 
-### Modified Files
-```
-backend/app/api/v1/router.py         — added cost_router include
-frontend/src/App.tsx                  — added /cost route
-frontend/src/features/dashboard/DashboardPage.tsx — added link
+### Frontend Build & Lint Verification
+```text
+> infralytix-frontend@0.1.0 lint
+> eslint .
+(Clean - 0 errors, 0 warnings)
+
+> infralytix-frontend@0.1.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+✓ 88 modules transformed.
+✓ built in 5.93s
 ```

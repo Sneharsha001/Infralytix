@@ -24,6 +24,13 @@ from app.schemas.project import (
     RepositoryAnalysisResult,
 )
 from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.schemas.workflow import (
+    TaskCategory,
+    WorkflowCreateRequest,
+    WorkflowResponse,
+    WorkflowTaskRequest,
+    WorkflowTaskResponse,
+)
 
 __all__ = [
     "AgentRunResponse",
@@ -44,4 +51,10 @@ __all__ = [
     "UserRegister",
     "UserResponse",
     "UserUpdate",
+    # Workflow
+    "TaskCategory",
+    "WorkflowCreateRequest",
+    "WorkflowResponse",
+    "WorkflowTaskRequest",
+    "WorkflowTaskResponse",
 ]

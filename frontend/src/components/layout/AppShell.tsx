@@ -76,15 +76,21 @@ export const AppShell: React.FC = () => {
               Simulation Modules
             </div>
 
-            <span className="flex items-center justify-between px-3 py-2 rounded-xl text-sm text-neutral-400 cursor-not-allowed">
-              <span className="flex items-center gap-3">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Workflows (DAG)
-              </span>
-              <span className="text-[10px] badge-neutral">Sprint 2</span>
-            </span>
+            <NavLink
+              to="/workflows"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-brand-600 text-white shadow-brand'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Workflows (DAG)
+            </NavLink>
 
             <span className="flex items-center justify-between px-3 py-2 rounded-xl text-sm text-neutral-400 cursor-not-allowed">
               <span className="flex items-center gap-3">

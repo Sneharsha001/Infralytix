@@ -7,6 +7,7 @@
  */
 
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
 
 export interface CloudCostEstimate {
@@ -120,7 +121,45 @@ export const CostComparisonPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-10 md:py-16">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12">
+      {/* ── Top Navigation Bar ─────────────────────────────────────────── */}
+      <div className="w-full max-w-5xl mb-8 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/30">
+            IX
+          </div>
+          <div>
+            <Link to="/" className="text-xl font-bold gradient-text tracking-tight hover:opacity-90">
+              Infralytix
+            </Link>
+            <div className="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">
+              Multi-Cloud Intelligence Platform
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex items-center gap-2 text-sm">
+          <Link
+            to="/cost-comparison"
+            className="px-3.5 py-1.5 rounded-lg bg-white/10 text-white font-medium border border-white/10 shadow-sm"
+          >
+            Cost Comparison
+          </Link>
+          <Link
+            to="/workflows"
+            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            Workflow Optimizer
+          </Link>
+          <Link
+            to="/dashboard"
+            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            Dashboard
+          </Link>
+        </nav>
+      </div>
+
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="w-full max-w-5xl text-center mb-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30 mb-4">

@@ -12,6 +12,8 @@ Test Categories:
 
 from __future__ import annotations
 
+from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -23,7 +25,7 @@ from app.main import create_application
 # =============================================================================
 
 @pytest.fixture(scope="module")
-def client() -> TestClient:
+def client() -> Generator[TestClient, None, None]:
     """
     Create a synchronous test client for the FastAPI application.
 
@@ -158,7 +160,10 @@ class TestNotFoundBehavior:
         response = client.get("/api/v1/nonexistent")
         assert response.status_code == 404
 
-    def test_root_path_returns_404(self, client: TestClient) -> None:
-        """The bare root path returns 404 (API has no root handler)."""
+    def test_root_path_returns_200(self, client: TestClient) -> None:
+        """The bare root path returns 200 with API discovery metadata."""
         response = client.get("/")
-        assert response.status_code == 404
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "online"
+        assert "version" in data

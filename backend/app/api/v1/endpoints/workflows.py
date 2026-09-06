@@ -18,6 +18,11 @@ from fastapi.responses import JSONResponse
 
 from app.logging.logging import get_logger
 from app.schemas.workflow import WorkflowCreateRequest, WorkflowResponse
+from app.schemas.workflow_optimizer import (
+    WorkflowOptimizeRequest,
+    WorkflowOptimizeResult,
+)
+from app.services.workflow_optimizer_service import workflow_optimizer_service
 from app.services.workflow_service import WorkflowValidationError, workflow_service
 
 logger = get_logger(__name__)
@@ -73,4 +78,46 @@ async def submit_workflow(
         )
 
 
-__all__ = ["router", "submit_workflow"]
+@router.post(
+    "/optimize",
+    response_model=WorkflowOptimizeResult,
+    status_code=status.HTTP_200_OK,
+    summary="Optimize workflow across multi-cloud instance catalog",
+    description=(
+        "Validates the workflow DAG and sweeps AWS, Azure, and GCP candidate instances "
+        "concurrently. Returns the Pareto-optimal frontier labelled with Fastest, Cheapest, "
+        "and Best balance."
+    ),
+    responses={
+        200: {"description": "Pareto optimization completed successfully."},
+        422: {"description": "Workflow DAG validation failed."},
+    },
+)
+async def optimize_workflow(
+    request: WorkflowOptimizeRequest,
+) -> WorkflowOptimizeResult | JSONResponse:
+    """
+    Validate workflow and compute Pareto-optimal cloud instance recommendations.
+    """
+    try:
+        validated_workflow = workflow_service.validate_and_build(request.workflow)
+    except WorkflowValidationError as exc:
+        logger.warning(f"workflow_optimization_validation_failed reason={exc}")
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "error": {
+                    "code": "WORKFLOW_VALIDATION_ERROR",
+                    "message": str(exc),
+                    "details": None,
+                }
+            },
+        )
+
+    return await workflow_optimizer_service.optimize(
+        validated_workflow,
+        region=request.region,
+    )
+
+
+__all__ = ["optimize_workflow", "router", "submit_workflow"]

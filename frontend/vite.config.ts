@@ -48,9 +48,11 @@ export default defineConfig({
       output: {
         // Split vendor chunks for better caching
         manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
+          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime', 'react-dom/client'],
           'router-vendor': ['react-router-dom'],
           'http-vendor': ['axios'],
+          'diagram-vendor': ['reactflow'],
+          'chart-vendor': ['recharts'],
         },
       },
     },

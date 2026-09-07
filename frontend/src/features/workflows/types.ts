@@ -16,7 +16,6 @@ export interface WorkflowTaskInput {
   baseline_ram_gb: number
   depends_on: string[]
 }
-
 export interface WorkflowCreateInput {
   tasks: WorkflowTaskInput[]
 }

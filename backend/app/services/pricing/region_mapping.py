@@ -18,9 +18,12 @@ VALID_REGION_PREFERENCES: Final[tuple[str, ...]] = (
 
 # Provider regional identifier mapping
 # Maps loose geographic preferences to default primary datacenter regions:
-#   - AWS: us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland), ap-southeast-1 (Singapore)
-#   - GCP: us-central1 (Iowa), us-east4 (N. Virginia), us-west1 (Oregon), europe-west1 (Belgium), asia-east1 (Taiwan)
-#   - Azure: eastus (Virginia), westus2 (Washington), westeurope (Netherlands), southeastasia (Singapore)
+#   - AWS: us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland),
+#          ap-southeast-1 (Singapore)
+#   - GCP: us-central1 (Iowa), us-east4 (N. Virginia), us-west1 (Oregon),
+#          europe-west1 (Belgium), asia-east1 (Taiwan)
+#   - Azure: eastus (Virginia), westus2 (Washington), westeurope (Netherlands),
+#            southeastasia (Singapore)
 PROVIDER_REGION_MAPPINGS: Final[dict[str, dict[str, str]]] = {
     "aws": {
         "us": "us-east-1",

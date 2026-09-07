@@ -358,11 +358,18 @@ class GeminiAgentService:
 
         summary_parts = [
             f"This repository contains {file_count:,} files totalling {loc:,} lines of code,",
-            f"primarily written in {primary}." if primary != "Unknown" else "across multiple languages.",
+            (
+                f"primarily written in {primary}."
+                if primary != "Unknown"
+                else "across multiple languages."
+            ),
         ]
         if frameworks:
             summary_parts.append(f"Key frameworks include {', '.join(frameworks[:3])}.")
-        health_label = "healthy" if overall >= 75 else ("needs attention" if overall >= 50 else "requires improvement")
+        health_label = (
+            "healthy" if overall >= 75
+            else ("needs attention" if overall >= 50 else "requires improvement")
+        )
         summary_parts.append(
             f"The overall code health score is {overall}/100 ({health_label})."
         )

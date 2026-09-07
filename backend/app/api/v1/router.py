@@ -10,6 +10,7 @@ Current routers:
     /projects     — Project CRUD and repository upload
     /projects     — AI agent invocation (analyze, analysis)
     /cost         — Multi-cloud cost comparison with AI suggestion
+    /workflows    — Workflow DAG submission and validation
 """
 
 from fastapi import APIRouter
@@ -20,6 +21,7 @@ from app.api.v1.endpoints.cost import router as cost_router
 from app.api.v1.endpoints.cost_comparison import router as cost_comparison_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.projects import router as projects_router
+from app.api.v1.endpoints.workflows import router as workflows_router
 
 # All v1 routes are assembled here.
 # The /api/v1 prefix is applied by main.py when including this router.
@@ -61,4 +63,8 @@ v1_router.include_router(
     tags=["Cost Comparison"],
 )
 
-
+v1_router.include_router(
+    workflows_router,
+    prefix="/workflows",
+    tags=["Workflows"],
+)

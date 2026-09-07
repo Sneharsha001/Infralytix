@@ -117,7 +117,9 @@ class CodeHealthScore(BaseModel):
 
     overall: int = Field(..., ge=0, le=100, description="Overall code health score (0–100)")
     maintainability: int = Field(..., ge=0, le=100, description="Maintainability sub-score")
-    complexity: int = Field(..., ge=0, le=100, description="Complexity sub-score (higher = simpler)")
+    complexity: int = Field(
+        ..., ge=0, le=100, description="Complexity sub-score (higher = simpler)"
+    )
     test_coverage_estimate: int = Field(
         ..., ge=0, le=100, description="Estimated test coverage score"
     )

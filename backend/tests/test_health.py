@@ -12,30 +12,11 @@ Test Categories:
 
 from __future__ import annotations
 
-from collections.abc import Generator
+from unittest.mock import AsyncMock
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.config.config import get_settings
-from app.main import create_application
-
-# =============================================================================
-# Test Fixtures
-# =============================================================================
-
-@pytest.fixture(scope="module")
-def client() -> Generator[TestClient, None, None]:
-    """
-    Create a synchronous test client for the FastAPI application.
-
-    Using scope="module" so the app is only created once per test file,
-    which is faster and reflects real startup behavior.
-    """
-    app = create_application()
-    with TestClient(app, raise_server_exceptions=True) as test_client:
-        yield test_client
-
 
 # =============================================================================
 # Liveness Check Tests — GET /api/v1/health
@@ -146,6 +127,29 @@ class TestReadinessCheck:
 
         assert "application" in checks
         assert checks["application"].startswith("ok")
+
+    def test_readiness_healthy_when_db_reachable(
+        self, client: TestClient, mock_db_session: AsyncMock
+    ) -> None:
+        """Readiness check returns 200 and 'ready' when database is reachable."""
+        response = client.get("/api/v1/health/ready")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["status"] == "ready"
+        assert body["checks"]["database"] == "ok"
+        assert body["checks"]["application"] == "ok"
+
+    def test_readiness_unhealthy_when_db_unreachable(
+        self, client: TestClient, mock_db_session: AsyncMock
+    ) -> None:
+        """Readiness check returns 503 and 'database unreachable' when DB ping fails."""
+        mock_db_session.execute.side_effect = Exception("DB connection timeout")
+        response = client.get("/api/v1/health/ready")
+        assert response.status_code == 503
+        body = response.json()
+        assert body["status"] == "not_ready"
+        assert body["checks"]["database"] == "database unreachable"
+        assert body["checks"]["application"] == "ok"
 
 
 # =============================================================================

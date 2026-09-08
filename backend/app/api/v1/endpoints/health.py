@@ -22,10 +22,13 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, Field
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.config import settings
+from app.database.session import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -111,27 +114,38 @@ async def health_check() -> HealthResponse:
         503: {"description": "Service is not ready — a dependency is unavailable"},
     },
 )
-async def readiness_check() -> ReadinessResponse:
+async def readiness_check(
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+) -> ReadinessResponse:
     """
     Readiness check — answers: 'Is the service ready to serve requests?'
 
     Unlike the liveness check, this verifies connectivity to critical
     dependencies. If the database is unreachable, this returns 503.
-
-    Sprint 2 will add real database connectivity verification here.
     """
     logger.debug("Readiness check requested")
 
     # ── Dependency Checks ─────────────────────────────────────────────────────
-    # TODO (Sprint 2): Add actual database ping
+    try:
+        await db.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception as exc:
+        logger.error("Readiness check database ping failed: %s", exc)
+        db_status = "database unreachable"
+
     checks: dict[str, str] = {
-        "database": "ok (not yet verified — Sprint 2)",
+        "database": db_status,
         "application": "ok",
     }
 
     # Determine overall status
-    all_ok = all(v.startswith("ok") for v in checks.values())
-    overall_status = "ready" if all_ok else "not_ready"
+    all_ok = all(v == "ok" for v in checks.values())
+    if not all_ok:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        overall_status = "not_ready"
+    else:
+        overall_status = "ready"
 
     return ReadinessResponse(
         status=overall_status,

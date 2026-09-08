@@ -27,7 +27,9 @@ def sample_project() -> Project:
 
 class TestProjectRepository:
     @pytest.mark.asyncio
-    async def test_get_by_id_success(self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project):
+    async def test_get_by_id_success(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_project
         mock_db_session.execute.return_value = mock_result
@@ -47,7 +49,9 @@ class TestProjectRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_list_by_user_success(self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project):
+    async def test_list_by_user_success(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project
+    ):
         mock_result = MagicMock()
         mock_result.scalars().all.return_value = [sample_project]
         mock_db_session.execute.return_value = mock_result
@@ -71,10 +75,7 @@ class TestProjectRepository:
     async def test_create_success(self, repo: ProjectRepository, mock_db_session: AsyncMock):
         user_id = uuid.uuid4()
         result = await repo.create(
-            user_id=user_id,
-            name=" My Project ",
-            description=" Desc ",
-            repo_name=" my-repo "
+            user_id=user_id, name=" My Project ", description=" Desc ", repo_name=" my-repo "
         )
         assert result.user_id == user_id
         assert result.name == "My Project"
@@ -86,21 +87,20 @@ class TestProjectRepository:
         mock_db_session.refresh.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_empty_optional_fields(self, repo: ProjectRepository, mock_db_session: AsyncMock):
+    async def test_create_empty_optional_fields(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock
+    ):
         # Edge case: description and repo_name are None or empty strings
         user_id = uuid.uuid4()
-        result = await repo.create(
-            user_id=user_id,
-            name="Project",
-            description="",
-            repo_name=None
-        )
+        result = await repo.create(user_id=user_id, name="Project", description="", repo_name=None)
         assert result.description is None
         assert result.repo_name is None
         mock_db_session.add.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_success(self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project):
+    async def test_update_success(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project
+    ):
         result = await repo.update(sample_project, name="Updated")
         assert result.name == "Updated"
         mock_db_session.add.assert_called_once_with(sample_project)
@@ -108,14 +108,18 @@ class TestProjectRepository:
         mock_db_session.refresh.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_invalid_field(self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project):
+    async def test_update_invalid_field(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project
+    ):
         # Edge case: updating with an invalid field should ignore it
         result = await repo.update(sample_project, invalid_field="ignore")
         assert not hasattr(result, "invalid_field")
         mock_db_session.add.assert_called_once_with(sample_project)
 
     @pytest.mark.asyncio
-    async def test_delete_success(self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project):
+    async def test_delete_success(
+        self, repo: ProjectRepository, mock_db_session: AsyncMock, sample_project: Project
+    ):
         await repo.delete(sample_project)
         mock_db_session.delete.assert_called_once_with(sample_project)
         mock_db_session.flush.assert_called_once()

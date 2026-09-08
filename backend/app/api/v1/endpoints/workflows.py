@@ -44,9 +44,7 @@ router = APIRouter()
     responses={
         201: {"description": "Workflow validated successfully."},
         422: {
-            "description": (
-                "Workflow failed DAG validation (cycle, dangling ref, or empty list)."
-            )
+            "description": ("Workflow failed DAG validation (cycle, dangling ref, or empty list).")
         },
     },
 )

@@ -68,11 +68,11 @@ class TextFormatter(logging.Formatter):
 
     # ANSI color codes
     _COLORS: dict[str, str] = {
-        "DEBUG": "\033[36m",    # Cyan
-        "INFO": "\033[32m",     # Green
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
         "WARNING": "\033[33m",  # Yellow
-        "ERROR": "\033[31m",    # Red
-        "CRITICAL": "\033[35m", # Magenta
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
         "RESET": "\033[0m",
     }
 
@@ -110,9 +110,7 @@ def setup_logging(log_level: str = "INFO", log_format: str = "json") -> None:
 
     # Build handler
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        JSONFormatter() if log_format == "json" else TextFormatter()
-    )
+    handler.setFormatter(JSONFormatter() if log_format == "json" else TextFormatter())
 
     # Configure root logger
     numeric_level = getattr(logging, log_level.upper(), logging.INFO)

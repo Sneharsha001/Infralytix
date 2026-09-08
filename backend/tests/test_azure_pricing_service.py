@@ -116,34 +116,18 @@ class TestAzureParsingHelpers:
             )
             is False
         )
-        assert (
-            is_standard_linux_ondemand({**base_item, "skuName": "D2s v3 Windows"})
-            is False
-        )
+        assert is_standard_linux_ondemand({**base_item, "skuName": "D2s v3 Windows"}) is False
 
         # Exclude Spot
-        assert (
-            is_standard_linux_ondemand({**base_item, "skuName": "D2s v3 Spot"})
-            is False
-        )
-        assert (
-            is_standard_linux_ondemand({**base_item, "meterName": "D2s v3 Spot"})
-            is False
-        )
+        assert is_standard_linux_ondemand({**base_item, "skuName": "D2s v3 Spot"}) is False
+        assert is_standard_linux_ondemand({**base_item, "meterName": "D2s v3 Spot"}) is False
 
         # Exclude Low Priority
-        assert (
-            is_standard_linux_ondemand(
-                {**base_item, "skuName": "D2s v3 Low Priority"}
-            )
-            is False
-        )
+        assert is_standard_linux_ondemand({**base_item, "skuName": "D2s v3 Low Priority"}) is False
 
         # Exclude Dedicated Host
         assert (
-            is_standard_linux_ondemand(
-                {**base_item, "productName": "Dedicated Host Dsv3 Series"}
-            )
+            is_standard_linux_ondemand({**base_item, "productName": "Dedicated Host Dsv3 Series"})
             is False
         )
 
@@ -151,16 +135,10 @@ class TestAzureParsingHelpers:
         assert is_standard_linux_ondemand({**base_item, "type": "Reservation"}) is False
 
         # Exclude non-hourly
-        assert (
-            is_standard_linux_ondemand({**base_item, "unitOfMeasure": "1 Month"})
-            is False
-        )
+        assert is_standard_linux_ondemand({**base_item, "unitOfMeasure": "1 Month"}) is False
 
         # Exclude non-VM
-        assert (
-            is_standard_linux_ondemand({**base_item, "serviceName": "Storage"})
-            is False
-        )
+        assert is_standard_linux_ondemand({**base_item, "serviceName": "Storage"}) is False
 
         # Exclude zero or negative price
         assert is_standard_linux_ondemand({**base_item, "retailPrice": 0.0}) is False
@@ -321,16 +299,12 @@ class TestAzureTTLAndCaching:
         mock_client.get.return_value = mock_resp
 
         # First call: cache miss, makes network call
-        first_result = await service.fetch_price_list(
-            "eastus", client=mock_client
-        )
+        first_result = await service.fetch_price_list("eastus", client=mock_client)
         assert len(first_result) == 7
         assert mock_client.get.call_count == 1
 
         # Second call: cache hit, no network call
-        second_result = await service.fetch_price_list(
-            "eastus", client=mock_client
-        )
+        second_result = await service.fetch_price_list("eastus", client=mock_client)
         assert len(second_result) == 7
         assert mock_client.get.call_count == 1
 
@@ -353,9 +327,7 @@ class TestAzureTTLAndCaching:
         assert mock_client.get.call_count == 1
 
         # Force refresh
-        await service.fetch_price_list(
-            "eastus", force_refresh=True, client=mock_client
-        )
+        await service.fetch_price_list("eastus", force_refresh=True, client=mock_client)
         assert mock_client.get.call_count == 2
 
     @pytest.mark.asyncio
@@ -447,4 +419,3 @@ class TestAzureCostCalculation:
                 storage_gb=50,
                 client=mock_client,
             )
-

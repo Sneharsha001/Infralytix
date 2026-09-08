@@ -34,9 +34,9 @@ from app.services.pricing.region_mapping import (
 logger = get_logger(__name__)
 
 # Standard block storage rates (USD per GB-month)
-AWS_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.08       # EBS gp3
-AZURE_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.0576   # Premium SSD LRS
-GCP_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.04       # pd-balanced
+AWS_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.08  # EBS gp3
+AZURE_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.0576  # Premium SSD LRS
+GCP_STORAGE_USD_PER_GB_MONTH: Final[float] = 0.04  # pd-balanced
 
 
 class CostComparisonService(CostCalculatorService):

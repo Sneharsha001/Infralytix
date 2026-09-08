@@ -107,12 +107,7 @@ def parse_memory_gb(memory_str: str | None) -> float:
     """
     if not memory_str:
         return 0.0
-    cleaned = (
-        memory_str.replace("GiB", "")
-        .replace("GB", "")
-        .replace(",", "")
-        .strip()
-    )
+    cleaned = memory_str.replace("GiB", "").replace("GB", "").replace(",", "").strip()
     try:
         return float(cleaned)
     except (ValueError, TypeError):
@@ -141,7 +136,6 @@ def parse_vcpu(vcpu_str: str | None) -> int:
             extra={"raw_value": vcpu_str},
         )
         return 0
-
 
 
 def is_standard_linux_ondemand(attrs: dict[str, Any]) -> bool:
@@ -223,7 +217,6 @@ class AWSPricingService:
         """Resolve region string or alias to canonical AWS region code."""
         return resolve_aws_region(region_input)
 
-
     def get_pricing_url(self, region_code: str) -> str:
         """
         Build the dynamic URL for the regional EC2 Price List file.
@@ -249,9 +242,7 @@ class AWSPricingService:
         """
         canonical_region = self.resolve_region_code(region_code)
         products: dict[str, Any] = raw_data.get("products", {})
-        terms_ondemand: dict[str, Any] = (
-            raw_data.get("terms", {}).get("OnDemand", {})
-        )
+        terms_ondemand: dict[str, Any] = raw_data.get("terms", {}).get("OnDemand", {})
 
         results: list[AWSEC2InstancePrice] = []
 
@@ -431,4 +422,3 @@ class AWSPricingService:
 
 # Singleton instance
 aws_pricing_service = AWSPricingService()
-

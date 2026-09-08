@@ -197,9 +197,13 @@ class RepositoryAnalysisService:
         languages: list[LanguageStat] = []
         for lang, count in lang_files.items():
             loc = lang_loc.get(lang, 0)
-            pct = round((loc / total_loc * 100.0), 1) if total_loc > 0 else round(
-                (count / total_files * 100.0), 1
-            ) if total_files > 0 else 0.0
+            pct = (
+                round((loc / total_loc * 100.0), 1)
+                if total_loc > 0
+                else round((count / total_files * 100.0), 1)
+                if total_files > 0
+                else 0.0
+            )
             languages.append(
                 LanguageStat(
                     language=lang,

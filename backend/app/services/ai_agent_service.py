@@ -367,12 +367,11 @@ class GeminiAgentService:
         if frameworks:
             summary_parts.append(f"Key frameworks include {', '.join(frameworks[:3])}.")
         health_label = (
-            "healthy" if overall >= 75
+            "healthy"
+            if overall >= 75
             else ("needs attention" if overall >= 50 else "requires improvement")
         )
-        summary_parts.append(
-            f"The overall code health score is {overall}/100 ({health_label})."
-        )
+        summary_parts.append(f"The overall code health score is {overall}/100 ({health_label}).")
 
         return AIInsightResult(
             summary=" ".join(summary_parts),
@@ -380,4 +379,4 @@ class GeminiAgentService:
             insights=insights,
             tech_debt_indicators=tech_debt,
             recommended_next_steps=next_steps,
-        )
+        )

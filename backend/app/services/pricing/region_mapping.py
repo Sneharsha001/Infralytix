@@ -13,7 +13,12 @@ from typing import Final
 
 # Canonical high-level region preferences accepted by the platform
 VALID_REGION_PREFERENCES: Final[tuple[str, ...]] = (
-    "us", "us-east", "us-west", "eu", "eu-west", "asia"
+    "us",
+    "us-east",
+    "us-west",
+    "eu",
+    "eu-west",
+    "asia",
 )
 
 # Provider regional identifier mapping

@@ -414,22 +414,33 @@ class TestHasGpuDetection:
 
 def _aws_inst(instance_type: str, vcpus: int, mem: float, price: float) -> AWSEC2InstancePrice:
     return AWSEC2InstancePrice(
-        sku="sku", instance_type=instance_type, vcpus=vcpus, memory_gb=mem,
+        sku="sku",
+        instance_type=instance_type,
+        vcpus=vcpus,
+        memory_gb=mem,
         price_per_hour_usd=price,
     )
 
 
 def _azure_inst(sku: str, vcpus: int, mem: float, price: float) -> AzureVMInstancePrice:
     return AzureVMInstancePrice(
-        arm_sku_name=sku, sku_name=sku, meter_name="", product_name="",
-        vcpus=vcpus, memory_gb=mem, price_per_hour_usd=price,
+        arm_sku_name=sku,
+        sku_name=sku,
+        meter_name="",
+        product_name="",
+        vcpus=vcpus,
+        memory_gb=mem,
+        price_per_hour_usd=price,
     )
 
 
 def _gcp_inst(machine_type: str, vcpus: int, mem: float, price: float) -> GCPInstancePrice:
     return GCPInstancePrice(
-        machine_type=machine_type, vcpus=vcpus, memory_gb=mem,
-        price_per_hour_usd=price, region_code="us-east4",
+        machine_type=machine_type,
+        vcpus=vcpus,
+        memory_gb=mem,
+        price_per_hour_usd=price,
+        region_code="us-east4",
     )
 
 
@@ -437,7 +448,7 @@ class TestShortlistAws:
     def test_filters_out_undersized_instances(self) -> None:
         instances = [
             _aws_inst("small", vcpus=2, mem=4.0, price=0.10),
-            _aws_inst("big",   vcpus=8, mem=32.0, price=0.50),
+            _aws_inst("big", vcpus=8, mem=32.0, price=0.50),
         ]
         result = _shortlist_aws(instances, peak_vcpu=4, peak_ram_gb=16.0)
         assert len(result) == 1
@@ -446,8 +457,8 @@ class TestShortlistAws:
     def test_sorted_by_price_ascending(self) -> None:
         instances = [
             _aws_inst("expensive", vcpus=4, mem=16.0, price=1.00),
-            _aws_inst("cheap",     vcpus=4, mem=16.0, price=0.20),
-            _aws_inst("mid",       vcpus=4, mem=16.0, price=0.50),
+            _aws_inst("cheap", vcpus=4, mem=16.0, price=0.20),
+            _aws_inst("mid", vcpus=4, mem=16.0, price=0.50),
         ]
         result = _shortlist_aws(instances, peak_vcpu=4, peak_ram_gb=16.0, top_n=10)
         assert [r.instance_type for r in result] == ["cheap", "mid", "expensive"]
@@ -483,7 +494,7 @@ class TestShortlistAzure:
 class TestShortlistGcp:
     def test_filters_undersized(self) -> None:
         instances = [
-            _gcp_inst("e2-small",      vcpus=2, mem=2.0,  price=0.02),
+            _gcp_inst("e2-small", vcpus=2, mem=2.0, price=0.02),
             _gcp_inst("e2-standard-8", vcpus=8, mem=32.0, price=0.27),
         ]
         result = _shortlist_gcp(instances, peak_vcpu=4, peak_ram_gb=16.0)
@@ -555,12 +566,17 @@ class TestWorkflowOptimizerIntegration:
         workflow = _simple_workflow()
 
         with (
-            patch.object(optimizer, "_fetch_aws_candidates",
-                         new=AsyncMock(side_effect=RuntimeError("fail"))),
-            patch.object(optimizer, "_fetch_azure_candidates",
-                         new=AsyncMock(side_effect=RuntimeError("fail"))),
-            patch.object(optimizer, "_fetch_gcp_candidates",
-                         new=AsyncMock(side_effect=RuntimeError("fail"))),
+            patch.object(
+                optimizer, "_fetch_aws_candidates", new=AsyncMock(side_effect=RuntimeError("fail"))
+            ),
+            patch.object(
+                optimizer,
+                "_fetch_azure_candidates",
+                new=AsyncMock(side_effect=RuntimeError("fail")),
+            ),
+            patch.object(
+                optimizer, "_fetch_gcp_candidates", new=AsyncMock(side_effect=RuntimeError("fail"))
+            ),
         ):
             result = await optimizer.optimize(workflow)
 
@@ -576,12 +592,11 @@ class TestWorkflowOptimizerIntegration:
         aws_inst = _aws_inst("m5.xlarge", vcpus=4, mem=16.0, price=0.192)
 
         with (
-            patch.object(optimizer, "_fetch_aws_candidates",
-                         new=AsyncMock(return_value=[aws_inst])),
-            patch.object(optimizer, "_fetch_azure_candidates",
-                         new=AsyncMock(return_value=[])),
-            patch.object(optimizer, "_fetch_gcp_candidates",
-                         new=AsyncMock(return_value=[])),
+            patch.object(
+                optimizer, "_fetch_aws_candidates", new=AsyncMock(return_value=[aws_inst])
+            ),
+            patch.object(optimizer, "_fetch_azure_candidates", new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_gcp_candidates", new=AsyncMock(return_value=[])),
         ):
             result = await optimizer.optimize(workflow)
 
@@ -601,16 +616,15 @@ class TestWorkflowOptimizerIntegration:
         # Both at 2× baseline_vcpu so 2× speedup; baseline_time=3600s
         # scaled_time = 3600/2 = 1800 s for any 4vCPU instance
         # cost = (1800/3600) * price_per_hour
-        winner = _aws_inst("winner", vcpus=4, mem=16.0, price=0.10)   # cost=0.05, time=1800
-        loser1 = _aws_inst("loser1", vcpus=4, mem=16.0, price=0.20)   # cost=0.10, same time
+        winner = _aws_inst("winner", vcpus=4, mem=16.0, price=0.10)  # cost=0.05, time=1800
+        loser1 = _aws_inst("loser1", vcpus=4, mem=16.0, price=0.20)  # cost=0.10, same time
 
         with (
-            patch.object(optimizer, "_fetch_aws_candidates",
-                         new=AsyncMock(return_value=[winner, loser1])),
-            patch.object(optimizer, "_fetch_azure_candidates",
-                         new=AsyncMock(return_value=[])),
-            patch.object(optimizer, "_fetch_gcp_candidates",
-                         new=AsyncMock(return_value=[])),
+            patch.object(
+                optimizer, "_fetch_aws_candidates", new=AsyncMock(return_value=[winner, loser1])
+            ),
+            patch.object(optimizer, "_fetch_azure_candidates", new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_gcp_candidates", new=AsyncMock(return_value=[])),
         ):
             result = await optimizer.optimize(workflow)
 
@@ -626,12 +640,9 @@ class TestWorkflowOptimizerIntegration:
         workflow = _simple_workflow()
 
         with (
-            patch.object(optimizer, "_fetch_aws_candidates",
-                         new=AsyncMock(return_value=[])),
-            patch.object(optimizer, "_fetch_azure_candidates",
-                         new=AsyncMock(return_value=[])),
-            patch.object(optimizer, "_fetch_gcp_candidates",
-                         new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_aws_candidates", new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_azure_candidates", new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_gcp_candidates", new=AsyncMock(return_value=[])),
         ):
             result = await optimizer.optimize(workflow)
 
@@ -661,15 +672,16 @@ class TestWorkflowOptimizerIntegration:
         # cheap&slow: 2vCPU (no speedup), low price
         # fast&expensive: 8vCPU (4× speedup), high price
         cheap_slow = _aws_inst("cheap", vcpus=2, mem=8.0, price=0.05)
-        fast_exp   = _aws_inst("fast",  vcpus=8, mem=8.0, price=0.50)
+        fast_exp = _aws_inst("fast", vcpus=8, mem=8.0, price=0.50)
 
         with (
-            patch.object(optimizer, "_fetch_aws_candidates",
-                         new=AsyncMock(return_value=[cheap_slow, fast_exp])),
-            patch.object(optimizer, "_fetch_azure_candidates",
-                         new=AsyncMock(return_value=[])),
-            patch.object(optimizer, "_fetch_gcp_candidates",
-                         new=AsyncMock(return_value=[])),
+            patch.object(
+                optimizer,
+                "_fetch_aws_candidates",
+                new=AsyncMock(return_value=[cheap_slow, fast_exp]),
+            ),
+            patch.object(optimizer, "_fetch_azure_candidates", new=AsyncMock(return_value=[])),
+            patch.object(optimizer, "_fetch_gcp_candidates", new=AsyncMock(return_value=[])),
         ):
             result = await optimizer.optimize(workflow)
 
@@ -761,4 +773,3 @@ class TestWorkflowOptimizeEndpoint:
             assert data["candidates_evaluated"] == 1
             assert data["candidates_pareto"] == 1
             assert data["pareto_front"][0]["candidate"]["instance_type"] == "t3.medium"
-

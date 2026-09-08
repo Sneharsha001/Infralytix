@@ -230,7 +230,6 @@ def compute_makespan(
     return max(earliest_finish.values())
 
 
-
 # ─── Step 3: Top-level evaluator ─────────────────────────────────────────────
 
 

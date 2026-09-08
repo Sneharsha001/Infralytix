@@ -145,4 +145,4 @@ async def get_analysis(
             detail="No AI analysis found. Run POST /projects/{id}/analyze first.",
         )
 
-    return AgentRunResponse.model_validate(ai_run)
+    return AgentRunResponse.model_validate(ai_run)

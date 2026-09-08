@@ -142,8 +142,7 @@ def _shortlist_aws(
     Returns at most *top_n* instances.
     """
     eligible = [
-        inst for inst in instances
-        if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
+        inst for inst in instances if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
     ]
     eligible.sort(key=lambda i: i.price_per_hour_usd)
     return eligible[:top_n]
@@ -160,8 +159,7 @@ def _shortlist_azure(
     Returns at most *top_n* instances.
     """
     eligible = [
-        inst for inst in instances
-        if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
+        inst for inst in instances if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
     ]
     eligible.sort(key=lambda i: i.price_per_hour_usd)
     return eligible[:top_n]
@@ -178,8 +176,7 @@ def _shortlist_gcp(
     Returns at most *top_n* instances.
     """
     eligible = [
-        inst for inst in instances
-        if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
+        inst for inst in instances if inst.vcpus >= peak_vcpu and inst.memory_gb >= peak_ram_gb
     ]
     eligible.sort(key=lambda i: i.price_per_hour_usd)
     return eligible[:top_n]
@@ -214,11 +211,7 @@ def compute_pareto_front(
             time_b = other.evaluation.makespan_seconds
             if other is candidate:
                 continue
-            if (
-                cost_b <= cost_a
-                and time_b <= time_a
-                and (cost_b < cost_a or time_b < time_a)
-            ):
+            if cost_b <= cost_a and time_b <= time_a and (cost_b < cost_a or time_b < time_a):
                 dominated = True
                 break
         if not dominated:
@@ -312,9 +305,7 @@ class WorkflowOptimizerService:
         client: httpx.AsyncClient | None,
     ) -> list[AWSEC2InstancePrice]:
         aws_region = resolve_aws_region(region)
-        all_instances = await aws_pricing_service.fetch_price_list(
-            aws_region, client=client
-        )
+        all_instances = await aws_pricing_service.fetch_price_list(aws_region, client=client)
         return _shortlist_aws(all_instances, peak_vcpu, peak_ram_gb)
 
     async def _fetch_azure_candidates(
@@ -325,9 +316,7 @@ class WorkflowOptimizerService:
         client: httpx.AsyncClient | None,
     ) -> list[AzureVMInstancePrice]:
         azure_region = resolve_azure_region(region)
-        all_instances = await azure_pricing_service.fetch_price_list(
-            azure_region, client=client
-        )
+        all_instances = await azure_pricing_service.fetch_price_list(azure_region, client=client)
         return _shortlist_azure(all_instances, peak_vcpu, peak_ram_gb)
 
     async def _fetch_gcp_candidates(
@@ -458,22 +447,34 @@ class WorkflowOptimizerService:
 
         for aws_inst in aws_candidates:
             r = self._evaluate_candidate(
-                "aws", aws_inst.instance_type, aws_inst.vcpus, aws_inst.memory_gb,
-                aws_inst.price_per_hour_usd, workflow,
+                "aws",
+                aws_inst.instance_type,
+                aws_inst.vcpus,
+                aws_inst.memory_gb,
+                aws_inst.price_per_hour_usd,
+                workflow,
             )
             all_results.append(r)
 
         for az_inst in azure_candidates:
             r = self._evaluate_candidate(
-                "azure", az_inst.arm_sku_name, az_inst.vcpus, az_inst.memory_gb,
-                az_inst.price_per_hour_usd, workflow,
+                "azure",
+                az_inst.arm_sku_name,
+                az_inst.vcpus,
+                az_inst.memory_gb,
+                az_inst.price_per_hour_usd,
+                workflow,
             )
             all_results.append(r)
 
         for gcp_inst in gcp_candidates:
             r = self._evaluate_candidate(
-                "gcp", gcp_inst.machine_type, gcp_inst.vcpus, gcp_inst.memory_gb,
-                gcp_inst.price_per_hour_usd, workflow,
+                "gcp",
+                gcp_inst.machine_type,
+                gcp_inst.vcpus,
+                gcp_inst.memory_gb,
+                gcp_inst.price_per_hour_usd,
+                workflow,
             )
             all_results.append(r)
 

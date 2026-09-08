@@ -28,7 +28,9 @@ def sample_run() -> AgentRun:
 
 class TestAgentRunRepository:
     @pytest.mark.asyncio
-    async def test_get_by_id_success(self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun):
+    async def test_get_by_id_success(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_run
         mock_db_session.execute.return_value = mock_result
@@ -48,7 +50,9 @@ class TestAgentRunRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_list_by_project_success(self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun):
+    async def test_list_by_project_success(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun
+    ):
         mock_result = MagicMock()
         mock_result.scalars().all.return_value = [sample_run]
         mock_db_session.execute.return_value = mock_result
@@ -59,7 +63,9 @@ class TestAgentRunRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_list_by_project_empty(self, repo: AgentRunRepository, mock_db_session: AsyncMock):
+    async def test_list_by_project_empty(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock
+    ):
         mock_result = MagicMock()
         mock_result.scalars().all.return_value = []
         mock_db_session.execute.return_value = mock_result
@@ -69,7 +75,9 @@ class TestAgentRunRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_latest_by_type_success(self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun):
+    async def test_get_latest_by_type_success(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_run
         mock_db_session.execute.return_value = mock_result
@@ -79,7 +87,9 @@ class TestAgentRunRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_latest_by_type_not_found(self, repo: AgentRunRepository, mock_db_session: AsyncMock):
+    async def test_get_latest_by_type_not_found(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
         mock_db_session.execute.return_value = mock_result
@@ -95,7 +105,7 @@ class TestAgentRunRepository:
             project_id=project_id,
             agent_type="security",
             status=AgentRunStatus.COMPLETED,
-            output_data={"key": "value"}
+            output_data={"key": "value"},
         )
         assert result.project_id == project_id
         assert result.agent_type == "security"
@@ -117,12 +127,14 @@ class TestAgentRunRepository:
         mock_db_session.add.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_status_success(self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun):
+    async def test_update_status_success(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun
+    ):
         result = await repo.update_status(
             sample_run,
             status=AgentRunStatus.COMPLETED,
             output_data={"done": True},
-            error_message="none"
+            error_message="none",
         )
         assert result.status == AgentRunStatus.COMPLETED
         assert result.output_data == {"done": True}
@@ -133,8 +145,11 @@ class TestAgentRunRepository:
         mock_db_session.refresh.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_status_partial(self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun):
-        # Edge case: updating status but keeping output_data/error_message as None doesn't overwrite them
+    async def test_update_status_partial(
+        self, repo: AgentRunRepository, mock_db_session: AsyncMock, sample_run: AgentRun
+    ):
+        # Edge case: updating status but keeping output_data/error_message as None
+        # should not overwrite existing values
         sample_run.output_data = {"existing": True}
         sample_run.error_message = "existing err"
 

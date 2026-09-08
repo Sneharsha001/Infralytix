@@ -222,7 +222,8 @@ class GCPPricingService:
             raise ValueError("GCP instances catalogue is empty")
 
         eligible = [
-            inst for inst in instances
+            inst
+            for inst in instances
             if inst.vcpus >= requested_vcpu and inst.memory_gb >= requested_ram_gb
         ]
 

@@ -39,6 +39,7 @@ router = APIRouter()
 # Response Schemas
 # =============================================================================
 
+
 class ServiceInfo(BaseModel):
     """Information about the running service."""
 
@@ -67,6 +68,7 @@ class ReadinessResponse(BaseModel):
 # =============================================================================
 # Endpoints
 # =============================================================================
+
 
 @router.get(
     "",

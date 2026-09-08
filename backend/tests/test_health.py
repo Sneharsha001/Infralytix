@@ -22,6 +22,7 @@ from app.config.config import get_settings
 # Liveness Check Tests — GET /api/v1/health
 # =============================================================================
 
+
 class TestLivenessCheck:
     """Tests for the liveness/health endpoint."""
 
@@ -95,6 +96,7 @@ class TestLivenessCheck:
 # Readiness Check Tests — GET /api/v1/health/ready
 # =============================================================================
 
+
 class TestReadinessCheck:
     """Tests for the readiness endpoint."""
 
@@ -155,6 +157,7 @@ class TestReadinessCheck:
 # =============================================================================
 # 404 Behavior Tests
 # =============================================================================
+
 
 class TestNotFoundBehavior:
     """Tests for non-existent routes."""

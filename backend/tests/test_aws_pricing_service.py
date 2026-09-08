@@ -103,9 +103,7 @@ class TestParsingHelpers:
 
         # BYOL
         assert (
-            is_standard_linux_ondemand(
-                {**valid_attrs, "licenseModel": "Bring your own license"}
-            )
+            is_standard_linux_ondemand({**valid_attrs, "licenseModel": "Bring your own license"})
             is False
         )
 
@@ -162,9 +160,7 @@ class TestAWSPricingServiceCore:
             == "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/ap-southeast-1/index.json"
         )
 
-    def test_parse_price_list_filters_correctly(
-        self, sample_pricing_json: dict[str, Any]
-    ) -> None:
+    def test_parse_price_list_filters_correctly(self, sample_pricing_json: dict[str, Any]) -> None:
         service = AWSPricingService()
         instances = service.parse_price_list(sample_pricing_json, "us-east-1")
 
@@ -205,9 +201,7 @@ class TestAWSPricingServiceCore:
 class TestInstanceSelection:
     """Test smallest instance selection matching vCPU and RAM (never undersizing)."""
 
-    def test_select_instance_exact_match(
-        self, sample_pricing_json: dict[str, Any]
-    ) -> None:
+    def test_select_instance_exact_match(self, sample_pricing_json: dict[str, Any]) -> None:
         service = AWSPricingService()
         instances = service.parse_price_list(sample_pricing_json, "us-east-1")
 
@@ -365,9 +359,7 @@ class TestAWSPricingServiceAsync:
             )
             assert mock_client.get.call_count == 2  # Re-fetched!
 
-    async def test_force_refresh_bypasses_cache(
-        self, sample_pricing_json: dict[str, Any]
-    ) -> None:
+    async def test_force_refresh_bypasses_cache(self, sample_pricing_json: dict[str, Any]) -> None:
         service = AWSPricingService(cache_ttl=timedelta(hours=24))
 
         mock_resp = MagicMock()

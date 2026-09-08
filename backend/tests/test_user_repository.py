@@ -33,7 +33,9 @@ def sample_user() -> User:
 
 class TestUserRepository:
     @pytest.mark.asyncio
-    async def test_get_by_id_success(self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User):
+    async def test_get_by_id_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_user
         mock_db_session.execute.return_value = mock_result
@@ -53,7 +55,9 @@ class TestUserRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_by_email_success(self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User):
+    async def test_get_by_email_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_user
         mock_db_session.execute.return_value = mock_result
@@ -92,7 +96,9 @@ class TestUserRepository:
             await repo.create("Dup", "dup@example.com", "hash")
 
     @pytest.mark.asyncio
-    async def test_update_success(self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User):
+    async def test_update_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User
+    ):
         result = await repo.update(sample_user, name="Updated Name", invalid_field="ignore_this")
         assert result.name == "Updated Name"
 
@@ -101,7 +107,9 @@ class TestUserRepository:
         mock_db_session.refresh.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_no_kwargs(self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User):
+    async def test_update_no_kwargs(
+        self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User
+    ):
         result = await repo.update(sample_user)
         assert result == sample_user
         mock_db_session.add.assert_called_once_with(sample_user)
@@ -111,7 +119,9 @@ class TestUserRepository:
 
 class TestRefreshTokenRepository:
     @pytest.mark.asyncio
-    async def test_create_refresh_token_success(self, repo: UserRepository, mock_db_session: AsyncMock):
+    async def test_create_refresh_token_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
         user_id = uuid.uuid4()
         expires = datetime.now(UTC)
         result = await repo.create_refresh_token(user_id, "token_hash_abc", expires)
@@ -124,8 +134,12 @@ class TestRefreshTokenRepository:
         mock_db_session.flush.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_refresh_token_by_hash_success(self, repo: UserRepository, mock_db_session: AsyncMock):
-        mock_token = RefreshToken(user_id=uuid.uuid4(), token_hash="abc", expires_at=datetime.now(UTC))
+    async def test_get_refresh_token_by_hash_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
+        mock_token = RefreshToken(
+            user_id=uuid.uuid4(), token_hash="abc", expires_at=datetime.now(UTC)
+        )
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = mock_token
         mock_db_session.execute.return_value = mock_result
@@ -135,7 +149,9 @@ class TestRefreshTokenRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_refresh_token_by_hash_not_found(self, repo: UserRepository, mock_db_session: AsyncMock):
+    async def test_get_refresh_token_by_hash_not_found(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
         mock_db_session.execute.return_value = mock_result
@@ -145,8 +161,12 @@ class TestRefreshTokenRepository:
         mock_db_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_revoke_refresh_token_success(self, repo: UserRepository, mock_db_session: AsyncMock):
-        mock_token = RefreshToken(user_id=uuid.uuid4(), token_hash="abc", expires_at=datetime.now(UTC))
+    async def test_revoke_refresh_token_success(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
+        mock_token = RefreshToken(
+            user_id=uuid.uuid4(), token_hash="abc", expires_at=datetime.now(UTC)
+        )
         assert mock_token.revoked_at is None
 
         await repo.revoke_refresh_token(mock_token)
@@ -156,11 +176,19 @@ class TestRefreshTokenRepository:
         mock_db_session.flush.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_revoke_refresh_token_already_revoked(self, repo: UserRepository, mock_db_session: AsyncMock):
+    async def test_revoke_refresh_token_already_revoked(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
         # Edge case: revoking an already revoked token updates the timestamp
         import datetime as dt
+
         old_time = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
-        mock_token = RefreshToken(user_id=uuid.uuid4(), token_hash="abc", expires_at=dt.datetime.now(dt.UTC), revoked_at=old_time)
+        mock_token = RefreshToken(
+            user_id=uuid.uuid4(),
+            token_hash="abc",
+            expires_at=dt.datetime.now(dt.UTC),
+            revoked_at=old_time,
+        )
 
         # Prevent RuntimeWarning for unawaited coroutine by making add a synchronous MagicMock
         mock_db_session.add = MagicMock()
@@ -173,7 +201,9 @@ class TestRefreshTokenRepository:
         mock_db_session.flush.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_revoke_all_user_refresh_tokens(self, repo: UserRepository, mock_db_session: AsyncMock):
+    async def test_revoke_all_user_refresh_tokens(
+        self, repo: UserRepository, mock_db_session: AsyncMock
+    ):
         user_id = uuid.uuid4()
         await repo.revoke_all_user_refresh_tokens(user_id)
 

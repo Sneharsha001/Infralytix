@@ -37,6 +37,7 @@ logger = get_logger(__name__)
 # Lifespan — Startup & Shutdown Events
 # =============================================================================
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
@@ -72,6 +73,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if settings.DATABASE_URL.startswith("sqlite"):
         from app.database.session import engine
         from app.models import Base
+
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
@@ -88,6 +90,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 # =============================================================================
 # Middleware
 # =============================================================================
+
 
 async def request_id_middleware(request: Request, call_next: Callable) -> Response:
     """
@@ -129,6 +132,7 @@ async def request_id_middleware(request: Request, call_next: Callable) -> Respon
 # =============================================================================
 # Application Factory
 # =============================================================================
+
 
 def create_application() -> FastAPI:
     """
@@ -188,6 +192,7 @@ def create_application() -> FastAPI:
     async def docs_redirect() -> Response:
         """Redirect convenience /docs to versioned /api/v1/docs."""
         from fastapi.responses import RedirectResponse
+
         return RedirectResponse(url="/api/v1/docs")
 
     return application

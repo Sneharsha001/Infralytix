@@ -181,10 +181,10 @@ class TestWorkflowServiceCycleRejection:
         """A cycle embedded in a larger valid-looking graph must still be caught."""
         service = WorkflowService()
         req = _make_request(
-            _make_task("root"),                           # valid root
+            _make_task("root"),  # valid root
             _make_task("A", depends_on=["root"]),
             _make_task("B", depends_on=["A"]),
-            _make_task("C", depends_on=["B"]),            # cycle starts here
+            _make_task("C", depends_on=["B"]),  # cycle starts here
             _make_task("leaf", depends_on=["C"]),
         )
         # Introduce a back-edge B → C so that B ← C ← B

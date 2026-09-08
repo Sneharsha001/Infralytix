@@ -158,4 +158,3 @@ class AIInsightResult(BaseModel):
         default_factory=list,
         description="Prioritized recommended actions",
     )
-

@@ -57,6 +57,7 @@ logger = get_logger(__name__)
 # Note: Static catalogue fallback is strictly GCP-only when GCP_API_KEY is unset.
 # AWS and Azure evaluate against their official live pricing APIs directly.
 
+
 @dataclass(frozen=True)
 class _InstanceSpec:
     instance_type: str
@@ -66,30 +67,29 @@ class _InstanceSpec:
 
 
 _GCP_CATALOGUE: list[_InstanceSpec] = [
-    _InstanceSpec("e2-micro",       2,   1.0,  0.0084),
-    _InstanceSpec("e2-small",       2,   2.0,  0.0134),
-    _InstanceSpec("e2-medium",      2,   4.0,  0.0268),
-    _InstanceSpec("e2-standard-2",  2,   8.0,  0.0670),
-    _InstanceSpec("e2-standard-4",  4,  16.0,  0.1340),
-    _InstanceSpec("e2-standard-8",  8,  32.0,  0.2680),
-    _InstanceSpec("e2-standard-16",16,  64.0,  0.5360),
-    _InstanceSpec("n2-standard-2",  2,   8.0,  0.0971),
-    _InstanceSpec("n2-standard-4",  4,  16.0,  0.1942),
-    _InstanceSpec("n2-standard-8",  8,  32.0,  0.3884),
-    _InstanceSpec("n2-standard-16",16,  64.0,  0.7768),
-    _InstanceSpec("n2-standard-32",32, 128.0,  1.5536),
-    _InstanceSpec("c2-standard-4",  4,  16.0,  0.2088),
-    _InstanceSpec("c2-standard-8",  8,  32.0,  0.4176),
-    _InstanceSpec("c2-standard-16",16,  64.0,  0.8352),
+    _InstanceSpec("e2-micro", 2, 1.0, 0.0084),
+    _InstanceSpec("e2-small", 2, 2.0, 0.0134),
+    _InstanceSpec("e2-medium", 2, 4.0, 0.0268),
+    _InstanceSpec("e2-standard-2", 2, 8.0, 0.0670),
+    _InstanceSpec("e2-standard-4", 4, 16.0, 0.1340),
+    _InstanceSpec("e2-standard-8", 8, 32.0, 0.2680),
+    _InstanceSpec("e2-standard-16", 16, 64.0, 0.5360),
+    _InstanceSpec("n2-standard-2", 2, 8.0, 0.0971),
+    _InstanceSpec("n2-standard-4", 4, 16.0, 0.1942),
+    _InstanceSpec("n2-standard-8", 8, 32.0, 0.3884),
+    _InstanceSpec("n2-standard-16", 16, 64.0, 0.7768),
+    _InstanceSpec("n2-standard-32", 32, 128.0, 1.5536),
+    _InstanceSpec("c2-standard-4", 4, 16.0, 0.2088),
+    _InstanceSpec("c2-standard-8", 8, 32.0, 0.4176),
+    _InstanceSpec("c2-standard-16", 16, 64.0, 0.8352),
     _InstanceSpec("m2-ultramem-208", 208, 5888.0, 24.1726),
 ]
 
 
-
 # Storage pricing: USD per GB per month
-_AWS_STORAGE_PRICE_PER_GB    = 0.08   # gp3
-_GCP_STORAGE_PRICE_PER_GB    = 0.04   # pd-balanced
-_AZURE_STORAGE_PRICE_PER_GB  = 0.0576 # Premium SSD LRS P4+
+_AWS_STORAGE_PRICE_PER_GB = 0.08  # gp3
+_GCP_STORAGE_PRICE_PER_GB = 0.04  # pd-balanced
+_AZURE_STORAGE_PRICE_PER_GB = 0.0576  # Premium SSD LRS P4+
 
 
 # ---------------------------------------------------------------------------
@@ -166,10 +166,10 @@ class CostCalculatorService:
     @staticmethod
     def _is_available(est: ProviderEstimate) -> bool:
         """Check if an estimate was successfully priced."""
-        return not any(
-            "unavailable" in n.lower() or "failed" in n.lower()
-            for n in est.notes
-        ) and est.total_monthly_usd > 0.0
+        return (
+            not any("unavailable" in n.lower() or "failed" in n.lower() for n in est.notes)
+            and est.total_monthly_usd > 0.0
+        )
 
     # ── Per-Provider Estimators ───────────────────────────────────────────
 
@@ -283,9 +283,7 @@ class CostCalculatorService:
             )
 
     def _gcp_estimate(self, req: CostEstimateRequest) -> ProviderEstimate:
-        instance = _select_instance(
-            _GCP_CATALOGUE, req.cpu_cores, req.memory_gb
-        )
+        instance = _select_instance(_GCP_CATALOGUE, req.cpu_cores, req.memory_gb)
         region = resolve_gcp_region(req.region_preference)
         compute_cost = round(instance.price_per_hour_usd * req.hours_per_month, 4)
         storage = _build_storage(
@@ -437,7 +435,6 @@ class CostCalculatorService:
             )
 
 
-
 # ---------------------------------------------------------------------------
 # Private Helpers
 # ---------------------------------------------------------------------------
@@ -455,8 +452,7 @@ def _select_instance(
     reasonable workload specs given our catalogue coverage).
     """
     eligible = [
-        spec for spec in catalogue
-        if spec.vcpus >= min_vcpus and spec.memory_gb >= min_memory_gb
+        spec for spec in catalogue if spec.vcpus >= min_vcpus and spec.memory_gb >= min_memory_gb
     ]
     if eligible:
         return min(eligible, key=lambda s: s.price_per_hour_usd)

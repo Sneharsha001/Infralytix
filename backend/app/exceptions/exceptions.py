@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 # Exception Hierarchy
 # =============================================================================
 
+
 class InfralytixBaseException(Exception):
     """
     Root exception for all Infralytix-specific errors.
@@ -60,54 +61,63 @@ class InfralytixBaseException(Exception):
 
 class NotFoundException(InfralytixBaseException):
     """Resource does not exist."""
+
     http_status = status.HTTP_404_NOT_FOUND
     error_code = "RESOURCE_NOT_FOUND"
 
 
 class ConflictException(InfralytixBaseException):
     """Resource already exists or violates a uniqueness constraint."""
+
     http_status = status.HTTP_409_CONFLICT
     error_code = "RESOURCE_CONFLICT"
 
 
 class UnauthorizedException(InfralytixBaseException):
     """Authentication credentials are missing or invalid."""
+
     http_status = status.HTTP_401_UNAUTHORIZED
     error_code = "UNAUTHORIZED"
 
 
 class ForbiddenException(InfralytixBaseException):
     """Authenticated user lacks permission for this action."""
+
     http_status = status.HTTP_403_FORBIDDEN
     error_code = "FORBIDDEN"
 
 
 class BadRequestException(InfralytixBaseException):
     """Client sent a malformed or logically invalid request."""
+
     http_status = status.HTTP_400_BAD_REQUEST
     error_code = "BAD_REQUEST"
 
 
 class UnprocessableEntityException(InfralytixBaseException):
     """Request is syntactically valid but semantically incorrect."""
+
     http_status = status.HTTP_422_UNPROCESSABLE_ENTITY
     error_code = "UNPROCESSABLE_ENTITY"
 
 
 class ServiceUnavailableException(InfralytixBaseException):
     """A downstream service (database, AI API) is unavailable."""
+
     http_status = status.HTTP_503_SERVICE_UNAVAILABLE
     error_code = "SERVICE_UNAVAILABLE"
 
 
 class RateLimitExceededException(InfralytixBaseException):
     """Client has exceeded the configured rate limit."""
+
     http_status = status.HTTP_429_TOO_MANY_REQUESTS
     error_code = "RATE_LIMIT_EXCEEDED"
 
 
 class AgentExecutionException(InfralytixBaseException):
     """An AI agent failed during execution."""
+
     http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
     error_code = "AGENT_EXECUTION_FAILED"
 
@@ -115,6 +125,7 @@ class AgentExecutionException(InfralytixBaseException):
 # =============================================================================
 # Response Builder
 # =============================================================================
+
 
 def _build_error_response(
     request: Request,
@@ -141,6 +152,7 @@ def _build_error_response(
 # =============================================================================
 # Exception Handlers
 # =============================================================================
+
 
 async def infralytix_exception_handler(
     request: Request,
@@ -236,6 +248,7 @@ async def unhandled_exception_handler(
 # =============================================================================
 # Registration
 # =============================================================================
+
 
 def register_exception_handlers(app: FastAPI) -> None:
     """

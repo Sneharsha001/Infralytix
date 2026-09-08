@@ -76,9 +76,7 @@ class WorkflowOptimizeResult(BaseModel):
         candidates_pareto:   Count of Pareto-optimal points.
     """
 
-    pareto_front: list[ParetoPoint] = Field(
-        ..., description="Pareto-optimal candidates, labelled."
-    )
+    pareto_front: list[ParetoPoint] = Field(..., description="Pareto-optimal candidates, labelled.")
     all_candidates: list[CandidateResult] = Field(
         ..., description="All evaluated candidates (dominated and non-dominated)."
     )
@@ -89,9 +87,7 @@ class WorkflowOptimizeResult(BaseModel):
     candidates_evaluated: int = Field(
         ..., ge=0, description="Total (provider, instance) pairs evaluated."
     )
-    candidates_pareto: int = Field(
-        ..., ge=0, description="Number of Pareto-optimal points."
-    )
+    candidates_pareto: int = Field(..., ge=0, description="Number of Pareto-optimal points.")
     ai_summary: str | None = Field(
         default=None,
         description="AI-generated plain-language summary of the Pareto trade-offs.",

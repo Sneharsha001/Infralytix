@@ -62,8 +62,7 @@ async def register(
     status_code=status.HTTP_200_OK,
     summary="Authenticate user",
     description=(
-        "Authenticates credentials, returns access token in body, "
-        "sets HttpOnly refresh cookie."
+        "Authenticates credentials, returns access token in body, " "sets HttpOnly refresh cookie."
     ),
 )
 async def login(

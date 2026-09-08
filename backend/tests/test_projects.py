@@ -315,8 +315,7 @@ class TestProjectUploadAndAnalysis:
             "    return {'ok': True}\n"
         )
         pkg_json = (
-            '{"name": "frontend", "dependencies": '
-            '{"react": "^19.0.0", "tailwindcss": "^3.4.0"}}'
+            '{"name": "frontend", "dependencies": ' '{"react": "^19.0.0", "tailwindcss": "^3.4.0"}}'
         )
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.writestr("main.py", py_code)

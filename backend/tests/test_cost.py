@@ -29,6 +29,7 @@ from app.models.user import User, UserRole
 # Helpers
 # =============================================================================
 
+
 def _make_user(**kwargs: Any) -> User:
     """Build a deterministic mock User for auth override."""
     uid = uuid.uuid4()
@@ -51,6 +52,7 @@ def _make_completed_cost_run(user_id: uuid.UUID, result: dict[str, Any]) -> Agen
     run.status = AgentRunStatus.COMPLETED
     run.output_data = {"result": result, "workload_label": "Test Workload"}
     from datetime import UTC, datetime
+
     run.created_at = datetime.now(UTC)
     run.updated_at = datetime.now(UTC)
     return run
@@ -59,6 +61,7 @@ def _make_completed_cost_run(user_id: uuid.UUID, result: dict[str, Any]) -> Agen
 # =============================================================================
 # Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def mock_db() -> AsyncMock:
@@ -245,7 +248,6 @@ def mock_cloud_pricing_services() -> Any:
     _AZURE_CACHE.clear()
 
 
-
 # =============================================================================
 # Minimal valid request body
 # =============================================================================
@@ -265,6 +267,7 @@ VALID_REQUEST: dict[str, Any] = {
 # Auth Guard Tests
 # =============================================================================
 
+
 class TestAuthGuards:
     """Protected endpoints require auth, but public cost estimation does not."""
 
@@ -281,9 +284,7 @@ class TestAuthGuards:
         assert "result" in data
         assert len(data["result"]["providers"]) == 3
 
-    def test_cost_comparison_alias_unauthenticated_allowed(
-        self, unauth_client: TestClient
-    ) -> None:
+    def test_cost_comparison_alias_unauthenticated_allowed(self, unauth_client: TestClient) -> None:
         """Direct /cost-comparison alias also allows unauthenticated calls."""
         response = unauth_client.post("/api/v1/cost-comparison", json=VALID_REQUEST)
         assert response.status_code == 200
@@ -305,6 +306,7 @@ class TestAuthGuards:
 # =============================================================================
 # POST /cost/estimate — Success
 # =============================================================================
+
 
 class TestCreateEstimate:
     """Tests for the POST /cost/estimate endpoint."""
@@ -491,6 +493,7 @@ class TestCreateEstimate:
 # POST /cost/estimate — Validation
 # =============================================================================
 
+
 class TestCreateEstimateValidation:
     """Input validation tests — Pydantic should reject bad inputs with 422."""
 
@@ -523,6 +526,7 @@ class TestCreateEstimateValidation:
 # =============================================================================
 # GET /cost/estimates — List
 # =============================================================================
+
 
 class TestListEstimates:
     """Tests for the GET /cost/estimates endpoint."""
@@ -598,6 +602,7 @@ class TestListEstimates:
 # GET /cost/estimates/{run_id} — Single Estimate
 # =============================================================================
 
+
 class TestGetEstimate:
     """Tests for the GET /cost/estimates/{run_id} endpoint."""
 
@@ -638,6 +643,7 @@ class TestGetEstimate:
 # Unit Tests — CostCalculatorService
 # =============================================================================
 
+
 class TestCostCalculatorService:
     """Unit tests for the pure service layer — no HTTP, no DB."""
 
@@ -646,7 +652,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=4, memory_gb=16, storage_gb=100,
+            cpu_cores=4,
+            memory_gb=16,
+            storage_gb=100,
             providers=["aws", "gcp", "azure"],
         )
         results = CostCalculatorService().compute(req)
@@ -658,7 +666,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=4, memory_gb=16, storage_gb=100,
+            cpu_cores=4,
+            memory_gb=16,
+            storage_gb=100,
             providers=["aws", "gcp", "azure"],
         )
         results = CostCalculatorService().compute(req)
@@ -670,7 +680,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=8, memory_gb=32, storage_gb=50,
+            cpu_cores=8,
+            memory_gb=32,
+            storage_gb=50,
             providers=["aws"],
         )
         results = CostCalculatorService().compute(req)
@@ -683,7 +695,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=2, memory_gb=4, storage_gb=0,
+            cpu_cores=2,
+            memory_gb=4,
+            storage_gb=0,
             providers=["gcp"],
         )
         results = CostCalculatorService().compute(req)
@@ -695,7 +709,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=2, memory_gb=4, storage_gb=0,
+            cpu_cores=2,
+            memory_gb=4,
+            storage_gb=0,
             hours_per_month=100.0,
             providers=["aws"],
         )
@@ -709,7 +725,9 @@ class TestCostCalculatorService:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=4, memory_gb=8, storage_gb=200,
+            cpu_cores=4,
+            memory_gb=8,
+            storage_gb=200,
             providers=["azure"],
         )
         results = CostCalculatorService().compute(req)
@@ -722,6 +740,7 @@ class TestCostCalculatorService:
 # Unit Tests — CostAIService (mock fallback path)
 # =============================================================================
 
+
 class TestCostAIServiceFallback:
     """Unit tests for the rule-based suggestion fallback."""
 
@@ -733,7 +752,9 @@ class TestCostAIServiceFallback:
         from app.services.cost_service import CostCalculatorService
 
         req = CostEstimateRequest(
-            cpu_cores=4, memory_gb=16, storage_gb=50,
+            cpu_cores=4,
+            memory_gb=16,
+            storage_gb=50,
             providers=["aws", "gcp", "azure"],
         )
         estimates = CostCalculatorService().compute(req)

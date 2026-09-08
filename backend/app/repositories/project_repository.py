@@ -28,11 +28,7 @@ class ProjectRepository:
 
     async def list_by_user(self, user_id: uuid.UUID) -> list[Project]:
         """Fetch all projects owned by the specified user, ordered by creation desc."""
-        stmt = (
-            select(Project)
-            .where(Project.user_id == user_id)
-            .order_by(Project.created_at.desc())
-        )
+        stmt = select(Project).where(Project.user_id == user_id).order_by(Project.created_at.desc())
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 

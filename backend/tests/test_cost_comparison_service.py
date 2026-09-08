@@ -464,5 +464,3 @@ async def test_cloud_comparison_concurrent_execution_in_parallel(
     assert len(resp.estimates) == 3
     # Parallel execution of 3 x 0.12s tasks must complete in well under the sequential sum of 0.36s
     assert elapsed < 0.28, f"Expected parallel execution under 0.28s, took {elapsed:.2f}s"
-
-

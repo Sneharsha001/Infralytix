@@ -119,10 +119,7 @@ async def create_estimate(
         available = [
             e
             for e in estimates
-            if not any(
-                "unavailable" in n.lower() or "failed" in n.lower()
-                for n in e.notes
-            )
+            if not any("unavailable" in n.lower() or "failed" in n.lower() for n in e.notes)
             and e.total_monthly_usd > 0.0
         ]
         cheapest = available[0] if available else estimates[0]
@@ -214,8 +211,7 @@ async def list_estimates(
 
     # Filter to only cost-type runs with completed status
     cost_runs = [
-        r for r in runs
-        if r.agent_type == _AGENT_TYPE and r.status == AgentRunStatus.COMPLETED
+        r for r in runs if r.agent_type == _AGENT_TYPE and r.status == AgentRunStatus.COMPLETED
     ][:50]
 
     items: list[CostEstimateListItem] = []
@@ -266,11 +262,7 @@ async def get_estimate(
     run = await run_repo.get_by_id(run_id)
 
     # 404-mask: don't reveal whether the run ID exists for another user
-    if (
-        not run
-        or run.agent_type != _AGENT_TYPE
-        or run.project_id != current_user.id
-    ):
+    if not run or run.agent_type != _AGENT_TYPE or run.project_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Cost estimate not found.",

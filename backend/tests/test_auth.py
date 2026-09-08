@@ -63,6 +63,7 @@ def admin_user() -> User:
 # 1. Registration Tests
 # =============================================================================
 
+
 class TestUserRegistration:
     """Tests for POST /api/v1/auth/register."""
 
@@ -152,6 +153,7 @@ class TestUserRegistration:
 # 2. Login Tests
 # =============================================================================
 
+
 class TestUserLogin:
     """Tests for POST /api/v1/auth/login."""
 
@@ -237,6 +239,7 @@ class TestUserLogin:
 # 3. Token Refresh Tests
 # =============================================================================
 
+
 class TestTokenRefresh:
     """Tests for POST /api/v1/auth/refresh."""
 
@@ -305,6 +308,7 @@ class TestTokenRefresh:
 # 4. Protected Route & RBAC Tests
 # =============================================================================
 
+
 class TestProtectedRoutesAndRBAC:
     """Tests for protected routes and Role-Based Access Control."""
 
@@ -358,9 +362,7 @@ class TestProtectedRoutesAndRBAC:
             assert response.status_code == 403
             assert response.json()["error"]["code"] == "FORBIDDEN"
 
-    def test_admin_route_as_admin_user_allowed(
-        self, client: TestClient, admin_user: User
-    ) -> None:
+    def test_admin_route_as_admin_user_allowed(self, client: TestClient, admin_user: User) -> None:
         """Administrator accessing admin route receives 200 OK."""
         token = auth_service.create_access_token(admin_user.id, admin_user.role.value)
 
@@ -380,6 +382,7 @@ class TestProtectedRoutesAndRBAC:
 # =============================================================================
 # 5. Logout Tests
 # =============================================================================
+
 
 class TestLogout:
     """Tests for POST /api/v1/auth/logout."""

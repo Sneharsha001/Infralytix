@@ -29,6 +29,7 @@ logger = get_logger(__name__)
 # Engine and Session Factory Initialization
 # =============================================================================
 
+
 def _create_engine() -> AsyncEngine:
     url = settings.DATABASE_URL
     if url.startswith("sqlite"):
@@ -61,6 +62,7 @@ AsyncSessionLocal = async_sessionmaker(
 # =============================================================================
 # Dependency Injection
 # =============================================================================
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """

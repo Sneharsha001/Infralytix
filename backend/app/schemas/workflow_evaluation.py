@@ -76,9 +76,7 @@ class WorkflowEvaluation(BaseModel):
                             fully execute on the candidate instance.
     """
 
-    makespan_seconds: float = Field(
-        ..., ge=0, description="Critical-path makespan in seconds."
-    )
+    makespan_seconds: float = Field(..., ge=0, description="Critical-path makespan in seconds.")
     total_cost_usd: float = Field(
         ..., ge=0, description="Total compute cost in USD across all tasks."
     )

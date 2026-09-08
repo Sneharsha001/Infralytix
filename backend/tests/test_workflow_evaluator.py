@@ -87,9 +87,7 @@ def _instance(
     hourly_price: float = 1.0,
     has_gpu: bool = False,
 ) -> InstanceSpec:
-    return InstanceSpec(
-        vcpu=vcpu, ram_gb=ram_gb, hourly_price_usd=hourly_price, has_gpu=has_gpu
-    )
+    return InstanceSpec(vcpu=vcpu, ram_gb=ram_gb, hourly_price_usd=hourly_price, has_gpu=has_gpu)
 
 
 def _workflow(*tasks: WorkflowTaskResponse) -> WorkflowResponse:
@@ -239,7 +237,7 @@ class TestComputeMakespan:
 
     def test_parallel_tasks_makespan_is_longest(self) -> None:
         """A with two parallel successors B and C (no common sink):
-           makespan = A + max(B, C) when B and C have no deps each other."""
+        makespan = A + max(B, C) when B and C have no deps each other."""
         tasks = [
             _task("A"),
             _task("B", depends_on=["A"]),
@@ -276,9 +274,9 @@ class TestComputeMakespan:
         # Manually provide scaled times (2× speedup)
         scaled: dict[str, float] = {"A": 50.0, "B": 100.0, "C": 25.0, "D": 40.0}
         result = compute_makespan(tasks, scaled)
-        assert result == pytest.approx(190.0), (
-            f"Expected critical path A→B→D = 190 s, got {result} s"
-        )
+        assert result == pytest.approx(
+            190.0
+        ), f"Expected critical path A→B→D = 190 s, got {result} s"
 
     def test_no_edges_makespan_is_max_task(self) -> None:
         """Independent tasks (no edges) run in parallel; makespan = longest task."""
@@ -438,8 +436,8 @@ class TestEvaluateWorkflowPricingAccuracy:
         wf = _workflow(
             _task("t", category=TaskCategory.cpu_bound, baseline_time=7200.0, baseline_vcpu=2)
         )
-        inst_slow = _instance(vcpu=2, hourly_price=1.0)   # no speedup
-        inst_fast = _instance(vcpu=4, hourly_price=1.0)   # 2× speedup
+        inst_slow = _instance(vcpu=2, hourly_price=1.0)  # no speedup
+        inst_fast = _instance(vcpu=4, hourly_price=1.0)  # 2× speedup
 
         result_slow = evaluate_workflow(wf, inst_slow)
         result_fast = evaluate_workflow(wf, inst_fast)
@@ -496,9 +494,9 @@ class TestEvaluateWorkflowCategoryVariety:
         # instance: 4 vCPU, 8 GB RAM, $1/hr
         inst = _instance(vcpu=4, ram_gb=8.0, hourly_price=1.0)
 
-        cpu_speedup = min(4 / 2, MAX_CPU_SPEEDUP)              # 2.0
+        cpu_speedup = min(4 / 2, MAX_CPU_SPEEDUP)  # 2.0
         io_speedup = min((4 / 2) ** IO_VCPU_EXPONENT, IO_MAX_SPEEDUP)
-        ram_speedup = min(8.0 / 4.0, MAX_RAM_SPEEDUP)          # 2.0
+        ram_speedup = min(8.0 / 4.0, MAX_RAM_SPEEDUP)  # 2.0
 
         expected_makespan = 100 / cpu_speedup + 100 / io_speedup + 100 / ram_speedup
         result = evaluate_workflow(wf, inst)

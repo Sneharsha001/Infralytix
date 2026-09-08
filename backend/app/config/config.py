@@ -99,6 +99,7 @@ class Settings(BaseSettings):
             v_str = v.strip()
             if v_str.startswith("[") and v_str.endswith("]"):
                 import json
+
                 try:
                     parsed = json.loads(v_str)
                     if isinstance(parsed, list):

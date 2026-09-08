@@ -2,9 +2,10 @@
 # Infralytix Backend — Multi-Stage Dockerfile
 # =============================================================================
 # Stages:
-#   builder     — Install Python dependencies
-#   development — Hot reload server (bind mount source)
-#   production  — Minimal, non-root, hardened image
+#   base        — Shared Python runtime with uv and venv PATH
+#   builder     — Install production Python dependencies into virtualenv
+#   development — Hot reload server with dev dependencies
+#   production  — Minimal, non-root, hardened production image
 # =============================================================================
 
 # ── Base: Shared Python version ───────────────────────────────────────────────
@@ -14,22 +15,23 @@ FROM python:${PYTHON_VERSION}-slim AS base
 # Prevent Python from writing .pyc files and buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONFAULTHANDLER=1
+    PYTHONFAULTHANDLER=1 \
+    PATH="/app/.venv/bin:$PATH"
 
 # ── Builder: Install all dependencies ────────────────────────────────────────
 FROM base AS builder
 
-WORKDIR /build
+WORKDIR /app
 
 # Install uv (fast Python package manager)
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Copy dependency spec first (Docker layer cache optimization)
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock* ./
 
-# Install production dependencies only
-# --system: install into system Python (not venv) for cleaner COPY in next stage
-RUN uv pip install --system --no-cache -e .
+# Install production dependencies into virtual environment (/app/.venv)
+# --no-install-project avoids requiring source code during dependency caching layer
+RUN uv sync --frozen --no-dev --no-install-project || uv sync --no-dev --no-install-project
 
 # ── Development: Hot reload with mounted source ───────────────────────────────
 FROM base AS development
@@ -43,9 +45,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 RUN apt-get update && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml and install all deps including dev
-COPY pyproject.toml .
-RUN uv pip install --system --no-cache -e ".[dev]"
+# Copy dependency specs and install all dependencies including dev tools
+COPY pyproject.toml uv.lock* ./
+RUN uv sync --frozen --extra dev --no-install-project || uv sync --extra dev --no-install-project
 
 # Note: Source code is mounted via docker-compose volume in dev mode
 EXPOSE 8000
@@ -70,14 +72,11 @@ RUN groupadd --gid 1001 infralytix && \
 
 WORKDIR /app
 
-# Copy only what is needed from builder
-# Python standard library is already in the base image
-COPY --from=builder /usr/local/lib/python3.12/site-packages \
-                    /usr/local/lib/python3.12/site-packages
+# Set ownership of /app
+RUN chown -R infralytix:infralytix /app
 
-# Copy CLI tools installed by packages (uvicorn, alembic)
-COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
-COPY --from=builder /usr/local/bin/alembic /usr/local/bin/alembic
+# Copy complete virtual environment from builder stage
+COPY --from=builder --chown=infralytix:infralytix /app/.venv /app/.venv
 
 # Copy application source with correct ownership
 COPY --chown=infralytix:infralytix app/ ./app/

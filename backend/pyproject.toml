@@ -14,30 +14,26 @@ dependencies = [
     # ─── Web Framework ────────────────────────────────────────────────────────
     "fastapi>=0.115.0,<0.116",
     "uvicorn[standard]>=0.32.0,<0.33",
-
     # ─── Data Validation & Settings ──────────────────────────────────────────
     "pydantic>=2.9.0,<3.0",
     "pydantic-settings>=2.6.0,<3.0",
     "email-validator>=2.2.0,<3.0",
-
     # ─── Database ─────────────────────────────────────────────────────────────
     "sqlalchemy>=2.0.36,<3.0",
     "alembic>=1.14.0,<2.0",
     "aiomysql>=0.2.0,<0.3",        # Async MySQL driver
     "pymysql>=1.1.0,<2.0",         # Sync MySQL driver (Alembic)
     "cryptography>=43.0.0",        # Required by PyMySQL for secure connections
-
     # ─── Authentication ───────────────────────────────────────────────────────
     "python-jose[cryptography]>=3.3.0,<4.0",
     "passlib[bcrypt]>=1.7.4,<2.0",
     "bcrypt>=4.0.0,<4.1.0",           # Pin for passlib 1.7.4 compatibility
     "python-multipart>=0.0.12,<0.1",  # Form data parsing
-
     # ─── HTTP ─────────────────────────────────────────────────────────────────
     "httpx>=0.28.0,<0.29",          # Async HTTP client (also used in tests)
-
     # ─── Graph / DAG ──────────────────────────────────────────────────────────
     "networkx>=3.4,<4.0",           # DAG validation for workflow service
+    "aiosqlite>=0.22.1",
 ]
 
 [project.optional-dependencies]

@@ -79,7 +79,7 @@ class TestUserRepository:
         assert result.name == "New User"
         assert result.email == "new@example.com"
         assert result.hashed_password == "hash"
-        
+
         mock_db_session.add.assert_called_once()
         mock_db_session.flush.assert_called_once()
         mock_db_session.refresh.assert_called_once()
@@ -95,7 +95,7 @@ class TestUserRepository:
     async def test_update_success(self, repo: UserRepository, mock_db_session: AsyncMock, sample_user: User):
         result = await repo.update(sample_user, name="Updated Name", invalid_field="ignore_this")
         assert result.name == "Updated Name"
-        
+
         mock_db_session.add.assert_called_once_with(sample_user)
         mock_db_session.flush.assert_called_once()
         mock_db_session.refresh.assert_called_once()
@@ -115,11 +115,11 @@ class TestRefreshTokenRepository:
         user_id = uuid.uuid4()
         expires = datetime.now(UTC)
         result = await repo.create_refresh_token(user_id, "token_hash_abc", expires)
-        
+
         assert result.user_id == user_id
         assert result.token_hash == "token_hash_abc"
         assert result.expires_at == expires
-        
+
         mock_db_session.add.assert_called_once()
         mock_db_session.flush.assert_called_once()
 
@@ -148,9 +148,9 @@ class TestRefreshTokenRepository:
     async def test_revoke_refresh_token_success(self, repo: UserRepository, mock_db_session: AsyncMock):
         mock_token = RefreshToken(user_id=uuid.uuid4(), token_hash="abc", expires_at=datetime.now(UTC))
         assert mock_token.revoked_at is None
-        
+
         await repo.revoke_refresh_token(mock_token)
-        
+
         assert mock_token.revoked_at is not None
         mock_db_session.add.assert_called_once_with(mock_token)
         mock_db_session.flush.assert_called_once()
@@ -161,12 +161,12 @@ class TestRefreshTokenRepository:
         import datetime as dt
         old_time = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
         mock_token = RefreshToken(user_id=uuid.uuid4(), token_hash="abc", expires_at=dt.datetime.now(dt.UTC), revoked_at=old_time)
-        
+
         # Prevent RuntimeWarning for unawaited coroutine by making add a synchronous MagicMock
         mock_db_session.add = MagicMock()
-        
+
         await repo.revoke_refresh_token(mock_token)
-        
+
         assert mock_token.revoked_at is not None
         assert mock_token.revoked_at != old_time
         mock_db_session.add.assert_called_once_with(mock_token)
@@ -176,6 +176,6 @@ class TestRefreshTokenRepository:
     async def test_revoke_all_user_refresh_tokens(self, repo: UserRepository, mock_db_session: AsyncMock):
         user_id = uuid.uuid4()
         await repo.revoke_all_user_refresh_tokens(user_id)
-        
+
         mock_db_session.execute.assert_called_once()
         mock_db_session.flush.assert_called_once()

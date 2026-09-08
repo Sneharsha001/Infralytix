@@ -6,7 +6,6 @@ import uuid
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from sqlalchemy.exc import IntegrityError
 
 from app.models.project import Project
 from app.repositories.project_repository import ProjectRepository
@@ -81,7 +80,7 @@ class TestProjectRepository:
         assert result.name == "My Project"
         assert result.description == "Desc"
         assert result.repo_name == "my-repo"
-        
+
         mock_db_session.add.assert_called_once()
         mock_db_session.flush.assert_called_once()
         mock_db_session.refresh.assert_called_once()

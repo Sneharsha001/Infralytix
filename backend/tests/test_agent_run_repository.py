@@ -101,7 +101,7 @@ class TestAgentRunRepository:
         assert result.agent_type == "security"
         assert result.status == AgentRunStatus.COMPLETED
         assert result.output_data == {"key": "value"}
-        
+
         mock_db_session.add.assert_called_once()
         mock_db_session.flush.assert_called_once()
         mock_db_session.refresh.assert_called_once()
@@ -127,7 +127,7 @@ class TestAgentRunRepository:
         assert result.status == AgentRunStatus.COMPLETED
         assert result.output_data == {"done": True}
         assert result.error_message == "none"
-        
+
         mock_db_session.add.assert_called_once_with(sample_run)
         mock_db_session.flush.assert_called_once()
         mock_db_session.refresh.assert_called_once()
@@ -137,10 +137,10 @@ class TestAgentRunRepository:
         # Edge case: updating status but keeping output_data/error_message as None doesn't overwrite them
         sample_run.output_data = {"existing": True}
         sample_run.error_message = "existing err"
-        
+
         result = await repo.update_status(sample_run, status=AgentRunStatus.FAILED)
         assert result.status == AgentRunStatus.FAILED
         assert result.output_data == {"existing": True}
         assert result.error_message == "existing err"
-        
+
         mock_db_session.add.assert_called_once_with(sample_run)

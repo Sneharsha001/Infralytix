@@ -29,20 +29,7 @@ COPY pyproject.toml .
 
 # Install production dependencies only
 # --system: install into system Python (not venv) for cleaner COPY in next stage
-RUN uv pip install --system --no-cache \
-    fastapi \
-    "uvicorn[standard]" \
-    "pydantic>=2.9.0,<3.0" \
-    "pydantic-settings>=2.6.0,<3.0" \
-    "sqlalchemy>=2.0.36,<3.0" \
-    "alembic>=1.14.0,<2.0" \
-    "aiomysql>=0.2.0,<0.3" \
-    "pymysql>=1.1.0,<2.0" \
-    "cryptography>=43.0.0" \
-    "python-jose[cryptography]>=3.3.0,<4.0" \
-    "passlib[bcrypt]>=1.7.4,<2.0" \
-    "python-multipart>=0.0.12,<0.1" \
-    "httpx>=0.28.0,<0.29"
+RUN uv pip install --system --no-cache -e .
 
 # ── Development: Hot reload with mounted source ───────────────────────────────
 FROM base AS development

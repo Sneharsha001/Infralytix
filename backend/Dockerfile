@@ -94,11 +94,9 @@ HEALTHCHECK \
     --timeout=10s \
     --start-period=15s \
     --retries=3 \
-    CMD curl --fail --silent http://localhost:8000/api/v1/health || exit 1
+    CMD sh -c "curl --fail --silent http://localhost:${PORT:-8000}/api/v1/health || exit 1"
 
-# Use exec form (not shell form) for proper signal handling (SIGTERM on shutdown)
-CMD ["uvicorn", "app.main:app", \
-     "--host", "0.0.0.0", \
-     "--port", "8000", \
-     "--no-access-log", \
-     "--workers", "1"]
+ENV PORT=8000
+
+# Support dynamic PORT injection (Render binds to $PORT, e.g. 10000)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --no-access-log --workers 1"]

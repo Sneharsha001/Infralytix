@@ -45,7 +45,7 @@ class Settings(BaseSettings):
 
     # ─── Server ───────────────────────────────────────────────────────────────
     HOST: str = Field(default="0.0.0.0", description="Bind address")
-    PORT: int = Field(default=8000, ge=1024, le=65535, description="Bind port")
+    PORT: int = Field(default=8000, ge=1, le=65535, description="Bind port")
 
     # ─── Database — MySQL 8.4 (with SQLite sandbox fallback) ─────────────────
     DB_ENGINE: Literal["mysql", "sqlite"] = Field(
@@ -54,9 +54,14 @@ class Settings(BaseSettings):
     )
     DB_HOST: str = Field(default="localhost", description="MySQL host")
     DB_PORT: int = Field(default=3306, ge=1, le=65535, description="MySQL port")
-    DB_USER: str = Field(description="MySQL username")
-    DB_PASSWORD: str = Field(description="MySQL password")
+    DB_USER: str = Field(default="", description="MySQL username")
+    DB_PASSWORD: str = Field(default="", description="MySQL password")
     DB_NAME: str = Field(default="infralytix_db", description="MySQL database name")
+    DATABASE_URL_ENV: str | None = Field(
+        default=None,
+        alias="DATABASE_URL",
+        description="Direct database URL override from environment (e.g. Render, Railway)",
+    )
 
     # Pool settings (tunable per environment)
     DB_POOL_SIZE: int = Field(default=10, ge=1, description="SQLAlchemy connection pool size")
@@ -145,6 +150,13 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL(self) -> str:
         """Async database URL for SQLAlchemy (aiomysql or aiosqlite driver)."""
+        if self.DATABASE_URL_ENV:
+            url = self.DATABASE_URL_ENV.strip()
+            if url.startswith("mysql://"):
+                url = url.replace("mysql://", "mysql+aiomysql://", 1)
+            elif url.startswith("sqlite://") and not url.startswith("sqlite+aiosqlite://"):
+                url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+            return url
         if self.DB_ENGINE == "sqlite":
             return f"sqlite+aiosqlite:///{self.DB_NAME}.db"
         return (
@@ -157,6 +169,15 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL_SYNC(self) -> str:
         """Sync database URL for Alembic migrations (pymysql or sqlite driver)."""
+        if self.DATABASE_URL_ENV:
+            url = self.DATABASE_URL_ENV.strip()
+            if url.startswith("mysql+aiomysql://"):
+                url = url.replace("mysql+aiomysql://", "mysql+pymysql://", 1)
+            elif url.startswith("mysql://"):
+                url = url.replace("mysql://", "mysql+pymysql://", 1)
+            elif url.startswith("sqlite+aiosqlite://"):
+                url = url.replace("sqlite+aiosqlite://", "sqlite://", 1)
+            return url
         if self.DB_ENGINE == "sqlite":
             return f"sqlite:///{self.DB_NAME}.db"
         return (

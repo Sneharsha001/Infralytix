@@ -1,0 +1,74 @@
+# =============================================================================
+# Infralytix — Render Deployment Blueprint
+# =============================================================================
+# Automatically provisions both the FastAPI Backend Web Service and the
+# React + Vite Frontend Static Site on Render (https://render.com).
+#
+# To deploy:
+#   1. Push this repository to GitHub.
+#   2. In the Render Dashboard, click "New" -> "Blueprint".
+#   3. Select your repository. Render will automatically configure both services.
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. Backend Web Service (FastAPI)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: infralytix-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: APP_NAME
+        value: Infralytix
+      - key: APP_VERSION
+        value: 0.1.0
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DB_ENGINE
+        value: sqlite
+      - key: DB_NAME
+        value: infralytix_db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: ALLOWED_ORIGINS
+        value: '["*"]'
+      - key: LOG_LEVEL
+        value: INFO
+      - key: LOG_FORMAT
+        value: json
+      # For cloud MySQL instances (e.g. Aiven, PlanetScale, Railway, AWS RDS),
+      # you can set DATABASE_URL directly in the Render environment settings.
+
+  # ---------------------------------------------------------------------------
+  # 2. Frontend Static Site (React 19 + TypeScript + Vite)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: infralytix-frontend
+    runtime: static
+    rootDir: frontend
+    plan: free
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      # SPA fallback: Rewrite all routes to index.html for client-side routing
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: "" # Set to your deployed backend URL: https://<infralytix-backend>.onrender.com/api/v1

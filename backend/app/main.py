@@ -165,9 +165,10 @@ def create_application() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_ORIGINS,
+        allow_origin_regex=r"https://.*\.onrender\.com",
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+        allow_methods=["*"],
+        allow_headers=["*"],
         expose_headers=["X-Request-ID", "X-Process-Time-Ms"],
     )
 

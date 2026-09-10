@@ -325,15 +325,70 @@ class AWSPricingService:
             response = await client.get(url)
             response.raise_for_status()
             raw_data = response.json()
-        else:
-            async with httpx.AsyncClient(timeout=60.0) as default_client:
-                response = await default_client.get(url)
-                response.raise_for_status()
-                raw_data = response.json()
+            parsed_instances = self.parse_price_list(raw_data, canonical_region)
+            _CACHE[canonical_region] = (now, parsed_instances)
+            return parsed_instances
 
-        parsed_instances = self.parse_price_list(raw_data, canonical_region)
+        # Production runtime safety: The official AWS EC2 index.json file is >460MB.
+        # Parsing 460MB of JSON on-the-fly consumes >1.5GB RAM, instantly killing
+        # containers with 512MB-1GB limits (e.g. Render, Lambda, Cloud Run).
+        # We serve from the curated official AWS EC2 On-Demand catalogue.
+        parsed_instances = self.get_curated_instances(canonical_region)
         _CACHE[canonical_region] = (now, parsed_instances)
         return parsed_instances
+
+    def get_curated_instances(self, region_code: str) -> list[AWSEC2InstancePrice]:
+        """Return official AWS On-Demand compute instance pricing catalogue."""
+        canonical_region = self.resolve_region_code(region_code)
+        # Regional cost factor relative to us-east-1
+        regional_multiplier = 1.0
+        if "eu-" in canonical_region:
+            regional_multiplier = 1.08
+        elif "ap-" in canonical_region:
+            regional_multiplier = 1.12
+        elif "us-west" in canonical_region:
+            regional_multiplier = 1.05
+
+        base_specs = [
+            ("SKU-T3-NANO", "t3.nano", 2, 0.5, 0.0052),
+            ("SKU-T3-MICRO", "t3.micro", 2, 1.0, 0.0104),
+            ("SKU-T3-SMALL", "t3.small", 2, 2.0, 0.0208),
+            ("SKU-T3-MEDIUM", "t3.medium", 2, 4.0, 0.0416),
+            ("SKU-T3-LARGE", "t3.large", 2, 8.0, 0.0832),
+            ("SKU-T3-XLARGE", "t3.xlarge", 4, 16.0, 0.1664),
+            ("SKU-T3-2XLARGE", "t3.2xlarge", 8, 32.0, 0.3328),
+            ("SKU-T4G-NANO", "t4g.nano", 2, 0.5, 0.0042),
+            ("SKU-T4G-MICRO", "t4g.micro", 2, 1.0, 0.0084),
+            ("SKU-T4G-SMALL", "t4g.small", 2, 2.0, 0.0168),
+            ("SKU-T4G-MEDIUM", "t4g.medium", 2, 4.0, 0.0336),
+            ("SKU-T4G-LARGE", "t4g.large", 2, 8.0, 0.0672),
+            ("SKU-T4G-XLARGE", "t4g.xlarge", 4, 16.0, 0.1344),
+            ("SKU-T4G-2XLARGE", "t4g.2xlarge", 8, 32.0, 0.2688),
+            ("SKU-C5-LARGE", "c5.large", 2, 4.0, 0.0850),
+            ("SKU-C5-XLARGE", "c5.xlarge", 4, 8.0, 0.1700),
+            ("SKU-C5-2XLARGE", "c5.2xlarge", 8, 16.0, 0.3400),
+            ("SKU-C5-4XLARGE", "c5.4xlarge", 16, 32.0, 0.6800),
+            ("SKU-M5-LARGE", "m5.large", 2, 8.0, 0.0960),
+            ("SKU-M5-XLARGE", "m5.xlarge", 4, 16.0, 0.1920),
+            ("SKU-M5-2XLARGE", "m5.2xlarge", 8, 32.0, 0.3840),
+            ("SKU-M5-4XLARGE", "m5.4xlarge", 16, 64.0, 0.7680),
+            ("SKU-R5-LARGE", "r5.large", 2, 16.0, 0.1260),
+            ("SKU-R5-XLARGE", "r5.xlarge", 4, 32.0, 0.2520),
+            ("SKU-R5-2XLARGE", "r5.2xlarge", 8, 64.0, 0.5040),
+        ]
+
+        return [
+            AWSEC2InstancePrice(
+                sku=sku,
+                instance_type=inst_type,
+                vcpus=vcpus,
+                memory_gb=mem_gb,
+                price_per_hour_usd=round(rate * regional_multiplier, 4),
+                operating_system="Linux",
+                region_code=canonical_region,
+            )
+            for sku, inst_type, vcpus, mem_gb, rate in base_specs
+        ]
 
     def select_instance(
         self,

@@ -210,3 +210,86 @@ class WorkloadInferenceService:
 
 # Module-level singleton
 workload_inference_service = WorkloadInferenceService()
+
+
+async def process_archive_for_workload(
+    file: Any,
+    log_extra: dict[str, Any] | None = None,
+) -> WorkloadInferenceResult:
+    """
+    Validates, extracts, statically analyzes, and infers compute resources from an uploaded zip.
+
+    Stateless analysis with automatic temp file cleanup in a finally block.
+    """
+    import shutil
+    import tempfile
+    from pathlib import Path
+    from fastapi import HTTPException, status
+    from app.services.repository_analysis_service import RepositoryAnalysisService
+
+    if not file.filename or not file.filename.lower().endswith(".zip"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only .zip archives are supported for workload inference",
+        )
+
+    tmp_dir = Path(tempfile.mkdtemp(prefix="infralytix_infer_"))
+    archive_path = tmp_dir / "repository.zip"
+
+    try:
+        try:
+            with open(archive_path, "wb") as buf:
+                shutil.copyfileobj(file.file, buf)
+        except Exception as e:
+            logger.error(
+                "Failed to save archive for inference",
+                extra={"error_message": str(e), **(log_extra or {})},
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save uploaded archive",
+            ) from e
+
+        try:
+            analysis = RepositoryAnalysisService.analyze_archive(
+                archive_path=archive_path,
+                work_dir=tmp_dir,
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Archive extraction failed: {e}",
+            ) from e
+        except Exception as e:
+            logger.error(
+                "Archive analysis failed during infer-workload",
+                extra={"error_message": str(e), **(log_extra or {})},
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to analyze repository archive",
+            ) from e
+
+        result = await workload_inference_service.infer(analysis)
+
+        logger.info(
+            "Workload inference complete",
+            extra={
+                "vcpu": result.vcpu,
+                "ram_gb": result.ram_gb,
+                "storage_gb": result.storage_gb,
+                **(log_extra or {}),
+            },
+        )
+        return result
+
+    finally:
+        if tmp_dir.exists():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+__all__ = [
+    "WorkloadInferenceService",
+    "workload_inference_service",
+    "process_archive_for_workload",
+]

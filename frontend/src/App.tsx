@@ -16,6 +16,7 @@ import { CostEstimatorPage } from '@/features/cost'
 import { CostComparisonPage } from '@/features/cost-comparison'
 import { DashboardPage } from '@/features/dashboard'
 import { ProjectDetailPage, ProjectsListPage } from '@/features/projects'
+import { WorkloadUploadPage } from '@/features/workload-upload/WorkloadUploadPage'
 import { WorkflowOptimizerPage } from '@/features/workflows'
 
 const App: React.FC = () => {
@@ -27,6 +28,7 @@ const App: React.FC = () => {
           <Route path="/" element={<CostComparisonPage />} />
           <Route path="/cost-comparison" element={<CostComparisonPage />} />
           <Route path="/workflows" element={<WorkflowOptimizerPage />} />
+          <Route path="/upload-workload" element={<WorkloadUploadPage />} />
 
           {/* Authentication */}
           <Route path="/login" element={<LoginPage />} />

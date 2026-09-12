@@ -148,3 +148,45 @@
     @apply bg-white/8 rounded-lg animate-pulse;
   }
 }
+
+/* ── Workload Analysis Animations ────────────────────────────────────────────
+   Used by WorkloadUploadPage during the "Analyzing…" phase.
+   These are raw CSS because Tailwind cannot express multi-step keyframe sequences. */
+
+@keyframes scan {
+  0%   { transform: translateY(0); opacity: 0.7; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(99, 102, 241, 0.35),
+    rgba(139, 92, 246, 0.5),
+    rgba(99, 102, 241, 0.35),
+    transparent
+  );
+  animation: scan 3.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes particle-float {
+  0%, 100% { opacity: 0.04; transform: translateY(0); }
+  50%       { opacity: 0.10; transform: translateY(-6px); }
+}
+
+.particle-grid {
+  background-image:
+    radial-gradient(circle, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  animation: particle-float 6s ease-in-out infinite;
+  border-radius: 1rem;
+}
+

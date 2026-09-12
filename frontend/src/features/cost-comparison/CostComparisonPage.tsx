@@ -4,11 +4,15 @@
  * Provides a live interactive form to configure compute and storage workloads,
  * queries POST /api/v1/cost-comparison concurrently across AWS, Azure, and GCP,
  * and renders comparative cards sorted cheapest-first alongside Gemini AI recommendations.
+ *
+ * Accepts optional React Router `state` from WorkloadUploadPage to pre-fill form
+ * fields with AI-inferred workload values.
  */
 
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
+import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
 
 export interface CloudCostEstimate {
   provider: string
@@ -67,13 +71,33 @@ const PROVIDER_META: Record<
 }
 
 export const CostComparisonPage: React.FC = () => {
+  const location = useLocation()
+  const inferredState = location.state as WorkloadInferenceRouteState | null
+
   const [formData, setFormData] = useState<FormState>({
-    vcpu: 4,
-    ram_gb: 16,
-    storage_gb: 100,
+    vcpu: inferredState?.autoDetected ? inferredState.vcpu : 4,
+    ram_gb: inferredState?.autoDetected ? inferredState.ram_gb : 16,
+    storage_gb: inferredState?.autoDetected ? inferredState.storage_gb : 100,
     region: 'us-east',
     hours_per_month: 730,
   })
+
+  const [autoDetectedBadge, setAutoDetectedBadge] = useState(
+    inferredState?.autoDetected ?? false
+  )
+
+  // Sync form if router state changes (e.g. navigating back and forward)
+  useEffect(() => {
+    if (inferredState?.autoDetected) {
+      setFormData((prev) => ({
+        ...prev,
+        vcpu: inferredState.vcpu,
+        ram_gb: inferredState.ram_gb,
+        storage_gb: inferredState.storage_gb,
+      }))
+      setAutoDetectedBadge(true)
+    }
+  }, [inferredState?.autoDetected]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [data, setData] = useState<CloudComparisonResponse | null>(null)
@@ -140,6 +164,16 @@ export const CostComparisonPage: React.FC = () => {
 
         <nav className="flex items-center gap-2 text-sm">
           <Link
+            to="/upload-workload"
+            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Upload & Detect
+          </Link>
+          <Link
             to="/cost-comparison"
             className="px-3.5 py-1.5 rounded-lg bg-white/10 text-white font-medium border border-white/10 shadow-sm"
           >
@@ -181,7 +215,7 @@ export const CostComparisonPage: React.FC = () => {
           {/* Subtle decorative glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-white">Workload Specifications</h2>
               <p className="text-xs text-neutral-400">
@@ -189,30 +223,56 @@ export const CostComparisonPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Quick Presets */}
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-neutral-500">Presets:</span>
-              <button
-                type="button"
-                onClick={() => applyPreset(2, 4, 50)}
-                className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
-              >
-                Micro (2v/4G)
-              </button>
-              <button
-                type="button"
-                onClick={() => applyPreset(4, 16, 100)}
-                className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
-              >
-                Standard (4v/16G)
-              </button>
-              <button
-                type="button"
-                onClick={() => applyPreset(8, 32, 250)}
-                className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
-              >
-                High-Mem (8v/32G)
-              </button>
+            <div className="flex flex-col items-end gap-2">
+              {/* Auto-detected badge */}
+              {autoDetectedBadge && inferredState?.justification && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span
+                    title={inferredState.justification}
+                    className="cursor-help"
+                  >
+                    Auto-detected from your project
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAutoDetectedBadge(false)}
+                    className="text-emerald-600 hover:text-emerald-300 ml-1 transition-colors"
+                    aria-label="Dismiss auto-detected badge"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Quick Presets */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-neutral-500">Presets:</span>
+                <button
+                  type="button"
+                  onClick={() => applyPreset(2, 4, 50)}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                >
+                  Micro (2v/4G)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyPreset(4, 16, 100)}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                >
+                  Standard (4v/16G)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyPreset(8, 32, 250)}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                >
+                  High-Mem (8v/32G)
+                </button>
+              </div>
             </div>
           </div>
 

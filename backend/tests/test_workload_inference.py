@@ -218,7 +218,7 @@ class TestInferWorkloadGemini:
         with (
             patch("app.middlewares.auth_middleware.UserRepository") as mock_user_repo,
             patch("app.services.project_service.ProjectRepository") as mock_proj_repo,
-            patch("app.config.config.settings") as mock_settings,
+            patch("app.services.workload_inference_service.settings") as mock_settings,
             patch(
                 "app.services.workload_inference_service.WorkloadInferenceService._gemini_infer",
                 new_callable=AsyncMock,
@@ -261,7 +261,7 @@ class TestInferWorkloadGemini:
         with (
             patch("app.middlewares.auth_middleware.UserRepository") as mock_user_repo,
             patch("app.services.project_service.ProjectRepository") as mock_proj_repo,
-            patch("app.config.config.settings") as mock_settings,
+            patch("app.services.workload_inference_service.settings") as mock_settings,
             patch(
                 "app.services.workload_inference_service.WorkloadInferenceService._gemini_infer",
                 new_callable=AsyncMock,

@@ -403,12 +403,53 @@ class TestInferWorkloadValidation:
                 files={"file": ("empty.zip", empty_zip, "application/zip")},
             )
 
-        # Empty repo should return minimal values, not 500
         assert response.status_code == 200
         data = response.json()
         assert data["vcpu"] >= 1
         assert data["ram_gb"] >= 1
         assert data["storage_gb"] >= 10
+
+    def test_public_cost_comparison_infer_workload_no_auth(
+        self,
+        client: TestClient,
+    ) -> None:
+        """Public /api/v1/cost-comparison/infer-workload succeeds without auth or project."""
+        zip_bytes = _minimal_repo_zip()
+        with patch("app.config.config.settings") as mock_settings:
+            mock_settings.GEMINI_API_KEY = ""
+            mock_settings.GEMINI_MODEL = "gemini-1.5-flash"
+            response = client.post(
+                "/api/v1/cost-comparison/infer-workload",
+                files={"file": ("repo.zip", zip_bytes, "application/zip")},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        result = WorkloadInferenceResult.model_validate(data)
+        assert result.vcpu >= 1
+        assert result.ram_gb >= 1
+        assert result.storage_gb >= 10
+
+    def test_public_projects_infer_workload_stateless_no_auth(
+        self,
+        client: TestClient,
+    ) -> None:
+        """Public /api/v1/projects/infer-workload succeeds without auth or project."""
+        zip_bytes = _minimal_repo_zip()
+        with patch("app.config.config.settings") as mock_settings:
+            mock_settings.GEMINI_API_KEY = ""
+            mock_settings.GEMINI_MODEL = "gemini-1.5-flash"
+            response = client.post(
+                "/api/v1/projects/infer-workload",
+                files={"file": ("repo.zip", zip_bytes, "application/zip")},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        result = WorkloadInferenceResult.model_validate(data)
+        assert result.vcpu >= 1
+        assert result.ram_gb >= 1
+        assert result.storage_gb >= 10
 
 
 # ─── 4. WorkloadInferenceService Unit Tests ───────────────────────────────────

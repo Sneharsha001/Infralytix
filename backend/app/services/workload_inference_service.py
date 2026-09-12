@@ -225,7 +225,7 @@ async def process_archive_for_workload(
     import tempfile
     from pathlib import Path
     from fastapi import HTTPException, status
-    from app.services.repository_analysis_service import RepositoryAnalysisService
+    from app.services.analysis_service import RepositoryAnalysisService
 
     if not file.filename or not file.filename.lower().endswith(".zip"):
         raise HTTPException(

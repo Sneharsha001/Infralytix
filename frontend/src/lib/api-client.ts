@@ -10,12 +10,13 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 
 export const apiClient = axios.create({
   baseURL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Backward compatibility storage stubs (no auth handling active)
+// In-memory access token storage
 let _inMemoryToken: string | null = null
 let _sessionCallback: (() => void) | null = null
 
@@ -34,5 +35,13 @@ export const _noop = (): void => {
     _sessionCallback()
   }
 }
+
+// Attach access token to outgoing requests if authenticated
+apiClient.interceptors.request.use((config) => {
+  if (_inMemoryToken) {
+    config.headers.Authorization = `Bearer ${_inMemoryToken}`
+  }
+  return config
+})
 
 export default apiClient

@@ -9,8 +9,10 @@
  * fields with AI-inferred workload values.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
+import { SiAmazonwebservices, SiGooglecloud, SiMicrosoftazure } from 'react-icons/si'
 import { apiClient } from '@/lib/api-client'
 import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
 
@@ -46,28 +48,89 @@ const REGION_OPTIONS = [
   { value: 'asia', label: 'Asia Pacific (Singapore / Taiwan / Tokyo)' },
 ]
 
+// ─── Provider brand metadata ─────────────────────────────────────────────────
+
 const PROVIDER_META: Record<
   string,
-  { name: string; tag: string; borderClass: string; badgeClass: string }
+  {
+    name: string
+    tag: string
+    // react-icons component
+    Icon: React.ComponentType<{ size?: number; className?: string }>
+    // CSS colour for the icon itself
+    iconColor: string
+    // Tailwind gradient class for the card border (normal)
+    borderGradient: string
+    // CSS box-shadow applied inline on hover
+    hoverShadow: string
+    // Tailwind ring/glow for cheapest-card shimmer base
+    cheapestGlow: string
+  }
 > = {
   aws: {
     name: 'Amazon Web Services',
     tag: 'AWS EC2',
-    borderClass: 'border-amber-500/30 hover:border-amber-500/60',
-    badgeClass: 'bg-amber-500/15 text-amber-300 ring-amber-500/30',
+    Icon: SiAmazonwebservices,
+    iconColor: '#FF9900',
+    borderGradient: 'provider-border-aws',
+    hoverShadow: '0 8px 32px -4px rgba(255,153,0,0.25)',
+    cheapestGlow: '',
   },
   azure: {
     name: 'Microsoft Azure',
     tag: 'Azure VMs',
-    borderClass: 'border-sky-500/30 hover:border-sky-500/60',
-    badgeClass: 'bg-sky-500/15 text-sky-300 ring-sky-500/30',
+    Icon: SiMicrosoftazure,
+    iconColor: '#0089D6',
+    borderGradient: 'provider-border-azure',
+    hoverShadow: '0 8px 32px -4px rgba(0,137,214,0.25)',
+    cheapestGlow: '',
   },
   gcp: {
     name: 'Google Cloud Platform',
     tag: 'GCP Compute',
-    borderClass: 'border-blue-500/30 hover:border-blue-500/60',
-    badgeClass: 'bg-blue-500/15 text-blue-300 ring-blue-500/30',
+    Icon: SiGooglecloud,
+    iconColor: '#4285F4',
+    borderGradient: 'provider-border-gcp',
+    hoverShadow: '0 8px 32px -4px rgba(66,133,244,0.25)',
+    cheapestGlow: '',
   },
+}
+
+// ─── Animated price counter ───────────────────────────────────────────────────
+
+function usePriceCounter(target: number, durationMs = 600): number {
+  const [display, setDisplay] = useState(0)
+  const rafRef = useRef<number>(0)
+  const startRef = useRef<number | null>(null)
+  const startValueRef = useRef(0)
+
+  useEffect(() => {
+    startRef.current = null
+    startValueRef.current = 0
+
+    const animate = (timestamp: number) => {
+      if (startRef.current === null) startRef.current = timestamp
+      const elapsed = timestamp - startRef.current
+      const progress = Math.min(elapsed / durationMs, 1)
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(eased * target)
+      if (progress < 1) rafRef.current = requestAnimationFrame(animate)
+      else setDisplay(target)
+    }
+
+    rafRef.current = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [target, durationMs])
+
+  return display
+}
+
+// ─── Individual animated price display ───────────────────────────────────────
+
+const AnimatedPrice: React.FC<{ value: number }> = ({ value }) => {
+  const displayed = usePriceCounter(value)
+  return <>{displayed.toFixed(2)}</>
 }
 
 export const CostComparisonPage: React.FC = () => {

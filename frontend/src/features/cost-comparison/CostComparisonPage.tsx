@@ -12,9 +12,48 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
-import { SiAmazonwebservices, SiGooglecloud, SiMicrosoftazure } from 'react-icons/si'
+import { SiGooglecloud } from 'react-icons/si'
 import { apiClient } from '@/lib/api-client'
 import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
+
+// ─── Inline brand SVGs (only the 2 not in react-icons/si) ───────────────────────────
+
+/** Amazon Web Services wordmark-style icon (official proportions) */
+const AwsIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <path d="M28.7 40.3c0 1.4.2 2.6.5 3.4.4.9.9 1.8 1.6 2.8.3.4.4.8.4 1.2 0 .5-.3 1.1-.9 1.6l-3 2c-.4.3-.8.4-1.2.4-.5 0-1-.2-1.4-.6-.7-.7-1.3-1.5-1.8-2.3-.5-.8-1-1.8-1.6-3-.4-.8-1-1.4-1.8-1.8-1.8 3.1-4.3 4.6-7.5 4.6-2.1 0-3.9-.6-5.1-1.9-1.3-1.3-1.9-3-1.9-5.1 0-2.3.8-4.1 2.4-5.6 1.6-1.4 3.8-2.1 6.6-2.1.9 0 1.9.1 2.9.2 1 .2 2 .4 3.1.7v-2c0-2-.4-3.4-1.3-4.2-.9-.9-2.4-1.3-4.6-1.3-1 0-2 .1-3 .4-1 .3-2 .6-3 1.1-.4.2-.8.3-1 .3-.5 0-.8-.4-.8-.9V27c0-.5.1-.9.3-1.1.2-.2.6-.4 1.1-.6 1-.5 2.2-.9 3.6-1.2 1.4-.3 2.9-.5 4.5-.5 3.4 0 5.9.8 7.5 2.3 1.6 1.5 2.4 3.8 2.4 6.9v9.5zm-10.4 3.9c.9 0 1.8-.2 2.8-.5 1-.3 1.9-.9 2.6-1.7.4-.5.7-1 .9-1.6.2-.6.3-1.3.3-2.2v-1.1c-.8-.2-1.6-.3-2.4-.4-.8-.1-1.6-.2-2.4-.2-1.7 0-2.9.3-3.7 1-.8.7-1.2 1.7-1.2 3 0 1.2.3 2.1.9 2.7.6.7 1.5 1 2.2 1zm20.1 2.7c-.6 0-1-.1-1.2-.4-.3-.3-.5-.8-.7-1.4L30 20.3c-.2-.7-.3-1.2-.3-1.4 0-.6.3-.9.9-.9h3.5c.6 0 1 .1 1.2.4.3.3.5.8.7 1.4l5.8 22.9 5.4-22.9c.2-.7.4-1.1.7-1.4.3-.3.7-.4 1.3-.4h2.9c.6 0 1 .1 1.3.4.3.3.5.8.7 1.4l5.5 23.2L65 19.8c.2-.7.4-1.1.7-1.4.3-.3.7-.4 1.2-.4h3.3c.6 0 .9.3.9.9 0 .2 0 .4-.1.6l-.2.8-7.7 25.2c-.2.7-.4 1.1-.7 1.4-.3.3-.7.4-1.2.4h-3.1c-.6 0-1-.1-1.3-.4-.3-.3-.5-.8-.7-1.4l-5.4-22.5-5.4 22.5c-.2.7-.4 1.1-.7 1.4-.3.3-.7.4-1.3.4h-3.1zm41.1.9c-1.9 0-3.8-.2-5.6-.7-1.8-.5-3.2-1-4.1-1.6-.6-.3-.9-.7-.9-1.2V43c0-.5.2-.9.7-.9.2 0 .4.1.7.2.2.1.5.2.8.4.9.4 1.9.8 3 1.1 1.1.3 2.2.4 3.3.4 1.7 0 3-.3 3.9-.9.9-.6 1.3-1.4 1.3-2.4 0-.7-.2-1.3-.7-1.8-.5-.5-1.4-1-2.7-1.4l-3.9-1.2c-2-.6-3.4-1.5-4.3-2.7-.9-1.2-1.4-2.6-1.4-4 0-1.2.3-2.2.8-3.1.5-.9 1.2-1.7 2-2.3.8-.6 1.8-1.1 2.9-1.4 1.1-.3 2.3-.5 3.5-.5.6 0 1.2.1 1.8.1.6.1 1.2.2 1.7.3.5.1 1 .3 1.5.4.5.2.9.3 1.2.5.4.2.7.4.8.7.2.2.2.5.2.9v2.1c0 .5-.2.9-.7.9-.3 0-.6-.1-1.1-.3-1.7-.7-3.5-1.1-5.5-1.1-1.5 0-2.7.2-3.5.7-.8.5-1.2 1.2-1.2 2.2 0 .7.2 1.3.7 1.8.5.5 1.5 1 3 1.5l3.8 1.2c2 .6 3.4 1.5 4.2 2.6.8 1.1 1.2 2.4 1.2 3.8 0 1.2-.2 2.3-.7 3.3-.5 1-1.2 1.8-2 2.5-.9.7-1.9 1.2-3 1.6-1.3.3-2.5.5-3.8.5z" fill="#FF9900"/>
+    <path d="M83.2 57.9C73.4 65.1 59.4 69 47.4 69c-16.7 0-31.8-6.2-43.2-16.4-1-.9-.1-2.1 1.1-1.4C17 57.8 31.5 62 46.4 62c10.1 0 21.2-2.1 31.4-6.4 1.5-.7 2.8 1 1.4 2.3z" fill="#FF9900"/>
+    <path d="M87.3 53.3c-1.3-1.7-8.7-1.2-12.1-.6-.9.1-1-.6-.2-1.2 5.9-4.1 15.6-2.9 16.7-1.6 1.1 1.4-.3 10.9-5.8 15.4-.8.7-1.6.3-1.3-.6 1.3-3.1 4-10 2.7-11.4z" fill="#FF9900"/>
+  </svg>
+)
+
+/** Microsoft Azure logomark */
+const AzureIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 96 96" fill="none">
+    <defs>
+      <linearGradient id="az-a" x1="-1032.17" y1="145.31" x2="-1059.17" y2="65.31" gradientTransform="matrix(1 0 0 -1 1075 158)" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stopColor="#114A8B"/>
+        <stop offset="1" stopColor="#0669BC"/>
+      </linearGradient>
+      <linearGradient id="az-b" x1="-1023.73" y1="108.08" x2="-1029.98" y2="105.98" gradientTransform="matrix(1 0 0 -1 1075 158)" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stopOpacity=".3"/>
+        <stop offset=".071" stopOpacity=".2"/>
+        <stop offset=".321" stopOpacity=".1"/>
+        <stop offset=".623" stopOpacity=".05"/>
+        <stop offset="1" stopOpacity="0"/>
+      </linearGradient>
+      <linearGradient id="az-c" x1="-1027.16" y1="147.64" x2="-997.48" y2="68.56" gradientTransform="matrix(1 0 0 -1 1075 158)" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stopColor="#3CCBF4"/>
+        <stop offset="1" stopColor="#2892DF"/>
+      </linearGradient>
+    </defs>
+    <path d="M33.34 6.54h26.04L32.84 89.9a4.14 4.14 0 01-3.93 2.83H8.78a4.14 4.14 0 01-3.92-5.46L29.42 9.37a4.14 4.14 0 013.93-2.83z" fill="url(#az-a)"/>
+    <path d="M71.17 60.26H29.88a1.91 1.91 0 00-1.3 3.31l26.53 24.78a4.17 4.17 0 002.85 1.12h23.38z" fill="url(#az-b)"/>
+    <path d="M33.34 6.54a4.1 4.1 0 00-3.95 2.88L4.9 87.22a4.13 4.13 0 003.91 5.51h20.56a4.44 4.44 0 003.4-2.88l4.96-14.63 17.76 16.6a4.24 4.24 0 002.76 1h24.1l-10.57-30.26-30.82.01L59.37 6.54z" fill="url(#az-c)"/>
+    <path d="M66.6 9.36a4.13 4.13 0 00-3.93-2.82H33.65a4.13 4.13 0 013.93 2.82l24.56 77.91a4.14 4.14 0 01-3.93 5.46h29.02a4.14 4.14 0 003.93-5.46z" fill="#0078D4"/>
+  </svg>
+)
+
 
 export interface CloudCostEstimate {
   provider: string
@@ -55,44 +94,35 @@ const PROVIDER_META: Record<
   {
     name: string
     tag: string
-    // react-icons component
-    Icon: React.ComponentType<{ size?: number; className?: string }>
-    // CSS colour for the icon itself
+    Icon: React.FC<{ size?: number }>
     iconColor: string
-    // Tailwind gradient class for the card border (normal)
     borderGradient: string
-    // CSS box-shadow applied inline on hover
     hoverShadow: string
-    // Tailwind ring/glow for cheapest-card shimmer base
-    cheapestGlow: string
   }
 > = {
   aws: {
     name: 'Amazon Web Services',
     tag: 'AWS EC2',
-    Icon: SiAmazonwebservices,
+    Icon: AwsIcon,
     iconColor: '#FF9900',
     borderGradient: 'provider-border-aws',
-    hoverShadow: '0 8px 32px -4px rgba(255,153,0,0.25)',
-    cheapestGlow: '',
+    hoverShadow: '0 8px 32px -4px rgba(255,153,0,0.22)',
   },
   azure: {
     name: 'Microsoft Azure',
     tag: 'Azure VMs',
-    Icon: SiMicrosoftazure,
+    Icon: AzureIcon,
     iconColor: '#0089D6',
     borderGradient: 'provider-border-azure',
-    hoverShadow: '0 8px 32px -4px rgba(0,137,214,0.25)',
-    cheapestGlow: '',
+    hoverShadow: '0 8px 32px -4px rgba(0,137,214,0.22)',
   },
   gcp: {
     name: 'Google Cloud Platform',
     tag: 'GCP Compute',
-    Icon: SiGooglecloud,
+    Icon: ({ size = 20 }) => <SiGooglecloud size={size} />,
     iconColor: '#4285F4',
     borderGradient: 'provider-border-gcp',
-    hoverShadow: '0 8px 32px -4px rgba(66,133,244,0.25)',
-    cheapestGlow: '',
+    hoverShadow: '0 8px 32px -4px rgba(66,133,244,0.22)',
   },
 }
 
@@ -102,31 +132,24 @@ function usePriceCounter(target: number, durationMs = 600): number {
   const [display, setDisplay] = useState(0)
   const rafRef = useRef<number>(0)
   const startRef = useRef<number | null>(null)
-  const startValueRef = useRef(0)
 
   useEffect(() => {
     startRef.current = null
-    startValueRef.current = 0
-
     const animate = (timestamp: number) => {
       if (startRef.current === null) startRef.current = timestamp
       const elapsed = timestamp - startRef.current
       const progress = Math.min(elapsed / durationMs, 1)
-      // ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3)
+      const eased = 1 - Math.pow(1 - progress, 3) // ease-out cubic
       setDisplay(eased * target)
       if (progress < 1) rafRef.current = requestAnimationFrame(animate)
       else setDisplay(target)
     }
-
     rafRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(rafRef.current)
   }, [target, durationMs])
 
   return display
 }
-
-// ─── Individual animated price display ───────────────────────────────────────
 
 const AnimatedPrice: React.FC<{ value: number }> = ({ value }) => {
   const displayed = usePriceCounter(value)

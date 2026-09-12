@@ -11,6 +11,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
 import { AiSummaryCard } from './components/AiSummaryCard'
@@ -19,6 +20,85 @@ import { ParetoScatterChart } from './components/ParetoScatterChart'
 import { SAMPLE_WORKFLOWS } from './sampleWorkflows'
 import { ValidationFeedback, WorkflowOptimizeResult, WorkflowTaskInput } from './types'
 import { validateWorkflowJson } from './validation'
+
+// ─── Staged loading status lines ─────────────────────────────────────────────
+
+const LOADING_STAGES = [
+  { label: 'Fetching live AWS EC2 price catalog…',    delay: 0 },
+  { label: 'Fetching Azure Retail API pricing…',       delay: 600 },
+  { label: 'Fetching GCP Cloud Billing rates…',        delay: 1100 },
+  { label: 'Computing critical-path makespan DAG…',    delay: 1700 },
+  { label: 'Filtering non-dominated Pareto frontier…', delay: 2300 },
+  { label: 'Generating AI architectural summary…',     delay: 2900 },
+]
+
+const StagedLoader: React.FC = () => {
+  const [activeStage, setActiveStage] = useState(0)
+
+  useEffect(() => {
+    const timers = LOADING_STAGES.slice(1).map((s, i) =>
+      setTimeout(() => setActiveStage(i + 1), s.delay)
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  return (
+    <div className="glass-card p-8 rounded-2xl border border-white/10 space-y-6">
+      <div className="flex flex-col items-center justify-center py-6 text-center space-y-4">
+        <div className="relative">
+          <div className="w-14 h-14 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.7s' }} />
+          </div>
+        </div>
+        <div>
+          <div className="text-base font-bold text-white mb-1">
+            Sweeping Live AWS, Azure &amp; GCP Pricing Catalogs…
+          </div>
+          <p className="text-xs text-neutral-400 max-w-md">
+            Querying concurrent cloud rate APIs, shortlisting peak-sized compute candidates,
+            computing category-aware makespan, and filtering non-dominated Pareto frontier.
+          </p>
+        </div>
+      </div>
+
+      {/* Staged status lines */}
+      <div className="space-y-2 max-w-sm mx-auto">
+        {LOADING_STAGES.map((stage, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: idx <= activeStage ? 1 : 0.2, x: 0 }}
+            transition={{ duration: 0.35, delay: idx === 0 ? 0 : 0 }}
+            className="flex items-center gap-2.5 text-xs"
+          >
+            <span
+              className={[
+                'w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500',
+                idx < activeStage
+                  ? 'bg-emerald-400'
+                  : idx === activeStage
+                  ? 'bg-brand-400 animate-pulse'
+                  : 'bg-neutral-700',
+              ].join(' ')}
+            />
+            <span className={idx <= activeStage ? 'text-neutral-300' : 'text-neutral-600'}>
+              {stage.label}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Skeleton cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="skeleton h-24 rounded-xl" />
+        <div className="skeleton h-24 rounded-xl" />
+        <div className="skeleton h-24 rounded-xl" />
+      </div>
+      <div className="skeleton h-80 rounded-xl" />
+    </div>
+  )
+}
 
 const REGION_OPTIONS = [
   { value: 'us-east', label: 'US East (N. Virginia — us-east-1 / eastus / us-east4)' },
@@ -118,7 +198,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white flex flex-col items-center px-4 py-8 md:py-12">
+    <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center px-4 py-8 md:py-12">
       {/* ── Top Navigation Header ─────────────────────────────────────────── */}
       <header className="w-full max-w-6xl mb-8 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -368,38 +448,37 @@ export const WorkflowOptimizerPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── Loading Skeleton State ────────────────────────────────────────── */}
-        {isLoading && (
-          <div className="glass-card p-8 rounded-2xl border border-white/10 space-y-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
-              <div className="w-12 h-12 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin" />
-              <div className="text-base font-bold text-white">
-                Sweeping Live AWS, Azure &amp; GCP Pricing Catalogs...
-              </div>
-              <p className="text-xs text-neutral-400 max-w-md">
-                Querying concurrent cloud rate APIs, shortlisting peak-sized compute candidates,
-                computing category-aware makespan, and filtering non-dominated Pareto frontier.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="skeleton h-24 rounded-xl" />
-              <div className="skeleton h-24 rounded-xl" />
-              <div className="skeleton h-24 rounded-xl" />
-            </div>
-            <div className="skeleton h-80 rounded-xl" />
-          </div>
-        )}
+        {/* ── Loading State (staged status lines) ──────────────────────────── */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35 }}
+            >
+              <StagedLoader />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Pareto Sweep Results ──────────────────────────────────────────── */}
-        {result && !isLoading && (
-          <section className="space-y-6 animate-fadeIn">
-            {/* Recharts Scatter Chart */}
-            <ParetoScatterChart result={result} />
-
-            {/* AI Architectural Summary */}
-            <AiSummaryCard result={result} />
-          </section>
-        )}
+        <AnimatePresence>
+          {result && !isLoading && (
+            <motion.section
+              key="results"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45 }}
+              className="space-y-6"
+            >
+              <ParetoScatterChart result={result} />
+              <AiSummaryCard result={result} />
+            </motion.section>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}

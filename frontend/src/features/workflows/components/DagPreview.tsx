@@ -1,11 +1,17 @@
 /**
  * Infralytix — DAG Preview Component (React Flow).
  *
- * Automatically positions task nodes in topological levels from left to right,
+ * Automatically positions task nodes in topological levels left-to-right,
  * with animated curved bezier edges representing dependency relationships.
+ *
+ * Visual upgrades vs v1:
+ * - Darker dot-grid background (neutral-950 bg matches page)
+ * - Framer Motion fade-in wrapper for smooth entrance
+ * - fitView on mount with a small animation delay so the viewport settles
+ * - Cleaner Controls panel styling
  */
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -13,54 +19,90 @@ import ReactFlow, {
   Edge,
   MarkerType,
   Node,
+  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
+import { motion } from 'framer-motion'
 
 import { WorkflowTaskInput } from '../types'
 import { TaskNode } from './TaskNode'
 
-const nodeTypes = {
-  workflowTask: TaskNode,
-}
+const nodeTypes = { workflowTask: TaskNode }
 
 interface DagPreviewProps {
   tasks: WorkflowTaskInput[]
 }
 
+// ─── Inner graph (needs ReactFlowProvider context for useReactFlow) ───────────
+
+const DagGraph: React.FC<{ nodes: Node<WorkflowTaskInput>[]; edges: Edge[] }> = ({
+  nodes,
+  edges,
+}) => {
+  const { fitView } = useReactFlow()
+
+  // Fit view 120ms after mount so React Flow has rendered the nodes
+  const onInit = useCallback(() => {
+    setTimeout(() => fitView({ padding: 0.22, duration: 500 }), 120)
+  }, [fitView])
+
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      fitView
+      fitViewOptions={{ padding: 0.22 }}
+      minZoom={0.15}
+      maxZoom={1.6}
+      proOptions={{ hideAttribution: true }}
+      onInit={onInit}
+    >
+      <Background
+        color="#1e293b"
+        gap={22}
+        size={1.2}
+        variant={BackgroundVariant.Dots}
+        style={{ backgroundColor: 'rgba(2,6,23,0.92)' }}
+      />
+      <Controls
+        className="!bg-neutral-900/90 !border-white/10 !rounded-xl !shadow-xl [&>button]:!bg-transparent [&>button]:!border-white/10 [&>button]:!text-white hover:[&>button]:!bg-white/10 [&>button]:transition-colors"
+      />
+    </ReactFlow>
+  )
+}
+
+// ─── Public component ─────────────────────────────────────────────────────────
+
 export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
-  // Compute topological layers for clean left-to-right hierarchy
+  // Compute topological layers
   const { nodes, edges } = useMemo(() => {
-    if (!tasks || tasks.length === 0) {
-      return { nodes: [], edges: [] }
-    }
+    if (!tasks || tasks.length === 0) return { nodes: [], edges: [] }
 
     const taskMap = new Map<string, WorkflowTaskInput>()
     tasks.forEach((t) => taskMap.set(t.id, t))
 
-    // Compute layer depth for each node
     const depthMemo = new Map<string, number>()
     const getDepth = (id: string, visited = new Set<string>()): number => {
       if (depthMemo.has(id)) return depthMemo.get(id)!
-      if (visited.has(id)) return 0 // cycle guard
-
+      if (visited.has(id)) return 0
       visited.add(id)
       const task = taskMap.get(id)
       if (!task || task.depends_on.length === 0) {
         depthMemo.set(id, 0)
         return 0
       }
-
-      let maxParentDepth = 0
+      let max = 0
       for (const parentId of task.depends_on) {
-        maxParentDepth = Math.max(maxParentDepth, getDepth(parentId, new Set(visited)) + 1)
+        max = Math.max(max, getDepth(parentId, new Set(visited)) + 1)
       }
-      depthMemo.set(id, maxParentDepth)
-      return maxParentDepth
+      depthMemo.set(id, max)
+      return max
     }
 
     tasks.forEach((t) => getDepth(t.id))
 
-    // Group tasks by layer
     const layers = new Map<number, WorkflowTaskInput[]>()
     tasks.forEach((t) => {
       const d = depthMemo.get(t.id) || 0
@@ -77,8 +119,8 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
           id: task.id,
           type: 'workflowTask',
           position: {
-            x: layerIndex * 280 + 40,
-            y: taskIndex * 145 + 40,
+            x: layerIndex * 290 + 40,
+            y: taskIndex * 155 + 40,
           },
           data: task,
         })
@@ -93,12 +135,12 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
           target: task.id,
           type: 'smoothstep',
           animated: true,
-          style: { stroke: '#818cf8', strokeWidth: 2 },
+          style: { stroke: '#6366f1', strokeWidth: 1.8 },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: '#818cf8',
-            width: 16,
-            height: 16,
+            color: '#6366f1',
+            width: 14,
+            height: 14,
           },
         })
       })
@@ -109,44 +151,31 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
 
   if (tasks.length === 0) {
     return (
-      <div className="h-80 glass-card flex items-center justify-center text-neutral-500 text-sm">
+      <div className="h-80 glass-card flex items-center justify-center text-neutral-500 text-sm rounded-2xl border border-white/10">
         No valid tasks to preview. Paste or upload workflow JSON above.
       </div>
     )
   }
 
   return (
-    <div className="w-full h-96 glass-card rounded-2xl overflow-hidden border border-white/10 relative">
-      <div className="absolute top-3 left-4 z-10 flex items-center gap-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.985 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full h-96 rounded-2xl overflow-hidden border border-white/10 relative"
+      style={{ background: 'rgba(2,6,23,0.92)' }}
+    >
+      {/* Overlay label */}
+      <div className="absolute top-3 left-4 z-10 flex items-center gap-2 pointer-events-none">
         <span className="badge-neutral text-xs">
           Interactive DAG ({tasks.length} {tasks.length === 1 ? 'task' : 'tasks'})
         </span>
-        <span className="text-[11px] text-neutral-400">
-          Scroll to zoom • Drag to pan
-        </span>
+        <span className="text-[11px] text-neutral-500">Scroll to zoom · Drag to pan</span>
       </div>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.2}
-        maxZoom={1.5}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Background
-          color="#374151"
-          gap={20}
-          size={1}
-          variant={BackgroundVariant.Dots}
-          className="bg-neutral-950/70"
-        />
-        <Controls
-          className="!bg-neutral-900/90 !border-white/10 !rounded-xl !shadow-lg [&>button]:!bg-transparent [&>button]:!border-white/10 [&>button]:!text-white hover:[&>button]:!bg-white/10"
-        />
-      </ReactFlow>
-    </div>
+      <ReactFlowProvider>
+        <DagGraph nodes={nodes} edges={edges} />
+      </ReactFlowProvider>
+    </motion.div>
   )
 }

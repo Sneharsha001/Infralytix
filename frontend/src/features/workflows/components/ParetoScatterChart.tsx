@@ -1,14 +1,15 @@
 /**
  * Infralytix — Pareto Scatter Chart (Recharts).
  *
- * Renders workflow candidates in Cost (X-axis) vs Makespan (Y-axis) space:
- * - Dominated candidates in subtle slate dots.
- * - Pareto-optimal candidates with vibrant provider colors.
- * - Pareto frontier step/connection line highlighting the optimal tradeoff curve.
- * - Prominently marked Fastest, Cheapest, and Best Balance points.
+ * Renders workflow candidates in Cost (X-axis) vs Makespan (Y-axis) space.
+ * Visual upgrades vs v1:
+ * - Per-provider branded scatter colors (AWS amber, Azure sky, GCP blue)
+ * - Custom dark glassmorphic tooltip (no default Recharts tooltip background)
+ * - Staggered point entrance: dominated points fade in first, then Pareto layer
+ * - Darker grid + axis styling to match neutral-950 background
  */
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -21,11 +22,14 @@ import {
   YAxis,
   ZAxis,
 } from 'recharts'
+import { motion } from 'framer-motion'
 import { CandidateResult, ParetoPoint, WorkflowOptimizeResult } from '../types'
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface ChartPoint {
-  x: number // cost in USD
-  y: number // makespan in seconds
+  x: number
+  y: number
   provider: string
   instanceType: string
   vcpu: number
@@ -35,11 +39,21 @@ interface ChartPoint {
   label: string | null
 }
 
+// ─── Per-provider brand colors ────────────────────────────────────────────────
+
 const PROVIDER_COLORS: Record<string, string> = {
-  aws: '#f59e0b', // amber
-  azure: '#0ea5e9', // sky
-  gcp: '#3b82f6', // blue
+  aws:   '#FF9900', // official AWS orange
+  azure: '#0089D6', // official Azure blue
+  gcp:   '#4285F4', // official GCP blue
 }
+
+const PROVIDER_LABELS: Record<string, string> = {
+  aws:   'AWS EC2',
+  azure: 'Azure VMs',
+  gcp:   'GCP Compute',
+}
+
+// ─── Custom Tooltip ───────────────────────────────────────────────────────────
 
 interface CustomTooltipProps {
   active?: boolean
@@ -50,60 +64,57 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   if (!active || !payload || payload.length === 0) return null
 
   const data = payload[0].payload
-  const providerColor = PROVIDER_COLORS[data.provider.toLowerCase()] || '#a855f7'
+  const color = PROVIDER_COLORS[data.provider.toLowerCase()] || '#a855f7'
 
   return (
-    <div className="glass-card p-3.5 bg-neutral-950/95 border-white/20 shadow-2xl rounded-xl text-xs space-y-2 min-w-[210px]">
+    <div className="glass-card p-3.5 bg-neutral-950/98 border-white/15 shadow-2xl rounded-xl text-xs space-y-2 min-w-[220px] backdrop-blur-md">
+      {/* Provider chip */}
       <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
         <span
-          className="font-bold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded-full"
+          className="font-bold uppercase tracking-wider text-[10px] px-2.5 py-0.5 rounded-full"
           style={{
-            backgroundColor: `${providerColor}20`,
-            color: providerColor,
-            border: `1px solid ${providerColor}40`,
+            backgroundColor: `${color}18`,
+            color,
+            border: `1px solid ${color}38`,
           }}
         >
-          {data.provider.toUpperCase()}
+          {PROVIDER_LABELS[data.provider.toLowerCase()] ?? data.provider.toUpperCase()}
         </span>
         {data.label && (
-          <span className="badge-success text-[10px] font-semibold">
-            ★ {data.label}
-          </span>
+          <span className="badge-success text-[10px] font-semibold">★ {data.label}</span>
         )}
       </div>
 
+      {/* Instance */}
       <div>
-        <div className="font-mono text-sm font-bold text-white truncate">
-          {data.instanceType}
-        </div>
-        <div className="text-neutral-400 text-[11px]">
-          {data.vcpu} vCPU • {data.ramGb} GB RAM {data.hasGpu ? '• GPU' : ''}
+        <div className="font-mono text-sm font-bold text-white truncate">{data.instanceType}</div>
+        <div className="text-neutral-400 text-[11px] mt-0.5">
+          {data.vcpu} vCPU · {data.ramGb} GB RAM{data.hasGpu ? ' · GPU' : ''}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
+      {/* Metrics */}
+      <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-white/10">
         <div>
-          <div className="text-[10px] text-neutral-400">Total Cost</div>
-          <div className="font-mono text-sm font-bold text-emerald-400">
-            ${data.x.toFixed(4)}
-          </div>
+          <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-0.5">Total Cost</div>
+          <div className="font-mono text-sm font-bold text-emerald-400">${data.x.toFixed(4)}</div>
         </div>
         <div>
-          <div className="text-[10px] text-neutral-400">Makespan</div>
+          <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-0.5">Makespan</div>
           <div className="font-mono text-sm font-bold text-sky-400">
-            {data.y >= 60
-              ? `${(data.y / 60).toFixed(1)}m (${data.y.toFixed(0)}s)`
-              : `${data.y.toFixed(1)}s`}
+            {data.y >= 60 ? `${(data.y / 60).toFixed(1)}m` : `${data.y.toFixed(1)}s`}
           </div>
         </div>
       </div>
 
-      <div className="text-[10px] text-neutral-500 pt-1">
+      <div className="text-[10px] text-neutral-600 pt-0.5">
         {data.isPareto ? '✓ Pareto-optimal configuration' : '○ Dominated by superior tradeoff'}
       </div>
     </div>
   )
 }
+
+// ─── Main chart component ─────────────────────────────────────────────────────
 
 interface ParetoScatterChartProps {
   result: WorkflowOptimizeResult
@@ -111,25 +122,32 @@ interface ParetoScatterChartProps {
 
 export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }) => {
   const [showAllCandidates, setShowAllCandidates] = useState<boolean>(true)
+  const [chartVisible, setChartVisible] = useState(false)
+
+  // Staggered entrance: trigger after a short mount delay
+  useEffect(() => {
+    const t = setTimeout(() => setChartVisible(true), 80)
+    return () => clearTimeout(t)
+  }, [])
 
   // Map Pareto set for O(1) lookup
   const paretoLookup = useMemo(() => {
     const map = new Map<string, ParetoPoint>()
     result.pareto_front.forEach((p) => {
-      const key = `${p.candidate.provider}:${p.candidate.instance_type}`
-      map.set(key, p)
+      map.set(`${p.candidate.provider}:${p.candidate.instance_type}`, p)
     })
     return map
   }, [result.pareto_front])
 
-  // Process all candidates into chart points
-  const { paretoPoints, dominatedPoints, frontierLinePoints } = useMemo(() => {
-    const pareto: ChartPoint[] = []
-    const dominated: ChartPoint[] = []
+  // Split candidates: pareto by provider, dominated
+  const { awsPareto, azurePareto, gcpPareto, dominated, frontierLinePoints } = useMemo(() => {
+    const aws: ChartPoint[] = []
+    const azure: ChartPoint[] = []
+    const gcp: ChartPoint[] = []
+    const dom: ChartPoint[] = []
 
     result.all_candidates.forEach((c: CandidateResult) => {
       if (c.provider_error) return
-
       const key = `${c.provider}:${c.instance_type}`
       const paretoMatch = paretoLookup.get(key)
       const isPareto = Boolean(paretoMatch)
@@ -147,24 +165,34 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
       }
 
       if (isPareto) {
-        pareto.push(point)
+        const p = c.provider.toLowerCase()
+        if (p === 'aws') aws.push(point)
+        else if (p === 'azure') azure.push(point)
+        else gcp.push(point)
       } else {
-        dominated.push(point)
+        dom.push(point)
       }
     })
 
-    // Sort Pareto frontier points by cost ascending to draw the frontier line
-    const frontier = [...pareto].sort((a, b) => a.x - b.x)
+    const frontier = [...aws, ...azure, ...gcp].sort((a, b) => a.x - b.x)
 
     return {
-      paretoPoints: pareto,
-      dominatedPoints: dominated,
+      awsPareto: aws,
+      azurePareto: azure,
+      gcpPareto: gcp,
+      dominated: dom,
       frontierLinePoints: frontier,
     }
   }, [result.all_candidates, paretoLookup])
 
   return (
-    <div className="glass-card p-6 rounded-2xl border border-white/10 space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="glass-card p-6 rounded-2xl border border-white/10 space-y-4"
+    >
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
           <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -174,46 +202,47 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
             </span>
           </h3>
           <p className="text-xs text-neutral-400 mt-0.5">
-            Lower Cost (left) and Lower Makespan (bottom) represent superior configurations.
+            Lower cost (left) and lower makespan (bottom) represent superior configurations.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={showAllCandidates}
-              onChange={(e) => setShowAllCandidates(e.target.checked)}
-              className="rounded bg-white/10 border-white/20 text-brand-500 focus:ring-0 w-3.5 h-3.5"
-            />
-            <span>Show dominated points ({dominatedPoints.length})</span>
-          </label>
-        </div>
+        <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={showAllCandidates}
+            onChange={(e) => setShowAllCandidates(e.target.checked)}
+            className="rounded bg-white/10 border-white/20 text-brand-500 focus:ring-0 w-3.5 h-3.5"
+          />
+          <span>Show dominated ({dominated.length})</span>
+        </label>
       </div>
 
-      {/* Recharts Canvas */}
-      <div className="w-full h-[420px]">
+      {/* Chart canvas — fade in when ready */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: chartVisible ? 1 : 0 }}
+        transition={{ duration: 0.6, delay: 0.15 }}
+        className="w-full h-[420px]"
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart
-            margin={{ top: 20, right: 30, bottom: 25, left: 20 }}
-          >
+          <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 20 }}>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#334155"
-              opacity={0.4}
+              stroke="#1e293b"
+              opacity={0.7}
             />
             <XAxis
               type="number"
               dataKey="x"
               name="Cost"
-              stroke="#94a3b8"
-              fontSize={11}
+              stroke="#475569"
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
               tickFormatter={(v: number) => `$${v.toFixed(3)}`}
               label={{
                 value: 'Total Workflow Cost (USD)',
                 position: 'insideBottom',
-                offset: -12,
-                fill: '#94a3b8',
+                offset: -15,
+                fill: '#64748b',
                 fontSize: 11,
               }}
             />
@@ -221,30 +250,30 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
               type="number"
               dataKey="y"
               name="Makespan"
-              stroke="#94a3b8"
-              fontSize={11}
+              stroke="#475569"
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
               tickFormatter={(v: number) => (v >= 60 ? `${(v / 60).toFixed(0)}m` : `${v.toFixed(0)}s`)}
               label={{
-                value: 'Makespan Completion Time',
+                value: 'Makespan',
                 angle: -90,
                 position: 'insideLeft',
-                offset: 5,
-                fill: '#94a3b8',
+                offset: 10,
+                fill: '#64748b',
                 fontSize: 11,
               }}
             />
             <ZAxis range={[60, 240]} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3', stroke: '#334155' }} />
 
-            {/* Pareto Frontier Connecting Line */}
+            {/* Pareto frontier dashed line */}
             {frontierLinePoints.length > 1 && (
               <Line
                 type="monotone"
                 data={frontierLinePoints}
                 dataKey="y"
                 stroke="#818cf8"
-                strokeWidth={2}
-                strokeDasharray="4 4"
+                strokeWidth={1.5}
+                strokeDasharray="5 4"
                 dot={false}
                 activeDot={false}
                 isAnimationActive={false}
@@ -252,55 +281,87 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
               />
             )}
 
-            {/* Dominated Candidates */}
+            {/* Dominated candidates */}
             {showAllCandidates && (
               <Scatter
-                name="Dominated Candidates"
-                data={dominatedPoints}
-                fill="#475569"
-                opacity={0.4}
+                name="Dominated"
+                data={dominated}
+                fill="#334155"
+                opacity={0.35}
+                isAnimationActive={chartVisible}
+                animationBegin={0}
+                animationDuration={600}
               />
             )}
 
-            {/* Pareto Frontier Points */}
-            <Scatter
-              name="Pareto Optimal"
-              data={paretoPoints}
-              fill="#818cf8"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-            />
+            {/* Per-provider Pareto points */}
+            {awsPareto.length > 0 && (
+              <Scatter
+                name="AWS Pareto"
+                data={awsPareto}
+                fill={PROVIDER_COLORS.aws}
+                stroke="#1c1917"
+                strokeWidth={1.5}
+                isAnimationActive={chartVisible}
+                animationBegin={showAllCandidates ? 300 : 0}
+                animationDuration={700}
+              />
+            )}
+            {azurePareto.length > 0 && (
+              <Scatter
+                name="Azure Pareto"
+                data={azurePareto}
+                fill={PROVIDER_COLORS.azure}
+                stroke="#0c1a27"
+                strokeWidth={1.5}
+                isAnimationActive={chartVisible}
+                animationBegin={showAllCandidates ? 400 : 100}
+                animationDuration={700}
+              />
+            )}
+            {gcpPareto.length > 0 && (
+              <Scatter
+                name="GCP Pareto"
+                data={gcpPareto}
+                fill={PROVIDER_COLORS.gcp}
+                stroke="#0f172a"
+                strokeWidth={1.5}
+                isAnimationActive={chartVisible}
+                animationBegin={showAllCandidates ? 500 : 200}
+                animationDuration={700}
+              />
+            )}
 
             <Legend
               verticalAlign="top"
               height={36}
-              wrapperStyle={{ fontSize: '11px', color: '#cbd5e1' }}
+              wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }}
             />
           </ScatterChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
-      {/* Legend & Provider Indicators */}
+      {/* Custom provider legend row */}
       <div className="flex flex-wrap items-center justify-between text-xs text-neutral-400 pt-3 border-t border-white/10 gap-3">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
+          {Object.entries(PROVIDER_LABELS).map(([key, label]) => (
+            <span key={key} className="flex items-center gap-1.5">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: PROVIDER_COLORS[key] }}
+              />
+              {label}
+            </span>
+          ))}
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> AWS EC2
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-500" /> Azure VMs
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> GCP Compute
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-indigo-400 border-dashed" /> Pareto Frontier Line
+            <span className="w-4 h-0 border-t border-dashed border-indigo-400" />
+            Pareto Frontier
           </span>
         </div>
-
-        <div className="text-[11px] text-neutral-500">
-          Evaluated via critical-path makespan DAG & live catalog pricing
+        <div className="text-[11px] text-neutral-600">
+          Evaluated via critical-path makespan DAG &amp; live catalog pricing
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

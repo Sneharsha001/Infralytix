@@ -190,3 +190,64 @@
   border-radius: 1rem;
 }
 
+/* ── Provider card brand borders ─────────────────────────────────────────────
+   Used by CostComparisonPage result cards (applied as className on motion.div). */
+
+.provider-border-aws {
+  border-color: rgba(255, 153, 0, 0.20);
+}
+.provider-border-aws:hover {
+  border-color: rgba(255, 153, 0, 0.45);
+}
+
+.provider-border-azure {
+  border-color: rgba(0, 137, 214, 0.20);
+}
+.provider-border-azure:hover {
+  border-color: rgba(0, 137, 214, 0.45);
+}
+
+.provider-border-gcp {
+  border-color: rgba(66, 133, 244, 0.20);
+}
+.provider-border-gcp:hover {
+  border-color: rgba(66, 133, 244, 0.45);
+}
+
+/* ── Cheapest card shimmer ────────────────────────────────────────────────────
+   An absolutely-positioned pseudo-element overlay that sweeps a shimmer
+   across the cheapest card's border to make it feel alive. */
+
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(250%) skewX(-12deg); }
+}
+
+.cheapest-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.cheapest-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(52, 211, 153, 0.08),
+    rgba(52, 211, 153, 0.18),
+    rgba(52, 211, 153, 0.08),
+    transparent
+  );
+  animation: shimmer-sweep 2.8s ease-in-out infinite;
+}
+
+

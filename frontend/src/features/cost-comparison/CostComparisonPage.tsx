@@ -520,140 +520,183 @@ export const CostComparisonPage: React.FC = () => {
         </section>
       )}
 
-      {/* ── Results Cards ─────────────────────────────────────────────────── */}
-      {!isLoading && data && (
-        <section className="w-full max-w-5xl mb-12 animate-fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Comparative Price Results</h2>
-              <p className="text-xs text-neutral-400">
-                Sorted cheapest-first. Storage line items: EBS gp3 (AWS), Premium SSD (Azure), pd-balanced (GCP).
-              </p>
-            </div>
-            <span className="badge-neutral text-xs">
-              {data.estimates.filter((e) => !e.error).length} / {data.estimates.length} Providers Online
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {data.estimates.map((est, idx) => {
-              const meta = PROVIDER_META[est.provider.toLowerCase()] || {
-                name: est.provider.toUpperCase(),
-                tag: est.provider.toUpperCase(),
-                borderClass: 'border-white/15',
-                badgeClass: 'bg-white/10 text-white',
-              }
-
-              const isCheapest = idx === 0 && !est.error && est.monthly_cost_low > 0
-              const isStaticGCP =
-                est.provider.toLowerCase() === 'gcp' &&
-                (est.notes?.toLowerCase().includes('static') ||
-                  est.notes?.toLowerCase().includes('reference'))
-
-              return (
-                <div
-                  key={est.provider}
-                  className={`glass-card p-6 flex flex-col justify-between relative transition-all duration-200 ${
-                    isCheapest
-                      ? 'border-emerald-500/60 ring-2 ring-emerald-500/20 bg-emerald-950/10 shadow-lg shadow-emerald-500/10'
-                      : meta.borderClass
-                  }`}
-                >
-                  {/* Top Badges */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ring-1 ${meta.badgeClass}`}
-                    >
-                      {meta.tag}
-                    </span>
-
-                    <div className="flex items-center gap-1.5">
-                      {isCheapest && (
-                        <span className="badge-success text-[11px] font-semibold">
-                          ★ Lowest Cost
-                        </span>
-                      )}
-                      {isStaticGCP && (
-                        <span className="badge-warning text-[10px]" title="Static fallback dataset active">
-                          Reference Pricing
-                        </span>
-                      )}
-                      {est.error && (
-                        <span className="badge-danger text-[10px]">
-                          Unavailable
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Provider & Matched Machine */}
-                  <div className="mb-4">
-                    <h3 className="text-sm font-semibold text-neutral-400 mb-1">
-                      {meta.name}
-                    </h3>
-                    <div className="text-lg md:text-xl font-mono font-bold text-white tracking-tight">
-                      {est.error ? '—' : est.instance_type_matched}
-                    </div>
-                  </div>
-
-                  {/* Price Section */}
-                  <div className="my-3 py-3 border-y border-white/10">
-                    {est.error ? (
-                      <div className="text-xs text-red-400 font-mono py-2">
-                        {est.error}
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-3xl md:text-4xl font-extrabold text-white">
-                            ${est.monthly_cost_low.toFixed(2)}
-                          </span>
-                          <span className="text-xs text-neutral-400">/ mo</span>
-                        </div>
-                        <div className="text-[11px] text-neutral-500 mt-1">
-                          {est.monthly_cost_low === est.monthly_cost_high
-                            ? `On-demand estimate (${est.currency})`
-                            : `Range: $${est.monthly_cost_low.toFixed(2)} – $${est.monthly_cost_high.toFixed(2)} ${est.currency}`}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Storage & Region Breakdown */}
-                  {est.notes && !est.error && (
-                    <div className="text-xs text-neutral-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/5 space-y-1">
-                      <div className="text-[10px] uppercase font-semibold tracking-wider text-neutral-500">
-                        Line Item Notes
-                      </div>
-                      <p className="line-clamp-3 leading-relaxed text-neutral-300">
-                        {est.notes}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-
-          {/* ── AI Recommendation Highlighted Section ──────────────────────── */}
-          {data.ai_suggestion && (
-            <div className="glass-card p-6 md:p-8 border-brand-500/30 bg-brand-950/15 relative overflow-hidden shadow-xl">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-2 h-2 rounded-full bg-brand-400 animate-ping" />
-                <span className="badge-info text-xs font-semibold">
-                  AI Architectural Recommendation
-                </span>
+      {/* ── Results Cards ──────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {!isLoading && data && (
+          <motion.section
+            key="results"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full max-w-5xl mb-12"
+          >
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-white">Comparative Price Results</h2>
+                <p className="text-xs text-neutral-400">
+                  Sorted cheapest-first. Storage line items: EBS gp3 (AWS), Premium SSD (Azure), pd-balanced (GCP).
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">
-                Workload Analysis &amp; Deployment Trade-offs
-              </h3>
-              <p className="text-sm md:text-base text-neutral-200 leading-relaxed">
-                {data.ai_suggestion}
-              </p>
+              <span className="badge-neutral text-xs">
+                {data.estimates.filter((e) => !e.error).length} / {data.estimates.length} Providers Online
+              </span>
             </div>
-          )}
-        </section>
-      )}
+
+            {/* Provider cards — staggered entrance */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {data.estimates.map((est, idx) => {
+                const key = est.provider.toLowerCase()
+                const meta = PROVIDER_META[key] ?? {
+                  name: est.provider.toUpperCase(),
+                  tag: est.provider.toUpperCase(),
+                  Icon: AwsIcon,
+                  iconColor: '#9ca3af',
+                  borderGradient: 'border-white/10',
+                  hoverShadow: '0 8px 24px -4px rgba(255,255,255,0.08)',
+                }
+
+                const isCheapest = idx === 0 && !est.error && est.monthly_cost_low > 0
+                const isStaticGCP =
+                  key === 'gcp' &&
+                  (est.notes?.toLowerCase().includes('static') ||
+                    est.notes?.toLowerCase().includes('reference'))
+
+                return (
+                  <motion.div
+                    key={est.provider}
+                    initial={{ opacity: 0, y: 28 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.45,
+                      delay: idx * 0.13,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      y: -4,
+                      transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+                    }}
+                    className={[
+                      'relative flex flex-col justify-between rounded-2xl p-6 overflow-hidden',
+                      'bg-neutral-900/70 backdrop-blur-sm border',
+                      isCheapest
+                        ? 'border-emerald-500/50 shadow-[0_0_32px_-4px_rgba(16,185,129,0.25)]'
+                        : `${meta.borderGradient} hover:shadow-[var(--provider-shadow)]`,
+                    ].join(' ')}
+                    style={{ '--provider-shadow': meta.hoverShadow } as React.CSSProperties}
+                    onMouseEnter={(e) => {
+                      if (!isCheapest)
+                        (e.currentTarget as HTMLElement).style.boxShadow = meta.hoverShadow
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isCheapest)
+                        (e.currentTarget as HTMLElement).style.boxShadow = ''
+                    }}
+                  >
+                    {/* Cheapest animated shimmer border */}
+                    {isCheapest && <div className="cheapest-shimmer" aria-hidden />}
+
+                    {/* ── Top row: icon + tag + badges ── */}
+                    <div className="flex items-start justify-between gap-2 mb-5 relative z-10">
+                      {/* Icon + name block */}
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+                          style={{ background: `${meta.iconColor}1A` }}
+                        >
+                          <meta.Icon size={22} />
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase font-semibold tracking-widest text-neutral-500 leading-none mb-0.5">
+                            {meta.tag}
+                          </div>
+                          <div className="text-[13px] font-semibold text-neutral-200 leading-snug">
+                            {meta.name}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Status badges */}
+                      <div className="flex flex-col items-end gap-1 shrink-0 pt-0.5">
+                        {isCheapest && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/40 whitespace-nowrap">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                            Lowest Cost
+                          </span>
+                        )}
+                        {isStaticGCP && (
+                          <span className="badge-warning text-[10px]" title="Static fallback dataset active">
+                            Reference Pricing
+                          </span>
+                        )}
+                        {est.error && <span className="badge-danger text-[10px]">Unavailable</span>}
+                      </div>
+                    </div>
+
+                    {/* ── Instance type ── */}
+                    <div className="mb-4 relative z-10">
+                      <div className="text-[10px] uppercase tracking-widest text-neutral-600 font-semibold mb-1">
+                        Matched instance
+                      </div>
+                      <div className="text-base md:text-lg font-mono font-bold text-white tracking-tight truncate">
+                        {est.error ? <span className="text-red-400/70">—</span> : est.instance_type_matched}
+                      </div>
+                    </div>
+
+                    {/* ── Price section ── */}
+                    <div className="py-3 my-2 border-y border-white/[0.07] relative z-10">
+                      {est.error ? (
+                        <div className="text-xs text-red-400 font-mono py-1">{est.error}</div>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span
+                              className={`text-3xl md:text-4xl font-extrabold tracking-tight ${
+                                isCheapest ? 'text-emerald-300' : 'text-white'
+                              }`}
+                            >
+                              $<AnimatedPrice value={est.monthly_cost_low} />
+                            </span>
+                            <span className="text-xs text-neutral-500">/ mo</span>
+                          </div>
+                          <div className="text-[11px] text-neutral-600 mt-1">
+                            {est.monthly_cost_low === est.monthly_cost_high
+                              ? `On-demand estimate (${est.currency})`
+                              : `Range: $${est.monthly_cost_low.toFixed(2)} – $${est.monthly_cost_high.toFixed(2)} ${est.currency}`}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* ── Line-item notes ── */}
+                    {est.notes && !est.error && (
+                      <div className="mt-3 text-xs text-neutral-400 bg-white/[0.03] p-2.5 rounded-lg border border-white/[0.05] space-y-1 relative z-10">
+                        <div className="text-[10px] uppercase font-semibold tracking-wider text-neutral-600">
+                          Line Item Notes
+                        </div>
+                        <p className="line-clamp-3 leading-relaxed text-neutral-300">{est.notes}</p>
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* ── AI Recommendation ── */}
+            {data.ai_suggestion && (
+              <div className="glass-card p-6 md:p-8 border-brand-500/30 bg-brand-950/15 relative overflow-hidden shadow-xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-brand-400 animate-ping" />
+                  <span className="badge-info text-xs font-semibold">AI Architectural Recommendation</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Workload Analysis &amp; Deployment Trade-offs</h3>
+                <p className="text-sm md:text-base text-neutral-200 leading-relaxed">{data.ai_suggestion}</p>
+              </div>
+            )}
+          </motion.section>
+        )}
+      </AnimatePresence>
+
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="w-full max-w-5xl text-center text-xs text-neutral-600 border-t border-white/5 pt-6 mt-auto">

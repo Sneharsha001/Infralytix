@@ -11,9 +11,9 @@
  */
 
 import React, { useCallback, useRef, useState } from 'react'
+import axios from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { projectsApi } from '@/features/projects/api'
 import { workloadUploadApi } from './api'
 
 // ─── Types & Constants ────────────────────────────────────────────────────────
@@ -168,19 +168,10 @@ export const WorkloadUploadPage: React.FC = () => {
     setError(null)
 
     try {
-      // Step 1: Create a temporary project to satisfy the ownership check
-      const tempProject = await projectsApi.create({
-        name: `workload-inference-${Date.now()}`,
-        description: 'Temporary project for workload inference',
-      })
+      // Run inference directly via public endpoint (no temp project or auth required)
+      const result = await workloadUploadApi.inferWorkload(selectedFile)
 
-      // Step 2: Run inference (Gemini or heuristic fallback)
-      const result = await workloadUploadApi.inferWorkload(tempProject.id, selectedFile)
-
-      // Step 3: Clean up the temp project (best-effort, don't block on failure)
-      projectsApi.delete(tempProject.id).catch(() => {/* ignore */})
-
-      // Step 4: Navigate to Cost Comparison with pre-filled values
+      // Navigate to Cost Comparison with pre-filled values
       navigate('/cost-comparison', {
         state: {
           vcpu: result.vcpu,
@@ -191,10 +182,19 @@ export const WorkloadUploadPage: React.FC = () => {
         },
       })
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : 'Failed to analyze repository. Please try again or enter specs manually.'
+      let msg = 'Failed to analyze repository. Please try again or enter specs manually.'
+      if (axios.isAxiosError(err)) {
+        if (err.response?.data?.detail) {
+          msg =
+            typeof err.response.data.detail === 'string'
+              ? err.response.data.detail
+              : JSON.stringify(err.response.data.detail)
+        } else if (err.message) {
+          msg = err.message
+        }
+      } else if (err instanceof Error) {
+        msg = err.message
+      }
       setError(msg)
       setPhase('error')
     }

@@ -12,13 +12,18 @@ export const workloadUploadApi = {
   /**
    * Upload a repository zip and infer workload compute requirements.
    * Uses Gemini inference server-side; falls back to heuristics automatically.
+   * Does NOT require user authentication or a database project when projectId is omitted.
    */
-  async inferWorkload(projectId: string, file: File): Promise<WorkloadInferenceResult> {
+  async inferWorkload(file: File, projectId?: string): Promise<WorkloadInferenceResult> {
     const formData = new FormData()
     formData.append('file', file)
 
+    const endpoint = projectId
+      ? `/projects/${projectId}/infer-workload`
+      : '/cost-comparison/infer-workload'
+
     const { data } = await apiClient.post<WorkloadInferenceResult>(
-      `/projects/${projectId}/infer-workload`,
+      endpoint,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },

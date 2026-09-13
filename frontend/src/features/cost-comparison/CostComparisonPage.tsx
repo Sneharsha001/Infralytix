@@ -493,31 +493,20 @@ export const CostComparisonPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── Loading State ─────────────────────────────────────────────────── */}
-      {isLoading && (
-        <section className="w-full max-w-5xl mb-12 text-center py-10 animate-fade-in">
-          <div className="inline-block p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 shadow-xl">
-            <div className="w-10 h-10 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-1">
-              Evaluating Multi-Cloud Pricing...
-            </h3>
-            <p className="text-xs text-neutral-400 max-w-md mx-auto">
-              Querying live AWS EC2 Price List API, Microsoft Azure Retail Prices API, and GCP
-              Cloud Billing concurrently. This takes a few seconds to parse live regional catalogues.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-6 h-64 skeleton" />
-            <div className="glass-card p-6 h-64 skeleton" />
-            <div className="glass-card p-6 h-64 skeleton" />
-          </div>
-        </section>
-      )}
+      {/* ── Multi-Cloud Querying Hero Sequence ───────────────────────────── */}
+      <AnimatePresence>
+        {isQuerying && (
+          <CloudQueryingHero
+            data={pendingData}
+            onComplete={handleQueryComplete}
+            onSkip={handleQueryComplete}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── Results Cards ──────────────────────────────────────────────────── */}
       <AnimatePresence>
-        {!isLoading && data && (
+        {!isQuerying && data && (
           <motion.section
             key="results"
             initial={{ opacity: 0 }}
@@ -538,8 +527,8 @@ export const CostComparisonPage: React.FC = () => {
               </span>
             </div>
 
-            {/* Provider cards — staggered entrance */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Provider cards — 3D tilt-and-settle staggered entrance */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" style={{ perspective: 1200 }}>
               {data.estimates.map((est, idx) => {
                 const key = est.provider.toLowerCase()
                 const meta = PROVIDER_META[key] ?? {
@@ -560,11 +549,23 @@ export const CostComparisonPage: React.FC = () => {
                 return (
                   <motion.div
                     key={est.provider}
-                    initial={{ opacity: 0, y: 28 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{
+                      opacity: 0,
+                      y: 44,
+                      rotateX: 14,
+                      rotateY: idx === 0 ? -6 : idx === 2 ? 6 : 0,
+                      scale: 0.93,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      rotateX: 0,
+                      rotateY: 0,
+                      scale: 1,
+                    }}
                     transition={{
-                      duration: 0.45,
-                      delay: idx * 0.13,
+                      duration: 0.55,
+                      delay: idx * 0.11,
                       ease: [0.22, 1, 0.36, 1],
                     }}
                     whileHover={{
@@ -578,7 +579,10 @@ export const CostComparisonPage: React.FC = () => {
                         ? 'border-emerald-500/50 shadow-[0_0_32px_-4px_rgba(16,185,129,0.25)]'
                         : `${meta.borderGradient} hover:shadow-[var(--provider-shadow)]`,
                     ].join(' ')}
-                    style={{ '--provider-shadow': meta.hoverShadow } as React.CSSProperties}
+                    style={{
+                      '--provider-shadow': meta.hoverShadow,
+                      transformStyle: 'preserve-3d',
+                    } as React.CSSProperties}
                     onMouseEnter={(e) => {
                       if (!isCheapest)
                         (e.currentTarget as HTMLElement).style.boxShadow = meta.hoverShadow
@@ -650,7 +654,7 @@ export const CostComparisonPage: React.FC = () => {
                                 isCheapest ? 'text-emerald-300' : 'text-white'
                               }`}
                             >
-                              $<AnimatedPrice value={est.monthly_cost_low} />
+                              $<AnimatedPrice value={est.monthly_cost_low} delayMs={idx * 110 + 150} />
                             </span>
                             <span className="text-xs text-neutral-500">/ mo</span>
                           </div>

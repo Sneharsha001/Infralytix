@@ -339,15 +339,17 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
     }
   }, [estimates, aiSuggestion, region, vcpu, ramGb])
 
+  const shouldReduce = useReducedMotion()
+
   if (!winner) return null
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 34, scale: 0.97 }}
+      initial={shouldReduce ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 34, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
-        duration: 0.65,
-        delay: 0.48, // Enters last after the 3 cards have settled
+        duration: shouldReduce ? 0 : 0.65,
+        delay: shouldReduce ? 0 : 0.48, // Enters last after the 3 cards have settled
         ease: [0.22, 1, 0.36, 1],
       }}
       className={`
@@ -358,12 +360,14 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
       style={{ boxShadow: winnerStyle.glowShadow }}
     >
       {/* ── Perimeter Highlight Glow Sweep on Entrance ────────────────────── */}
-      <motion.div
-        initial={{ x: '-100%', opacity: 0 }}
-        animate={{ x: '200%', opacity: [0, 0.8, 0] }}
-        transition={{ duration: 1.4, delay: 0.6, ease: 'easeInOut' }}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none -skew-x-12"
-      />
+      {!shouldReduce && (
+        <motion.div
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={{ x: '200%', opacity: [0, 0.8, 0] }}
+          transition={{ duration: 1.4, delay: 0.6, ease: 'easeInOut' }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none -skew-x-12"
+        />
+      )}
 
       {/* Ambient background brand orb */}
       <div

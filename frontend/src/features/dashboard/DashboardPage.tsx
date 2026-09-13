@@ -131,7 +131,7 @@ export const DashboardPage: React.FC = () => {
                   ? p.latest_run.output_data
                   : undefined
               return (
-                <div key={p.id} className="glass-card p-5 flex flex-col justify-between">
+                <div key={p.id} className="glass-card-hover p-5 flex flex-col justify-between elev-1">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="badge-neutral text-[10px] font-mono">
@@ -173,7 +173,7 @@ export const DashboardPage: React.FC = () => {
         </div>
       ) : (
         /* Empty State Hero */
-        <div className="glass-card p-12 text-center relative overflow-hidden border-dashed border-white/15">
+        <div className="glass-card p-12 text-center relative overflow-hidden border-dashed border-white/15 elev-2">
           <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -214,7 +214,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* ── Architecture Telemetry ───────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="glass-card p-6">
+        <div className="glass-card p-6 elev-1">
           <h4 className="text-base font-semibold mb-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             Backend Engine Status
@@ -238,7 +238,7 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-6">
+        <div className="glass-card p-6 elev-1">
           <h4 className="text-base font-semibold mb-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-brand-400" />
             Platform Capabilities

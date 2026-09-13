@@ -16,6 +16,7 @@ import { apiClient } from '@/lib/api-client'
 import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
 import { AwsIcon, AzureIcon, GcpIcon } from './components/BrandIcons'
 import { CloudQueryingHero } from './components/CloudQueryingHero'
+import { AIVerdictCard } from './components/AIVerdictCard'
 
 export interface CloudCostEstimate {
   provider: string
@@ -681,16 +682,15 @@ export const CostComparisonPage: React.FC = () => {
               })}
             </div>
 
-            {/* ── AI Recommendation ── */}
+            {/* ── AI Architectural Verdict ── */}
             {data.ai_suggestion && (
-              <div className="glass-card p-6 md:p-8 border-brand-500/30 bg-brand-950/15 relative overflow-hidden shadow-xl">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-brand-400 animate-ping" />
-                  <span className="badge-info text-xs font-semibold">AI Architectural Recommendation</span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Workload Analysis &amp; Deployment Trade-offs</h3>
-                <p className="text-sm md:text-base text-neutral-200 leading-relaxed">{data.ai_suggestion}</p>
-              </div>
+              <AIVerdictCard
+                estimates={data.estimates}
+                aiSuggestion={data.ai_suggestion}
+                region={formData.region}
+                vcpu={formData.vcpu}
+                ramGb={formData.ram_gb}
+              />
             )}
           </motion.section>
         )}

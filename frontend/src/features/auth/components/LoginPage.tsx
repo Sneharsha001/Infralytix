@@ -45,9 +45,10 @@ export const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-neutral-900 selection:bg-brand-500 selection:text-white relative overflow-hidden">
-      {/* Background Decorative Glow */}
+    <div className="min-h-screen flex items-center justify-center p-4 bg-neutral-950 selection:bg-brand-500 selection:text-white relative overflow-hidden">
+      {/* Background Decorative Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
@@ -67,7 +68,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Login Form Card */}
-        <div className="glass-card p-8 shadow-2xl border-white/10">
+        <div className="glass-card p-8 elev-4 border-white/10">
           <h2 className="text-xl font-semibold mb-6">Welcome Back</h2>
 
           {errorMsg && (

@@ -10,9 +10,10 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
+import { PublicNav } from '@/components/layout'
 import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
 import { AwsIcon, AzureIcon, GcpIcon } from './components/BrandIcons'
 import { CloudQueryingHero } from './components/CloudQueryingHero'
@@ -92,12 +93,18 @@ const PROVIDER_META: Record<
 // ─── Animated price counter ───────────────────────────────────────────────────
 
 function usePriceCounter(target: number, durationMs = 700, delayMs = 0): number {
-  const [display, setDisplay] = useState(0)
+  const shouldReduce = useReducedMotion()
+  const [display, setDisplay] = useState(shouldReduce ? target : 0)
   const rafRef = useRef<number>(0)
   const startRef = useRef<number | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    if (shouldReduce) {
+      setDisplay(target)
+      return
+    }
+
     setDisplay(0)
     startRef.current = null
 
@@ -124,9 +131,9 @@ function usePriceCounter(target: number, durationMs = 700, delayMs = 0): number 
       cancelAnimationFrame(rafRef.current)
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [target, durationMs, delayMs])
+  }, [target, durationMs, delayMs, shouldReduce])
 
-  return display
+  return shouldReduce ? target : display
 }
 
 const AnimatedPrice: React.FC<{ value: number; delayMs?: number }> = ({ value, delayMs = 0 }) => {

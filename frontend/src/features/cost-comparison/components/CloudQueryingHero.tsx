@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { AwsIcon, AzureIcon, GcpIcon } from './BrandIcons'
 import type { CloudComparisonResponse } from '../CostComparisonPage'
 
@@ -39,9 +39,10 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
   onComplete,
   onSkip,
 }) => {
-  const [awsLocked, setAwsLocked] = useState(false)
-  const [azureLocked, setAzureLocked] = useState(false)
-  const [gcpLocked, setGcpLocked] = useState(false)
+  const shouldReduce = useReducedMotion()
+  const [awsLocked, setAwsLocked] = useState(shouldReduce ? true : false)
+  const [azureLocked, setAzureLocked] = useState(shouldReduce ? true : false)
+  const [gcpLocked, setGcpLocked] = useState(shouldReduce ? true : false)
   const [isHandoff, setIsHandoff] = useState(false)
   const [canSkip, setCanSkip] = useState(false)
 
@@ -61,6 +62,14 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
 
   // Sequential progression / lock-in choreography
   useEffect(() => {
+    if (shouldReduce) {
+      setAwsLocked(true)
+      setAzureLocked(true)
+      setGcpLocked(true)
+      setCanSkip(true)
+      return
+    }
+
     // Enable skip button after brief moment
     const skipTimer = setTimeout(() => setCanSkip(true), 600)
 
@@ -85,11 +94,16 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
       clearTimeout(tAzure)
       clearTimeout(tGcp)
     }
-  }, [])
+  }, [shouldReduce])
 
   // When all 3 are locked AND data has arrived from backend, trigger completion handoff
   useEffect(() => {
     if (awsLocked && azureLocked && gcpLocked && data) {
+      if (shouldReduce) {
+        onComplete()
+        return
+      }
+
       const handoffTimer = setTimeout(() => {
         setIsHandoff(true)
         const completeTimer = setTimeout(() => {
@@ -100,7 +114,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
 
       return () => clearTimeout(handoffTimer)
     }
-  }, [awsLocked, azureLocked, gcpLocked, data, onComplete])
+  }, [awsLocked, azureLocked, gcpLocked, data, onComplete, shouldReduce])
 
   const handleSkip = () => {
     setIsHandoff(true)

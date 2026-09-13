@@ -202,43 +202,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center px-4 py-8 md:py-12">
       {/* ── Top Navigation Header ─────────────────────────────────────────── */}
-      <header className="w-full max-w-6xl mb-8 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/30">
-            IX
-          </div>
-          <div>
-            <Link to="/" className="text-xl font-bold gradient-text tracking-tight hover:opacity-90">
-              Infralytix
-            </Link>
-            <div className="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">
-              Multi-Cloud Workflow Optimizer
-            </div>
-          </div>
-        </div>
-
-        {/* Global Navigation Links */}
-        <nav className="flex items-center gap-2 text-sm">
-          <Link
-            to="/cost-comparison"
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            Cost Comparison
-          </Link>
-          <Link
-            to="/workflows"
-            className="px-3.5 py-1.5 rounded-lg bg-white/10 text-white font-medium border border-white/10 shadow-sm"
-          >
-            Workflow Optimizer
-          </Link>
-          <Link
-            to="/dashboard"
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            Dashboard
-          </Link>
-        </nav>
-      </header>
+      <PublicNav subtitle="Multi-Cloud Workflow Optimizer" />
 
       {/* ── Main Container ────────────────────────────────────────────────── */}
       <main className="w-full max-w-6xl space-y-8">

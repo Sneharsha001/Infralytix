@@ -228,7 +228,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
     const parsedHw = parseInstanceHardware(win.instance_type_matched)
     let specBadge = 'Exact'
     let specBar = 100
-    let specValue = win.instance_type_matched
+    const specValue = win.instance_type_matched
     let specSubtext = `100% matched to ${vcpu}v / ${ramGb}GB`
 
     if (parsedHw) {

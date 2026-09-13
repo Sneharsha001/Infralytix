@@ -231,7 +231,12 @@ export const CostComparisonPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12"
+    >
       {/* ── Top Navigation Bar ─────────────────────────────────────────── */}
       <div className="w-full max-w-5xl mb-8 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -702,7 +707,7 @@ export const CostComparisonPage: React.FC = () => {
       <footer className="w-full max-w-5xl text-center text-xs text-neutral-600 border-t border-white/5 pt-6 mt-auto">
         Infralytix Cloud Intelligence Platform — Real-time price catalog ingestion.
       </footer>
-    </div>
+    </motion.div>
   )
 }
 

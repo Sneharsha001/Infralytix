@@ -236,52 +236,7 @@ export const CostComparisonPage: React.FC = () => {
       className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12"
     >
       {/* ── Top Navigation Bar ─────────────────────────────────────────── */}
-      <div className="w-full max-w-5xl mb-8 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/30">
-            IX
-          </div>
-          <div>
-            <Link to="/" className="text-xl font-bold gradient-text tracking-tight hover:opacity-90">
-              Infralytix
-            </Link>
-            <div className="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">
-              Multi-Cloud Intelligence Platform
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex items-center gap-2 text-sm">
-          <Link
-            to="/upload-workload"
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
-          >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            Upload & Detect
-          </Link>
-          <Link
-            to="/cost-comparison"
-            className="px-3.5 py-1.5 rounded-lg bg-white/10 text-white font-medium border border-white/10 shadow-sm"
-          >
-            Cost Comparison
-          </Link>
-          <Link
-            to="/workflows"
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            Workflow Optimizer
-          </Link>
-          <Link
-            to="/dashboard"
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            Dashboard
-          </Link>
-        </nav>
-      </div>
+      <PublicNav />
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="w-full max-w-5xl text-center mb-10">

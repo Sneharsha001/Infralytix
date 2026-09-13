@@ -16,91 +16,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { workloadUploadApi } from './api'
 
+import { AnalysisLoadingScreen } from './components/AnalysisLoadingScreen'
+import type { WorkloadInferenceResult } from './types'
+
 // ─── Types & Constants ────────────────────────────────────────────────────────
 
 type UploadPhase = 'idle' | 'analyzing' | 'error'
-
-const ANALYSIS_STAGES = [
-  { id: 'tree',  label: 'Reading project structure…',   delay: 0 },
-  { id: 'deps',  label: 'Detecting dependencies…',      delay: 1200 },
-  { id: 'infer', label: 'Estimating compute profile…',  delay: 2400 },
-]
-
-// Pseudo file-tree lines shown in the animated background panel
-const FAKE_TREE_LINES = [
-  '├── src/',
-  '│   ├── main.py',
-  '│   ├── api/',
-  '│   │   ├── routes.py',
-  '│   │   └── models.py',
-  '│   └── services/',
-  '│       └── inference.py',
-  '├── tests/',
-  '│   ├── conftest.py',
-  '│   └── test_api.py',
-  '├── Dockerfile',
-  '├── requirements.txt',
-  '└── pyproject.toml',
-]
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-/** Animated staged status line */
-const StageItem: React.FC<{ label: string; delay: number; isActive: boolean }> = ({
-  label,
-  delay,
-  isActive,
-}) => (
-  <AnimatePresence>
-    {isActive && (
-      <motion.div
-        key={label}
-        initial={{ opacity: 0, x: -16, filter: 'blur(4px)' }}
-        animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-        exit={{ opacity: 0.4 }}
-        transition={{ duration: 0.5, ease: 'easeOut', delay: delay / 1000 }}
-        className="flex items-center gap-3 text-sm font-mono"
-      >
-        <motion.span
-          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-2 h-2 rounded-full bg-brand-400 shrink-0"
-        />
-        <span className="text-neutral-200">{label}</span>
-      </motion.div>
-    )}
-  </AnimatePresence>
-)
-
-/** Ghost code-tree lines behind the analysis panel */
-const GhostTree: React.FC = () => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-    <div className="absolute left-6 top-8 font-mono text-[11px] text-brand-500/20 leading-6 space-y-0">
-      {FAKE_TREE_LINES.map((line, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.6, 0.3] }}
-          transition={{ duration: 1, delay: i * 0.08, repeat: Infinity, repeatDelay: 4 }}
-        >
-          {line}
-        </motion.div>
-      ))}
-    </div>
-    {/* Scanline overlay */}
-    <div className="scan-line" />
-  </div>
-)
-
-/** Horizontal scanning bar that sweeps top-to-bottom */
-const ScanBeam: React.FC = () => (
-  <motion.div
-    className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-400/60 to-transparent"
-    initial={{ top: '0%' }}
-    animate={{ top: ['0%', '100%', '0%'] }}
-    transition={{ duration: 3.5, repeat: Infinity, ease: 'linear' }}
-  />
-)
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -112,7 +33,7 @@ export const WorkloadUploadPage: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [activeStages, setActiveStages] = useState<Set<string>>(new Set())
+  const [inferenceResult, setInferenceResult] = useState<WorkloadInferenceResult | null>(null)
 
   // ── File validation helper ──────────────────────────────────────────────────
   const validateAndSet = useCallback((file: File): boolean => {
@@ -146,15 +67,6 @@ export const WorkloadUploadPage: React.FC = () => {
     if (file) validateAndSet(file)
   }
 
-  // ── Staged analysis animation ───────────────────────────────────────────────
-  const runStagedAnimation = () => {
-    ANALYSIS_STAGES.forEach(({ id, delay }) => {
-      setTimeout(() => {
-        setActiveStages((prev) => new Set([...prev, id]))
-      }, delay)
-    })
-  }
-
   // ── Upload + Inference pipeline ─────────────────────────────────────────────
   const handleAnalyze = async () => {
     if (!selectedFile) {
@@ -163,24 +75,13 @@ export const WorkloadUploadPage: React.FC = () => {
     }
 
     setPhase('analyzing')
-    setActiveStages(new Set())
-    runStagedAnimation()
+    setInferenceResult(null)
     setError(null)
 
     try {
       // Run inference directly via public endpoint (no temp project or auth required)
       const result = await workloadUploadApi.inferWorkload(selectedFile)
-
-      // Navigate to Cost Comparison with pre-filled values
-      navigate('/cost-comparison', {
-        state: {
-          vcpu: result.vcpu,
-          ram_gb: result.ram_gb,
-          storage_gb: result.storage_gb,
-          justification: result.justification,
-          autoDetected: true,
-        },
-      })
+      setInferenceResult(result)
     } catch (err: unknown) {
       let msg = 'Failed to analyze repository. Please try again or enter specs manually.'
       if (axios.isAxiosError(err)) {
@@ -200,95 +101,37 @@ export const WorkloadUploadPage: React.FC = () => {
     }
   }
 
+  const handleHandoff = useCallback(() => {
+    if (!inferenceResult) return
+    navigate('/cost-comparison', {
+      state: {
+        vcpu: inferenceResult.vcpu,
+        ram_gb: inferenceResult.ram_gb,
+        storage_gb: inferenceResult.storage_gb,
+        justification: inferenceResult.justification,
+        autoDetected: true,
+      },
+    })
+  }, [inferenceResult, navigate])
+
   const handleRetry = () => {
     setPhase('idle')
     setError(null)
-    setActiveStages(new Set())
+    setInferenceResult(null)
     setSelectedFile(null)
   }
-
 
   // ─── Render: Analyzing Phase ─────────────────────────────────────────────
 
   if (phase === 'analyzing') {
     return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center relative overflow-hidden">
-        {/* Ambient glow blobs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/8 rounded-full blur-3xl pointer-events-none" />
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="relative w-full max-w-lg mx-4"
-        >
-          {/* Main analysis panel */}
-          <div className="glass-card border border-brand-500/20 bg-neutral-900/80 p-8 relative overflow-hidden shadow-2xl shadow-brand-500/10">
-            <GhostTree />
-            <ScanBeam />
-
-            {/* Header */}
-            <div className="relative z-10 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-400 rounded-full"
-                />
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-0.5">
-                    Infralytix AI Engine
-                  </div>
-                  <h2 className="text-lg font-bold text-white leading-tight">
-                    Analyzing Workload…
-                  </h2>
-                </div>
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-brand-500/40 via-brand-400/20 to-transparent mb-6" />
-
-              {/* Staged status lines */}
-              <div className="space-y-4">
-                {ANALYSIS_STAGES.map(({ id, label, delay }) => (
-                  <StageItem
-                    key={id}
-                    label={label}
-                    delay={delay}
-                    isActive={activeStages.has(id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* File being analyzed */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="relative z-10 mt-6 p-3 rounded-xl bg-white/[0.04] border border-white/8 flex items-center gap-3"
-            >
-              <div className="w-8 h-8 rounded-lg bg-brand-500/15 flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs text-neutral-300 font-medium truncate">
-                  {selectedFile?.name}
-                </div>
-                <div className="text-[11px] text-neutral-500 mt-0.5">
-                  {selectedFile ? `${(selectedFile.size / 1024).toFixed(0)} KB` : ''}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Particle dots grid (decorative) */}
-          <div className="particle-grid absolute inset-0 pointer-events-none -z-10" />
-        </motion.div>
-      </div>
+      <AnalysisLoadingScreen
+        selectedFile={selectedFile}
+        result={inferenceResult}
+        error={error}
+        onCompleteHandoff={handleHandoff}
+        onSkip={handleHandoff}
+      />
     )
   }
 

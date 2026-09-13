@@ -1,13 +1,13 @@
 /**
- * Infralytix Frontend — Global CSS
+ * Infralytix Frontend â€” Global CSS
  *
  * Layer structure:
- *  1. @layer base       — HTML element resets and base styles
- *  2. @layer components — Reusable component classes
+ *  1. @layer base       â€” HTML element resets and base styles
+ *  2. @layer components â€” Reusable component classes
  *
  * Design system:
- *  - Elevation: 4 named shadow levels (elev-1 … elev-4)
- *  - Typography: 7 named scale classes (type-display … type-caption)
+ *  - Elevation: 4 named shadow levels (elev-1 â€¦ elev-4)
+ *  - Typography: 7 named scale classes (type-display â€¦ type-caption)
  *  - Ambient background: slow-moving gradient mesh on body pseudo-element
  *  - Scrollbar: brand-accented, thin, rounded
  *  - Transitions: all interactive elements use 200ms ease-out
@@ -18,7 +18,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* ── CSS Custom Properties ────────────────────────────────────────────────── */
+/* â”€â”€ CSS Custom Properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root {
   --shadow-elev-1: 0 2px 8px -2px rgba(0,0,0,0.40), 0 1px 3px -1px rgba(0,0,0,0.25);
   --shadow-elev-2: 0 8px 24px -4px rgba(0,0,0,0.50), 0 4px 8px -2px rgba(0,0,0,0.30);
@@ -31,7 +31,7 @@
   --t-slow: 350ms ease-out;
 }
 
-/* ── Base Layer ──────────────────────────────────────────────────────────── */
+/* â”€â”€ Base Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -45,7 +45,7 @@
     position: relative;
   }
 
-  /* ── Ambient background mesh ─────────────────────────────────────────────
+  /* â”€â”€ Ambient background mesh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
      Slow-moving conic gradient + SVG noise grain behind ALL pages.
      pointer-events:none so it never interferes with clicks.                */
   body::before {
@@ -74,14 +74,14 @@
 
   code, kbd, samp, pre { @apply font-mono; }
 
-  /* Focus styles — accessible keyboard navigation */
+  /* Focus styles â€” accessible keyboard navigation */
   :focus-visible {
     outline: 2px solid rgba(96, 165, 250, 0.9);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
-  /* ── Scrollbar ───────────────────────────────────────────────────────────
+  /* â”€â”€ Scrollbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
      Thin, rounded, brand-accented to match the dark theme.                */
   ::-webkit-scrollbar        { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track  { background: transparent; }
@@ -100,11 +100,11 @@
   ::selection { @apply bg-brand-600 text-white; }
 }
 
-/* ── Component Layer ─────────────────────────────────────────────────────── */
+/* â”€â”€ Component Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @layer components {
 
-  /* ── Typographic Scale ──────────────────────────────────────────────────
-     7 named pairings — use instead of one-off font-size utilities.         */
+  /* â”€â”€ Typographic Scale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+     7 named pairings â€” use instead of one-off font-size utilities.         */
   .type-display { font-size: 3rem;     line-height: 1.10; font-weight: 800; letter-spacing: -0.03em; }
   .type-h1      { font-size: 2.25rem;  line-height: 1.20; font-weight: 700; letter-spacing: -0.025em; }
   .type-h2      { font-size: 1.5rem;   line-height: 1.30; font-weight: 600; letter-spacing: -0.015em; }
@@ -113,7 +113,7 @@
   .type-body    { font-size: 0.875rem; line-height: 1.60; font-weight: 400; }
   .type-caption { font-size: 0.75rem;  line-height: 1.50; font-weight: 500; letter-spacing: 0.01em; }
 
-  /* ── Elevation Classes ──────────────────────────────────────────────────
+  /* â”€â”€ Elevation Classes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
      4 levels: resting card / hover card / focused element / modal.        */
   .elev-0 { box-shadow: none; }
   .elev-1 { box-shadow: var(--shadow-elev-1); }
@@ -121,7 +121,7 @@
   .elev-3 { box-shadow: var(--shadow-elev-3); }
   .elev-4 { box-shadow: var(--shadow-elev-4); }
 
-  /* ── Glassmorphism Card ────────────────────────────────────────────────── */
+  /* â”€â”€ Glassmorphism Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .glass-card {
     @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl;
     box-shadow: var(--shadow-elev-1);
@@ -138,11 +138,11 @@
     box-shadow: var(--shadow-elev-3);
   }
 
-  /* ── Gradient Text ─────────────────────────────────────────────────────── */
+  /* â”€â”€ Gradient Text â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .gradient-text      { @apply bg-gradient-to-r from-brand-400 to-brand-200 bg-clip-text text-transparent; }
   .gradient-text-warm { @apply bg-gradient-to-r from-amber-400 to-orange-300 bg-clip-text text-transparent; }
 
-  /* ── Buttons ────────────────────────────────────────────────────────────── */
+  /* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2
            px-5 py-2.5 rounded-xl
@@ -201,7 +201,7 @@
     outline-offset: 2px;
   }
 
-  /* ── Form Inputs ─────────────────────────────────────────────────────────── */
+  /* â”€â”€ Form Inputs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .input-field {
     @apply w-full px-4 py-3 rounded-xl
            bg-white/5 border border-white/10
@@ -216,7 +216,7 @@
     box-shadow: 0 0 0 3px rgba(59,130,246,0.18), var(--shadow-elev-3), inset 0 1px 2px rgba(0,0,0,0.2);
   }
 
-  /* ── Nav Link — public pages ─────────────────────────────────────────────── */
+  /* â”€â”€ Nav Link â€” public pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .nav-link {
     @apply px-3.5 py-1.5 rounded-lg text-sm font-medium text-neutral-400
            transition-all duration-200 ease-out;
@@ -232,28 +232,28 @@
     box-shadow: 0 0 12px rgba(59,130,246,0.15);
   }
 
-  /* ── Status Badges ──────────────────────────────────────────────────────── */
+  /* â”€â”€ Status Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .badge-success { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30; }
   .badge-warning { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30; }
   .badge-danger  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400 ring-1 ring-red-500/30; }
   .badge-info    { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/15 text-brand-400 ring-1 ring-brand-500/30; }
   .badge-neutral { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/8 text-neutral-300 ring-1 ring-white/15; }
 
-  /* ── Code Block ──────────────────────────────────────────────────────────── */
+  /* â”€â”€ Code Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .code-block {
     @apply font-mono text-sm bg-neutral-950 border border-white/10 rounded-xl p-4
            text-emerald-400 overflow-x-auto;
     box-shadow: var(--shadow-elev-1);
   }
 
-  /* ── Divider ─────────────────────────────────────────────────────────────── */
+  /* â”€â”€ Divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .divider { @apply h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-6; }
 
-  /* ── Skeleton Loader ─────────────────────────────────────────────────────── */
+  /* â”€â”€ Skeleton Loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .skeleton { @apply bg-white/8 rounded-lg animate-pulse; }
 }
 
-/* ── Keyframes ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Keyframes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /* Ambient background mesh drift */
 @keyframes ambientDrift {
@@ -339,7 +339,7 @@
   animation: shimmer-sweep 2.8s ease-in-out infinite;
 }
 
-/* ── prefers-reduced-motion ───────────────────────────────────────────────────
+/* â”€â”€ prefers-reduced-motion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Zeroes all CSS animations and transitions for users with this OS preference.
    Framer Motion components use useReducedMotion() hook (applied in components).
    GSAP timelines are gated via matchMedia() inside each component.             */
@@ -357,255 +357,4 @@
   .scan-line, .particle-grid, .cheapest-shimmer::before { animation: none; }
   ::-webkit-scrollbar-thumb { transition: none; }
 }
-
- *
- * Layer structure:
- *  1. @layer base      — HTML element resets and base styles
- *  2. @layer components — Reusable component classes
- *  3. @layer utilities  — Tailwind utilities (auto-managed)
- *
- * All custom CSS should use Tailwind @apply where possible.
- * Reserve raw CSS for things Tailwind cannot express.
- */
-
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-/* ── Base Layer ──────────────────────────────────────────────────────────── */
-@layer base {
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  /* Typography defaults */
-  body {
-    @apply font-sans text-base text-white bg-neutral-900 antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  }
-
-  /* Heading hierarchy */
-  h1 { @apply text-4xl font-bold tracking-tight; }
-  h2 { @apply text-3xl font-semibold tracking-tight; }
-  h3 { @apply text-2xl font-semibold; }
-  h4 { @apply text-xl font-medium; }
-  h5 { @apply text-lg font-medium; }
-  h6 { @apply text-base font-medium; }
-
-  /* Code / pre */
-  code, kbd, samp, pre {
-    @apply font-mono;
-  }
-
-  /* Focus styles — accessible keyboard navigation */
-  :focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-500;
-  }
-
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    @apply w-1.5 h-1.5;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-700 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-600;
-  }
-
-  /* Selection */
-  ::selection {
-    @apply bg-brand-600 text-white;
-  }
-}
-
-/* ── Component Layer ─────────────────────────────────────────────────────── */
-@layer components {
-  /* ── Glassmorphism Card ────────────────────────────────────────────────── */
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl;
-  }
-
-  .glass-card-hover {
-    @apply glass-card transition-all duration-200
-           hover:bg-white/8 hover:border-white/20 hover:shadow-brand;
-  }
-
-  /* ── Gradient Text ─────────────────────────────────────────────────────── */
-  .gradient-text {
-    @apply bg-gradient-to-r from-brand-400 to-brand-200 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-warm {
-    @apply bg-gradient-to-r from-amber-400 to-orange-300 bg-clip-text text-transparent;
-  }
-
-  /* ── Buttons ────────────────────────────────────────────────────────────── */
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2
-           px-5 py-2.5 rounded-xl
-           bg-brand-600 text-white font-medium text-sm
-           hover:bg-brand-500 active:bg-brand-700
-           transition-all duration-150
-           focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2
-           px-5 py-2.5 rounded-xl
-           bg-white/8 text-white font-medium text-sm border border-white/15
-           hover:bg-white/12 hover:border-white/25 active:bg-white/5
-           transition-all duration-150
-           focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2
-           px-4 py-2 rounded-lg
-           text-neutral-400 font-medium text-sm
-           hover:text-white hover:bg-white/8
-           transition-all duration-150;
-  }
-
-  /* ── Form Inputs ─────────────────────────────────────────────────────────── */
-  .input-field {
-    @apply w-full px-4 py-3 rounded-xl
-           bg-white/5 border border-white/10
-           text-white placeholder-neutral-500 text-sm
-           focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50
-           transition-colors duration-150;
-  }
-
-  /* ── Status Badges ──────────────────────────────────────────────────────── */
-  .badge-success { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30; }
-  .badge-warning { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30; }
-  .badge-danger  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400 ring-1 ring-red-500/30; }
-  .badge-info    { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/15 text-brand-400 ring-1 ring-brand-500/30; }
-  .badge-neutral { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/8 text-neutral-300 ring-1 ring-white/15; }
-
-  /* ── Code Block ──────────────────────────────────────────────────────────── */
-  .code-block {
-    @apply font-mono text-sm bg-neutral-950 border border-white/10 rounded-xl p-4
-           text-emerald-400 overflow-x-auto;
-  }
-
-  /* ── Divider ─────────────────────────────────────────────────────────────── */
-  .divider {
-    @apply h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-6;
-  }
-
-  /* ── Skeleton Loader ─────────────────────────────────────────────────────── */
-  .skeleton {
-    @apply bg-white/8 rounded-lg animate-pulse;
-  }
-}
-
-/* ── Workload Analysis Animations ────────────────────────────────────────────
-   Used by WorkloadUploadPage during the "Analyzing…" phase.
-   These are raw CSS because Tailwind cannot express multi-step keyframe sequences. */
-
-@keyframes scan {
-  0%   { transform: translateY(0); opacity: 0.7; }
-  50%  { opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-.scan-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(99, 102, 241, 0.35),
-    rgba(139, 92, 246, 0.5),
-    rgba(99, 102, 241, 0.35),
-    transparent
-  );
-  animation: scan 3.5s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes particle-float {
-  0%, 100% { opacity: 0.04; transform: translateY(0); }
-  50%       { opacity: 0.10; transform: translateY(-6px); }
-}
-
-.particle-grid {
-  background-image:
-    radial-gradient(circle, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-  animation: particle-float 6s ease-in-out infinite;
-  border-radius: 1rem;
-}
-
-/* ── Provider card brand borders ─────────────────────────────────────────────
-   Used by CostComparisonPage result cards (applied as className on motion.div). */
-
-.provider-border-aws {
-  border-color: rgba(255, 153, 0, 0.20);
-}
-.provider-border-aws:hover {
-  border-color: rgba(255, 153, 0, 0.45);
-}
-
-.provider-border-azure {
-  border-color: rgba(0, 137, 214, 0.20);
-}
-.provider-border-azure:hover {
-  border-color: rgba(0, 137, 214, 0.45);
-}
-
-.provider-border-gcp {
-  border-color: rgba(66, 133, 244, 0.20);
-}
-.provider-border-gcp:hover {
-  border-color: rgba(66, 133, 244, 0.45);
-}
-
-/* ── Cheapest card shimmer ────────────────────────────────────────────────────
-   An absolutely-positioned pseudo-element overlay that sweeps a shimmer
-   across the cheapest card's border to make it feel alive. */
-
-@keyframes shimmer-sweep {
-  0%   { transform: translateX(-100%) skewX(-12deg); }
-  100% { transform: translateX(250%) skewX(-12deg); }
-}
-
-.cheapest-shimmer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.cheapest-shimmer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(52, 211, 153, 0.08),
-    rgba(52, 211, 153, 0.18),
-    rgba(52, 211, 153, 0.08),
-    transparent
-  );
-  animation: shimmer-sweep 2.8s ease-in-out infinite;
-}
-
 

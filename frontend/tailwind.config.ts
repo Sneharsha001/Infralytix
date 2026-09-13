@@ -95,10 +95,18 @@ const config: Config = {
         '4xl': '2rem',
       },
 
-      // ── Box Shadow ───────────────────────────────────────────────────────────
+      // ── Box Shadow / Elevation System ────────────────────────────────────────
+      // 4 named levels used identically everywhere — resting card, hover, focused, modal
       boxShadow: {
-        'brand': '0 0 20px rgba(59, 130, 246, 0.3)',
-        'glow':  '0 0 40px rgba(59, 130, 246, 0.15)',
+        // Elevation levels
+        'elev-1': '0 2px 8px -2px rgba(0,0,0,0.40), 0 1px 3px -1px rgba(0,0,0,0.25)',
+        'elev-2': '0 8px 24px -4px rgba(0,0,0,0.50), 0 4px 8px -2px rgba(0,0,0,0.30)',
+        'elev-3': '0 16px 48px -8px rgba(0,0,0,0.60), 0 8px 16px -4px rgba(0,0,0,0.35)',
+        'elev-4': '0 32px 80px -12px rgba(0,0,0,0.70), 0 16px 32px -8px rgba(0,0,0,0.40)',
+        // Brand glow variants
+        'brand':    '0 0 20px rgba(59, 130, 246, 0.30)',
+        'brand-lg': '0 0 40px rgba(59, 130, 246, 0.45), 0 0 80px rgba(59, 130, 246, 0.15)',
+        'glow':     '0 0 40px rgba(59, 130, 246, 0.15)',
         'inner-dark': 'inset 0 2px 4px rgba(0, 0, 0, 0.4)',
       },
 

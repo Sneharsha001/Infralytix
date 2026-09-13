@@ -10,7 +10,7 @@
  */
 
 import React, { useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { AwsIcon, AzureIcon, GcpIcon } from './BrandIcons'
 import type { CloudCostEstimate } from '../CostComparisonPage'
 

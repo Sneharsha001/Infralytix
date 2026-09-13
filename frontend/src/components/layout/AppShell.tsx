@@ -19,9 +19,9 @@ export const AppShell: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-neutral-900 text-white selection:bg-brand-500 selection:text-white">
+    <div className="min-h-screen flex bg-neutral-950 text-white selection:bg-brand-500 selection:text-white">
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
-      <aside className="w-64 border-r border-white/10 bg-neutral-950/80 backdrop-blur-md flex flex-col justify-between shrink-0 sticky top-0 h-screen">
+      <aside className="w-64 border-r border-white/10 bg-neutral-950/90 backdrop-blur-md flex flex-col justify-between shrink-0 sticky top-0 h-screen elev-2 z-20">
         <div>
           {/* Logo / Brand */}
           <div className="p-6 border-b border-white/10 flex items-center gap-3">
@@ -29,7 +29,7 @@ export const AppShell: React.FC = () => {
               IX
             </div>
             <div>
-              <Link to="/dashboard" className="text-lg font-bold gradient-text tracking-tight">
+              <Link to="/dashboard" className="text-lg font-bold gradient-text tracking-tight hover:opacity-90 transition-opacity duration-200">
                 Infralytix
               </Link>
               <div className="text-[10px] uppercase tracking-wider text-neutral-400 font-medium">
@@ -39,11 +39,11 @@ export const AppShell: React.FC = () => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-4 space-y-1">
+          <nav className="p-4 space-y-1" aria-label="Sidebar navigation">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-2 focus-visible:outline-brand-400 focus-visible:outline-offset-2 ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-brand'
                     : 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -59,7 +59,7 @@ export const AppShell: React.FC = () => {
             <NavLink
               to="/projects"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-2 focus-visible:outline-brand-400 focus-visible:outline-offset-2 ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-brand'
                     : 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -79,7 +79,7 @@ export const AppShell: React.FC = () => {
             <NavLink
               to="/workflows"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-2 focus-visible:outline-brand-400 focus-visible:outline-offset-2 ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-brand'
                     : 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -139,7 +139,7 @@ export const AppShell: React.FC = () => {
       {/* ── Main Layout (Topbar + Content) ─────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar Header */}
-        <header className="h-16 border-b border-white/10 bg-neutral-900/60 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-30">
+        <header className="h-16 border-b border-white/10 bg-neutral-900/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-30 elev-1">
           <div className="flex items-center gap-3">
             <h1 className="text-lg font-semibold tracking-tight">Workspace Overview</h1>
             <span className="badge-info text-[11px] capitalize">{user?.role}</span>

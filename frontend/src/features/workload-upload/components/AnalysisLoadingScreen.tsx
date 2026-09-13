@@ -104,6 +104,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
 
   // ── GSAP Choreography: Scan-line sweep across abstract file tree ─────────────
   useEffect(() => {
+    if (shouldReduce) return
     if (!scanLineRef.current || !codeBlockRef.current) return
 
     const tl = gsap.timeline({ repeat: -1 })
@@ -136,10 +137,18 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
     return () => {
       tl.kill()
     }
-  }, [])
+  }, [shouldReduce])
 
   // ── Staged Stage State Transitions ──────────────────────────────────────────
   useEffect(() => {
+    if (shouldReduce) {
+      setStage1Status('completed')
+      setStage2Status('completed')
+      setStage3Status('active')
+      setCanSkip(true)
+      return
+    }
+
     // Stage 1 active initially. Advance to Stage 2 after 750ms
     const t1 = setTimeout(() => {
       setStage1Status('completed')
@@ -157,7 +166,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
       clearTimeout(t1)
       clearTimeout(t2)
     }
-  }, [])
+  }, [shouldReduce])
 
   // ── When backend result arrives, complete Stage 3 & trigger handoff ─────────
   useEffect(() => {
@@ -167,6 +176,11 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
     setStage1Status('completed')
     setStage2Status('completed')
     setStage3Status('completed')
+
+    if (shouldReduce) {
+      onCompleteHandoff()
+      return
+    }
 
     // Graceful pause so user absorbs the completed state before cinematic handoff
     const handoffTimer = setTimeout(() => {
@@ -179,7 +193,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
     }, 450)
 
     return () => clearTimeout(handoffTimer)
-  }, [result, onCompleteHandoff])
+  }, [result, onCompleteHandoff, shouldReduce])
 
   // ── Skip Handler ─────────────────────────────────────────────────────────────
   const handleImmediateSkip = () => {

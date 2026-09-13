@@ -11,8 +11,8 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { PublicNav } from '@/components/layout'
 import { apiClient } from '@/lib/api-client'
 import { AiSummaryCard } from './components/AiSummaryCard'
 import { DagPreview } from './components/DagPreview'
@@ -33,14 +33,16 @@ const LOADING_STAGES = [
 ]
 
 const StagedLoader: React.FC = () => {
-  const [activeStage, setActiveStage] = useState(0)
+  const shouldReduce = useReducedMotion()
+  const [activeStage, setActiveStage] = useState(shouldReduce ? LOADING_STAGES.length - 1 : 0)
 
   useEffect(() => {
+    if (shouldReduce) return
     const timers = LOADING_STAGES.slice(1).map((s, i) =>
       setTimeout(() => setActiveStage(i + 1), s.delay)
     )
     return () => timers.forEach(clearTimeout)
-  }, [])
+  }, [shouldReduce])
 
   return (
     <div className="glass-card p-8 rounded-2xl border border-white/10 space-y-6">

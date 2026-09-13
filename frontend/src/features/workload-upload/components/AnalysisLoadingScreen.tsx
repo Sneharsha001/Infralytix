@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { gsap } from 'gsap'
 import type { WorkloadInferenceResult } from '../types'
 
@@ -33,6 +33,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
   onCompleteHandoff,
   onSkip,
 }) => {
+  const shouldReduce = useReducedMotion()
   const [stage1Status, setStage1Status] = useState<StageStatus>('active')
   const [stage2Status, setStage2Status] = useState<StageStatus>('pending')
   const [stage3Status, setStage3Status] = useState<StageStatus>('pending')

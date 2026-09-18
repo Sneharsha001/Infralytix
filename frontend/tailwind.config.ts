@@ -28,6 +28,19 @@ const config: Config = {
           800: '#1e40af',
           900: '#1e3a8a',
           950: '#172554',
+          // New palette tokens
+          base: 'var(--color-bg-base)',
+          elevated: 'var(--color-bg-elevated)',
+          accent: 'var(--color-accent-primary)',
+          muted: 'var(--color-text-muted)',
+          success: 'var(--color-success)',
+        },
+        palette: {
+          base: 'var(--color-bg-base)',
+          elevated: 'var(--color-bg-elevated)',
+          accent: 'var(--color-accent-primary)',
+          muted: 'var(--color-text-muted)',
+          success: 'var(--color-success)',
         },
         // Neutral palette for backgrounds and text
         neutral: {

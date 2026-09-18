@@ -151,7 +151,7 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
 
   if (tasks.length === 0) {
     return (
-      <div className="h-80 glass-card flex items-center justify-center text-neutral-500 text-sm rounded-2xl border border-white/10">
+      <div className="h-80 glass-card flex items-center justify-center text-neutral-400 text-sm rounded-2xl">
         No valid tasks to preview. Paste or upload workflow JSON above.
       </div>
     )
@@ -162,7 +162,7 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
       initial={{ opacity: 0, scale: 0.985 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full h-96 rounded-2xl overflow-hidden border border-white/10 relative"
+      className="w-full h-96 rounded-2xl overflow-hidden border border-[color-mix(in_srgb,var(--color-bg-elevated)_65%,rgba(255,255,255,0.12))] relative"
       style={{ background: 'rgba(2,6,23,0.92)' }}
     >
       {/* Overlay label */}

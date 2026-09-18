@@ -355,7 +355,7 @@ export const CostComparisonPage: React.FC = () => {
       <section className="w-full max-w-5xl mb-12">
         <div className="glass-card p-6 md:p-8 relative overflow-hidden shadow-2xl">
           {/* Subtle decorative glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-accent-primary)]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
             <div>
@@ -827,8 +827,8 @@ export const CostComparisonPage: React.FC = () => {
                   tag: est.provider.toUpperCase(),
                   Icon: AwsIcon,
                   iconColor: '#9ca3af',
-                  borderGradient: 'border-white/10',
-                  hoverShadow: '0 8px 24px -4px rgba(255,255,255,0.08)',
+                  borderGradient: 'border-[color-mix(in_srgb,var(--color-bg-elevated)_65%,rgba(255,255,255,0.12))]',
+                  hoverShadow: '0 8px 24px -4px color-mix(in srgb, var(--color-accent-primary) 20%, transparent)',
                 }
 
                 const isCheapest = idx === 0 && !est.error && est.monthly_cost_low > 0
@@ -865,13 +865,14 @@ export const CostComparisonPage: React.FC = () => {
                     }}
                     className={[
                       'relative flex flex-col justify-between rounded-2xl p-6 overflow-hidden',
-                      'bg-neutral-900/70 backdrop-blur-sm border',
+                      'backdrop-blur-sm border',
                       isCheapest
                         ? 'border-emerald-500/50 shadow-[0_0_32px_-4px_rgba(16,185,129,0.25)]'
-                        : `${meta.borderGradient} hover:shadow-[var(--provider-shadow)]`,
+                        : `${meta.borderGradient} elev-1 hover:shadow-[var(--provider-shadow)]`,
                     ].join(' ')}
                     style={{
                       '--provider-shadow': meta.hoverShadow,
+                      background: 'color-mix(in srgb, var(--color-bg-elevated) 28%, rgba(15,15,35,0.75))',
                       transformStyle: 'preserve-3d',
                     } as React.CSSProperties}
                     onMouseEnter={(e) => {

@@ -45,7 +45,7 @@ const StagedLoader: React.FC = () => {
   }, [shouldReduce])
 
   return (
-    <div className="glass-card p-8 rounded-2xl border border-white/10 space-y-6">
+    <div className="glass-card p-8 rounded-2xl space-y-6">
       <div className="flex flex-col items-center justify-center py-6 text-center space-y-4">
         <div className="relative">
           <div className="w-14 h-14 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin" />
@@ -224,7 +224,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left: JSON Input Card (5 cols) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="glass-card p-5 md:p-6 rounded-2xl border border-white/10 space-y-4">
+            <div className="glass-card p-5 md:p-6 rounded-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-white">Workflow Definition</span>
@@ -290,7 +290,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
                     value={jsonInput}
                     onChange={(e) => setJsonInput(e.target.value)}
                     rows={12}
-                    className="w-full font-mono text-xs p-3.5 rounded-xl bg-neutral-950/80 border border-white/10 text-neutral-200 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 resize-y leading-relaxed"
+                    className="w-full font-mono text-xs p-3.5 rounded-xl bg-neutral-950/80 border border-white/10 text-neutral-200 focus:outline-none focus:border-[var(--color-accent-primary)] focus:ring-1 focus:ring-[var(--color-accent-primary)]/50 resize-y leading-relaxed"
                     placeholder="Paste workflow JSON containing { tasks: [...] }..."
                   />
                 </div>
@@ -298,9 +298,9 @@ export const WorkflowOptimizerPage: React.FC = () => {
                 <div
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleDrop}
-                  className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-xl p-8 text-center bg-white/[0.02] transition-colors cursor-pointer space-y-3"
+                  className="border-2 border-dashed border-white/15 hover:border-[var(--color-accent-primary)]/50 rounded-xl p-8 text-center bg-white/[0.02] transition-colors cursor-pointer space-y-3"
                 >
-                  <div className="w-10 h-10 mx-auto rounded-full bg-brand-500/10 flex items-center justify-center text-brand-400">
+                  <div className="w-10 h-10 mx-auto rounded-full bg-[var(--color-accent-primary)]/10 flex items-center justify-center text-[var(--color-accent-primary)]">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
@@ -371,7 +371,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
                   type="button"
                   onClick={handleOptimize}
                   disabled={!validation.isValid || isLoading}
-                  className="btn-primary w-full py-3 text-sm font-semibold shadow-lg shadow-brand-500/20"
+                  className="btn-primary w-full py-3 text-sm font-semibold shadow-lg shadow-[var(--color-accent-primary)]/25"
                 >
                   {isLoading ? (
                     <span className="flex items-center gap-2">

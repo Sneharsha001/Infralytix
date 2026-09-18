@@ -236,9 +236,9 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
         className="relative w-full max-w-xl mx-auto z-10"
       >
         {/* Main Analysis Card */}
-        <div className="glass-card border border-brand-500/25 bg-neutral-900/90 p-6 md:p-8 relative overflow-hidden shadow-2xl shadow-brand-500/15 rounded-3xl">
+        <div className="glass-card border border-[var(--color-accent-primary)]/30 bg-neutral-900/90 p-6 md:p-8 relative overflow-hidden shadow-2xl shadow-[var(--color-accent-primary)]/15 rounded-3xl">
           {/* Subtle perimeter border glow */}
-          <div className="absolute inset-0 rounded-3xl border border-white/10 pointer-events-none" />
+          <div className="absolute inset-0 rounded-3xl border border-[var(--color-accent-primary)]/15 pointer-events-none" />
 
           {/* ── 1. Layered Visual Core Header ───────────────────────────── */}
           <div className="flex items-center justify-between gap-4 mb-7 relative z-10">

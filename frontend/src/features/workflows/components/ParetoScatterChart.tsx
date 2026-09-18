@@ -67,7 +67,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   const color = PROVIDER_COLORS[data.provider.toLowerCase()] || '#a855f7'
 
   return (
-    <div className="glass-card p-3.5 bg-neutral-950/98 border-white/15 shadow-2xl rounded-xl text-xs space-y-2 min-w-[220px] backdrop-blur-md">
+    <div className="glass-card p-3.5 bg-neutral-950/98 border-[color-mix(in_srgb,var(--color-bg-elevated)_65%,rgba(255,255,255,0.12))] shadow-2xl rounded-xl text-xs space-y-2 min-w-[220px] backdrop-blur-md">
       {/* Provider chip */}
       <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
         <span
@@ -190,7 +190,7 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="glass-card p-6 rounded-2xl border border-white/10 space-y-4"
+      className="glass-card p-6 rounded-2xl space-y-4"
     >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">

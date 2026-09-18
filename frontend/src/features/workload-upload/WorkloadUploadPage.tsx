@@ -195,7 +195,7 @@ export const WorkloadUploadPage: React.FC = () => {
       <section className="w-full max-w-3xl">
         <div className="glass-card p-8 md:p-10 relative overflow-hidden elev-3">
           {/* Decorative glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/8 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-accent-primary)]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10">
             {/* Drop zone */}
@@ -208,10 +208,10 @@ export const WorkloadUploadPage: React.FC = () => {
                 relative cursor-pointer rounded-2xl border-2 border-dashed p-10 md:p-14 text-center
                 transition-all duration-200
                 ${isDragging
-                  ? 'border-brand-400 bg-brand-500/10 scale-[1.01]'
+                  ? 'border-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 scale-[1.01]'
                   : selectedFile
                     ? 'border-emerald-500/50 bg-emerald-500/5'
-                    : 'border-white/15 hover:border-brand-500/50 hover:bg-white/[0.02]'
+                    : 'border-white/15 hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-accent-primary)]/[0.03]'
                 }
               `}
             >

@@ -181,7 +181,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-amber-500/8 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-cyan-500/8 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      <div className="glass-card border border-brand-500/30 bg-neutral-950/90 p-6 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+      <div className="glass-card border border-[var(--color-accent-primary)]/30 bg-neutral-950/90 p-6 md:p-10 rounded-3xl shadow-2xl shadow-[var(--color-accent-primary)]/15 relative overflow-hidden">
         {/* Subtle particle grid background */}
         <div className="particle-grid absolute inset-0 pointer-events-none -z-10" />
 

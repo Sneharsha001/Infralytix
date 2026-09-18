@@ -224,10 +224,10 @@ export const AiSummaryCard: React.FC<AiSummaryCardProps> = ({ result }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="glass-card p-6 md:p-8 border-brand-500/30 bg-brand-950/15 relative overflow-hidden shadow-2xl rounded-2xl space-y-6"
+      className="glass-card p-6 md:p-8 border-[var(--color-accent-primary)]/30 bg-[color-mix(in_srgb,var(--color-bg-elevated)_25%,rgba(15,15,35,0.6))] relative overflow-hidden shadow-2xl shadow-[var(--color-accent-primary)]/10 rounded-2xl space-y-6"
     >
       {/* Decorative background glow */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[var(--color-accent-primary)]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 relative z-10">

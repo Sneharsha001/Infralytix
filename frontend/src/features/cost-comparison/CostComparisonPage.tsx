@@ -9,7 +9,7 @@
  * fields with AI-inferred workload values.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
@@ -141,6 +141,45 @@ const AnimatedPrice: React.FC<{ value: number; delayMs?: number }> = ({ value, d
   return <>{displayed.toFixed(2)}</>
 }
 
+// ─── Field Info Tooltip Component ─────────────────────────────────────────────
+
+interface FieldTooltipProps {
+  label: string
+  content: string
+}
+
+const FieldTooltip: React.FC<FieldTooltipProps> = ({ label, content }) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <span className="relative inline-flex items-center ml-1.5">
+      <button
+        type="button"
+        aria-label={`Information regarding ${label}`}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((prev) => !prev)}
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
+        onFocus={() => setIsOpen(true)}
+        onBlur={() => setIsOpen(false)}
+        className="w-3.5 h-3.5 rounded-full bg-white/10 hover:bg-brand-500/25 text-neutral-400 hover:text-brand-300 text-[10px] font-mono flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-1 focus-visible:ring-offset-neutral-950"
+      >
+        i
+      </button>
+
+      {isOpen && (
+        <div
+          role="tooltip"
+          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2.5 rounded-xl bg-neutral-900/95 border border-white/15 text-[11px] leading-relaxed text-neutral-200 shadow-2xl backdrop-blur-md z-30 pointer-events-none"
+        >
+          {content}
+          <span className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-neutral-900/95" />
+        </div>
+      )}
+    </span>
+  )
+}
+
 export const CostComparisonPage: React.FC = () => {
   const location = useLocation()
   const inferredState = location.state as WorkloadInferenceRouteState | null
@@ -152,6 +191,8 @@ export const CostComparisonPage: React.FC = () => {
     region: 'us-east',
     hours_per_month: 730,
   })
+
+  const [lastQueriedData, setLastQueriedData] = useState<FormState | null>(null)
 
   const [autoDetectedBadge, setAutoDetectedBadge] = useState(
     inferredState?.autoDetected ?? false
@@ -186,6 +227,14 @@ export const CostComparisonPage: React.FC = () => {
     }))
   }
 
+  const stepField = (name: 'vcpu' | 'ram_gb' | 'storage_gb' | 'hours_per_month', delta: number, min: number, max: number) => {
+    setFormData((prev) => {
+      const currentVal = prev[name]
+      const newVal = Math.min(max, Math.max(min, currentVal + delta))
+      return { ...prev, [name]: newVal }
+    })
+  }
+
   const applyPreset = (vcpu: number, ram_gb: number, storage_gb: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -195,12 +244,61 @@ export const CostComparisonPage: React.FC = () => {
     }))
   }
 
+  const activePreset = useMemo<'micro' | 'standard' | 'high-mem' | null>(() => {
+    if (formData.vcpu === 2 && formData.ram_gb === 4 && formData.storage_gb === 50) return 'micro'
+    if (formData.vcpu === 4 && formData.ram_gb === 16 && formData.storage_gb === 100) return 'standard'
+    if (formData.vcpu === 8 && formData.ram_gb === 32 && formData.storage_gb === 250) return 'high-mem'
+    return null
+  }, [formData.vcpu, formData.ram_gb, formData.storage_gb])
+
+  const hasAnyChangesSinceRun = useMemo(() => {
+    if (!lastQueriedData) return false
+    return (
+      lastQueriedData.vcpu !== formData.vcpu ||
+      lastQueriedData.ram_gb !== formData.ram_gb ||
+      lastQueriedData.storage_gb !== formData.storage_gb ||
+      lastQueriedData.region !== formData.region ||
+      lastQueriedData.hours_per_month !== formData.hours_per_month
+    )
+  }, [lastQueriedData, formData])
+
+  // Real-time validation & contextual helpers
+  const vcpuValidation = useMemo(() => {
+    if (formData.vcpu < 1) return { type: 'error' as const, text: 'vCPU must be at least 1 core.' }
+    if (formData.vcpu > 128) return { type: 'advisory' as const, text: 'Large compute (> 128 vCPUs) requires specialized bare-metal instances.' }
+    return { type: 'helper' as const, text: 'Standard cloud instance range (1 to 128 vCPUs).' }
+  }, [formData.vcpu])
+
+  const ramValidation = useMemo(() => {
+    if (formData.ram_gb < 1) return { type: 'error' as const, text: 'RAM must be at least 1 GB.' }
+    const ratio = formData.vcpu > 0 ? formData.ram_gb / formData.vcpu : 0
+    if (ratio < 1) return { type: 'advisory' as const, text: 'Low memory-to-core ratio (< 1 GB/core). Cloud instances typically offer 2–8 GB/core.' }
+    if (ratio > 16) return { type: 'advisory' as const, text: 'High memory-to-core ratio (> 16 GB/core). Matches memory-optimized instance families.' }
+    return { type: 'helper' as const, text: `Memory allocation (~${ratio.toFixed(1)} GB/core).` }
+  }, [formData.ram_gb, formData.vcpu])
+
+  const storageValidation = useMemo(() => {
+    if (formData.storage_gb < 0) return { type: 'error' as const, text: 'Storage volume cannot be negative.' }
+    if (formData.storage_gb === 0) return { type: 'advisory' as const, text: 'Compute only (0 GB attached block storage).' }
+    if (formData.storage_gb > 16384) return { type: 'advisory' as const, text: 'Large volume (> 16 TB) may require multi-volume striping.' }
+    return { type: 'helper' as const, text: 'Persistent block SSD (gp3 / managed disk / pd-balanced).' }
+  }, [formData.storage_gb])
+
+  const hoursValidation = useMemo(() => {
+    if (formData.hours_per_month < 1) return { type: 'error' as const, text: 'Hours must be at least 1 hr/month.' }
+    if (formData.hours_per_month > 744) return { type: 'error' as const, text: 'Maximum 744 hours in any calendar month (31d × 24h).' }
+    if (formData.hours_per_month === 730) return { type: 'helper' as const, text: 'Continuous 24/7 run-rate (standard 730 hrs/month).' }
+    const pct = Math.round((formData.hours_per_month / 730) * 100)
+    return { type: 'helper' as const, text: `Scheduled runtime (~${pct}% monthly utilization).` }
+  }, [formData.hours_per_month])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setIsQuerying(true)
     setPendingData(null)
     setError(null)
+    setLastQueriedData({ ...formData })
 
     try {
       const response = await apiClient.post<CloudComparisonResponse>(
@@ -294,25 +392,40 @@ export const CostComparisonPage: React.FC = () => {
 
               {/* Quick Presets */}
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-neutral-500">Presets:</span>
+                <span className="text-neutral-500 font-medium">Presets:</span>
                 <button
                   type="button"
                   onClick={() => applyPreset(2, 4, 50)}
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                    activePreset === 'micro'
+                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
+                  }`}
+                  aria-pressed={activePreset === 'micro'}
                 >
                   Micro (2v/4G)
                 </button>
                 <button
                   type="button"
                   onClick={() => applyPreset(4, 16, 100)}
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                    activePreset === 'standard'
+                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
+                  }`}
+                  aria-pressed={activePreset === 'standard'}
                 >
                   Standard (4v/16G)
                 </button>
                 <button
                   type="button"
                   onClick={() => applyPreset(8, 32, 250)}
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 transition-colors"
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                    activePreset === 'high-mem'
+                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
+                  }`}
+                  aria-pressed={activePreset === 'high-mem'}
                 >
                   High-Mem (8v/32G)
                 </button>
@@ -324,71 +437,229 @@ export const CostComparisonPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* vCPU */}
               <div>
-                <label htmlFor="vcpu" className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  vCPU Cores
-                </label>
-                <input
-                  id="vcpu"
-                  name="vcpu"
-                  type="number"
-                  min="1"
-                  max="256"
-                  required
-                  value={formData.vcpu}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  placeholder="e.g. 4"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center">
+                    <label htmlFor="vcpu" className="text-xs font-semibold text-neutral-300">
+                      vCPU Cores
+                    </label>
+                    <FieldTooltip
+                      label="vCPU Cores"
+                      content="Virtual CPU cores allocated to execute your workload. Cloud providers size standard instances from 1 to 128 vCPUs."
+                    />
+                  </div>
+                  {lastQueriedData && lastQueriedData.vcpu !== formData.vcpu && (
+                    <span className="text-[10px] font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                      Was {lastQueriedData.vcpu}
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    id="vcpu"
+                    name="vcpu"
+                    type="number"
+                    min="1"
+                    max="256"
+                    required
+                    value={formData.vcpu}
+                    onChange={handleInputChange}
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    placeholder="e.g. 4"
+                    aria-describedby="vcpu-helper"
+                  />
+                  <div className="absolute right-1.5 flex items-center gap-0.5 bg-neutral-800/80 rounded-lg p-0.5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => stepField('vcpu', -1, 1, 256)}
+                      disabled={formData.vcpu <= 1}
+                      aria-label="Decrease vCPU"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      –
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepField('vcpu', 1, 1, 256)}
+                      disabled={formData.vcpu >= 256}
+                      aria-label="Increase vCPU"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p
+                  id="vcpu-helper"
+                  className={`text-[11px] mt-1.5 leading-snug transition-colors duration-150 ${
+                    vcpuValidation.type === 'error'
+                      ? 'text-red-400 font-medium'
+                      : vcpuValidation.type === 'advisory'
+                      ? 'text-amber-400 font-medium'
+                      : 'text-neutral-400'
+                  }`}
+                >
+                  {vcpuValidation.text}
+                </p>
               </div>
 
               {/* RAM */}
               <div>
-                <label htmlFor="ram_gb" className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  RAM (GB)
-                </label>
-                <input
-                  id="ram_gb"
-                  name="ram_gb"
-                  type="number"
-                  min="1"
-                  max="3904"
-                  required
-                  value={formData.ram_gb}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  placeholder="e.g. 16"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center">
+                    <label htmlFor="ram_gb" className="text-xs font-semibold text-neutral-300">
+                      RAM (GB)
+                    </label>
+                    <FieldTooltip
+                      label="RAM"
+                      content="System memory allocated. General-purpose cloud workloads typically require 2 to 4 GB per vCPU; in-memory caches and databases need more."
+                    />
+                  </div>
+                  {lastQueriedData && lastQueriedData.ram_gb !== formData.ram_gb && (
+                    <span className="text-[10px] font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                      Was {lastQueriedData.ram_gb}G
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    id="ram_gb"
+                    name="ram_gb"
+                    type="number"
+                    min="1"
+                    max="3904"
+                    required
+                    value={formData.ram_gb}
+                    onChange={handleInputChange}
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    placeholder="e.g. 16"
+                    aria-describedby="ram-helper"
+                  />
+                  <div className="absolute right-1.5 flex items-center gap-0.5 bg-neutral-800/80 rounded-lg p-0.5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => stepField('ram_gb', formData.ram_gb <= 8 ? -2 : -4, 1, 3904)}
+                      disabled={formData.ram_gb <= 1}
+                      aria-label="Decrease RAM"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      –
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepField('ram_gb', formData.ram_gb < 8 ? 2 : 4, 1, 3904)}
+                      disabled={formData.ram_gb >= 3904}
+                      aria-label="Increase RAM"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p
+                  id="ram-helper"
+                  className={`text-[11px] mt-1.5 leading-snug transition-colors duration-150 ${
+                    ramValidation.type === 'error'
+                      ? 'text-red-400 font-medium'
+                      : ramValidation.type === 'advisory'
+                      ? 'text-amber-400 font-medium'
+                      : 'text-neutral-400'
+                  }`}
+                >
+                  {ramValidation.text}
+                </p>
               </div>
 
               {/* Storage */}
               <div>
-                <label htmlFor="storage_gb" className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Storage (GB)
-                </label>
-                <input
-                  id="storage_gb"
-                  name="storage_gb"
-                  type="number"
-                  min="0"
-                  max="65536"
-                  value={formData.storage_gb}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  placeholder="e.g. 100"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center">
+                    <label htmlFor="storage_gb" className="text-xs font-semibold text-neutral-300">
+                      Storage (GB)
+                    </label>
+                    <FieldTooltip
+                      label="Storage"
+                      content="Persistent block storage volume attached to the instance (AWS EBS gp3, Azure Managed Disks, or GCP pd-balanced). Set to 0 for compute-only pricing."
+                    />
+                  </div>
+                  {lastQueriedData && lastQueriedData.storage_gb !== formData.storage_gb && (
+                    <span className="text-[10px] font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                      Was {lastQueriedData.storage_gb}G
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    id="storage_gb"
+                    name="storage_gb"
+                    type="number"
+                    min="0"
+                    max="65536"
+                    value={formData.storage_gb}
+                    onChange={handleInputChange}
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    placeholder="e.g. 100"
+                    aria-describedby="storage-helper"
+                  />
+                  <div className="absolute right-1.5 flex items-center gap-0.5 bg-neutral-800/80 rounded-lg p-0.5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => stepField('storage_gb', -25, 0, 65536)}
+                      disabled={formData.storage_gb <= 0}
+                      aria-label="Decrease Storage"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      –
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepField('storage_gb', 25, 0, 65536)}
+                      disabled={formData.storage_gb >= 65536}
+                      aria-label="Increase Storage"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p
+                  id="storage-helper"
+                  className={`text-[11px] mt-1.5 leading-snug transition-colors duration-150 ${
+                    storageValidation.type === 'error'
+                      ? 'text-red-400 font-medium'
+                      : storageValidation.type === 'advisory'
+                      ? 'text-amber-400 font-medium'
+                      : 'text-neutral-400'
+                  }`}
+                >
+                  {storageValidation.text}
+                </p>
               </div>
 
               {/* Region */}
               <div className="sm:col-span-2 lg:col-span-1">
-                <label htmlFor="region" className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Target Region
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center">
+                    <label htmlFor="region" className="text-xs font-semibold text-neutral-300">
+                      Target Region
+                    </label>
+                    <FieldTooltip
+                      label="Target Region"
+                      content="Cloud data center geography. Infrastructure availability, network latency, and regional power/tax rates cause on-demand pricing to vary by 10% to 25%."
+                    />
+                  </div>
+                  {lastQueriedData && lastQueriedData.region !== formData.region && (
+                    <span className="text-[10px] font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                      Changed
+                    </span>
+                  )}
+                </div>
                 <select
                   id="region"
                   name="region"
                   value={formData.region}
                   onChange={handleInputChange}
-                  className="input-field bg-neutral-900 cursor-pointer"
+                  className="input-field bg-neutral-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                  aria-describedby="region-helper"
                 >
                   {REGION_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value} className="bg-neutral-900 text-white">
@@ -396,37 +667,94 @@ export const CostComparisonPage: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <p id="region-helper" className="text-[11px] mt-1.5 leading-snug text-neutral-400">
+                  Regional catalogs vary up to 25% across locations.
+                </p>
               </div>
 
               {/* Hours / Month */}
               <div>
-                <label htmlFor="hours_per_month" className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Hours / Month
-                </label>
-                <input
-                  id="hours_per_month"
-                  name="hours_per_month"
-                  type="number"
-                  min="1"
-                  max="744"
-                  required
-                  value={formData.hours_per_month}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  placeholder="730 (24x7)"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center">
+                    <label htmlFor="hours_per_month" className="text-xs font-semibold text-neutral-300">
+                      Hours / Month
+                    </label>
+                    <FieldTooltip
+                      label="Hours / Month"
+                      content="Estimated operational hours per month. 730 hours is the cloud standard for full-time 24/7 continuous workloads (365 days × 24 hrs ÷ 12 months = 730)."
+                    />
+                  </div>
+                  {lastQueriedData && lastQueriedData.hours_per_month !== formData.hours_per_month && (
+                    <span className="text-[10px] font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                      Was {lastQueriedData.hours_per_month}h
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    id="hours_per_month"
+                    name="hours_per_month"
+                    type="number"
+                    min="1"
+                    max="744"
+                    required
+                    value={formData.hours_per_month}
+                    onChange={handleInputChange}
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    placeholder="730 (24x7)"
+                    aria-describedby="hours-helper"
+                  />
+                  <div className="absolute right-1.5 flex items-center gap-0.5 bg-neutral-800/80 rounded-lg p-0.5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => stepField('hours_per_month', -24, 1, 744)}
+                      disabled={formData.hours_per_month <= 1}
+                      aria-label="Decrease Hours"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      –
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepField('hours_per_month', 24, 1, 744)}
+                      disabled={formData.hours_per_month >= 744}
+                      aria-label="Increase Hours"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p
+                  id="hours-helper"
+                  className={`text-[11px] mt-1.5 leading-snug transition-colors duration-150 ${
+                    hoursValidation.type === 'error'
+                      ? 'text-red-400 font-medium'
+                      : 'text-neutral-400'
+                  }`}
+                >
+                  {hoursValidation.text}
+                </p>
               </div>
             </div>
 
             {/* Submit Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
-              <span className="text-xs text-neutral-400">
-                Queries live AWS EC2 &amp; Azure Retail APIs + Google Cloud Billing simultaneously.
-              </span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+                <span className="text-xs text-neutral-400">
+                  Queries live AWS EC2 &amp; Azure Retail APIs + Google Cloud Billing simultaneously.
+                </span>
+                {hasAnyChangesSinceRun && (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-lg shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    Specifications modified since previous comparison run
+                  </span>
+                )}
+              </div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full sm:w-auto px-8 py-3 text-sm font-semibold shadow-lg shadow-brand-600/20"
+                className="btn-primary w-full sm:w-auto px-8 py-3 text-sm font-semibold shadow-lg shadow-brand-600/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

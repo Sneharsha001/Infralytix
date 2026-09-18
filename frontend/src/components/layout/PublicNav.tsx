@@ -122,7 +122,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            className="group flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 transition-transform duration-200"
+            className="group flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 transition-transform duration-200"
             aria-label="Infralytix Homepage"
           >
             {/* Living Icon Mark */}
@@ -132,8 +132,8 @@ export const PublicNav: React.FC<PublicNavProps> = ({
               transition={{ type: 'spring', stiffness: 400, damping: 22 }}
               className="relative w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-lg overflow-hidden shrink-0 select-none"
               style={{
-                background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)',
-                boxShadow: '0 0 16px rgba(59,130,246,0.30)',
+                background: 'linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-bg-elevated) 100%)',
+                boxShadow: '0 0 16px rgba(136, 46, 202, 0.35)',
               }}
             >
               {/* Subtle animated breathing aura */}
@@ -148,7 +148,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                     repeat: Infinity,
                     ease: 'easeInOut',
                   }}
-                  className="absolute inset-0 bg-brand-400/40 blur-[8px] pointer-events-none"
+                  className="absolute inset-0 bg-[var(--color-accent-primary)]/40 blur-[8px] pointer-events-none"
                 />
               )}
 
@@ -194,18 +194,18 @@ export const PublicNav: React.FC<PublicNavProps> = ({
             {/* Step 1: Detect */}
             <Link
               to="/upload-workload"
-              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 ${
+              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)] ${
                 activeStep === 1
-                  ? 'bg-brand-500/20 text-brand-300 font-semibold border border-brand-500/40 shadow-[0_0_8px_rgba(59,130,246,0.25)]'
+                  ? 'bg-[var(--color-accent-primary)]/20 text-white font-semibold border border-[var(--color-accent-primary)]/40 shadow-[0_0_8px_rgba(136,46,202,0.30)]'
                   : activeStep > 1
                   ? 'text-emerald-400 hover:text-emerald-300'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'
               }`}
             >
               <span
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
                   activeStep === 1
-                    ? 'bg-brand-500 text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-white'
                     : activeStep > 1
                     ? 'bg-emerald-500/20 text-emerald-400'
                     : 'bg-white/10 text-neutral-400'
@@ -221,18 +221,18 @@ export const PublicNav: React.FC<PublicNavProps> = ({
             {/* Step 2: Compare */}
             <Link
               to="/cost-comparison"
-              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 ${
+              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)] ${
                 activeStep === 2
-                  ? 'bg-brand-500/20 text-brand-300 font-semibold border border-brand-500/40 shadow-[0_0_8px_rgba(59,130,246,0.25)]'
+                  ? 'bg-[var(--color-accent-primary)]/20 text-white font-semibold border border-[var(--color-accent-primary)]/40 shadow-[0_0_8px_rgba(136,46,202,0.30)]'
                   : activeStep > 2
                   ? 'text-emerald-400 hover:text-emerald-300'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'
               }`}
             >
               <span
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
                   activeStep === 2
-                    ? 'bg-brand-500 text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-white'
                     : activeStep > 2
                     ? 'bg-emerald-500/20 text-emerald-400'
                     : 'bg-white/10 text-neutral-400'
@@ -251,16 +251,16 @@ export const PublicNav: React.FC<PublicNavProps> = ({
             {/* Step 3: Optimize */}
             <Link
               to="/workflows"
-              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 ${
+              className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)] ${
                 activeStep === 3
-                  ? 'bg-brand-500/20 text-brand-300 font-semibold border border-brand-500/40 shadow-[0_0_8px_rgba(59,130,246,0.25)]'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-[var(--color-accent-primary)]/20 text-white font-semibold border border-[var(--color-accent-primary)]/40 shadow-[0_0_8px_rgba(136,46,202,0.30)]'
+                  : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'
               }`}
             >
               <span
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
                   activeStep === 3
-                    ? 'bg-brand-500 text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-white'
                     : 'bg-white/10 text-neutral-400'
                 }`}
               >
@@ -288,15 +288,15 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                 to={item.to}
                 end={item.exact}
                 className={`relative px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors duration-200
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950
-                  ${isCurrent ? 'text-white' : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.03]'}`}
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950
+                  ${isCurrent ? 'text-white' : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'}`}
                 aria-current={isCurrent ? 'page' : undefined}
               >
                 {/* Animated active shared-element pill */}
                 {isCurrent && (
                   <motion.span
                     layoutId="activeNavPill"
-                    className="absolute inset-0 rounded-xl bg-brand-600/30 border border-brand-500/40 shadow-[0_0_14px_rgba(59,130,246,0.30)]"
+                    className="absolute inset-0 rounded-xl bg-[var(--color-accent-primary)]/20 border border-[var(--color-accent-primary)]/40 shadow-[0_0_14px_rgba(136,46,202,0.35)]"
                     style={{ zIndex: 0 }}
                     transition={{
                       type: 'spring',

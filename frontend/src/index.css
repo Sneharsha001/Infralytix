@@ -228,15 +228,17 @@
     @apply px-3.5 py-1.5 rounded-lg text-sm font-medium text-neutral-400
            transition-all duration-200 ease-out;
   }
-  .nav-link:hover       { @apply text-white bg-white/8; }
+  .nav-link:hover       { @apply text-white; background-color: color-mix(in srgb, var(--color-accent-primary) 12%, transparent); }
   .nav-link:active      { transform: scale(0.97); }
   .nav-link:focus-visible {
-    outline: 2px solid rgba(96, 165, 250, 0.9);
+    outline: 2px solid var(--color-accent-primary);
     outline-offset: 2px;
   }
   .nav-link-active {
-    @apply bg-brand-600/20 text-brand-300 border border-brand-500/30;
-    box-shadow: 0 0 12px rgba(59,130,246,0.15);
+    @apply text-white;
+    background-color: color-mix(in srgb, var(--color-accent-primary) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent-primary) 40%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-primary) 25%, transparent);
   }
 
   /* â”€â”€ Status Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */

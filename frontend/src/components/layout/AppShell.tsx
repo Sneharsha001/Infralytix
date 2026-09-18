@@ -19,7 +19,7 @@ export const AppShell: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-neutral-950 text-white selection:bg-brand-500 selection:text-white">
+    <div className="min-h-screen flex bg-[var(--color-bg-base)] text-white selection:bg-brand-500 selection:text-white">
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
       <aside className="w-64 border-r border-white/10 bg-neutral-950/90 backdrop-blur-md flex flex-col justify-between shrink-0 sticky top-0 h-screen elev-2 z-20">
         <div>

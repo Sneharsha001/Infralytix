@@ -60,14 +60,14 @@ const DagGraph: React.FC<{ nodes: Node<WorkflowTaskInput>[]; edges: Edge[] }> = 
       onInit={onInit}
     >
       <Background
-        color="#1e293b"
+        color="rgba(180, 149, 164, 0.2)"
         gap={22}
         size={1.2}
         variant={BackgroundVariant.Dots}
-        style={{ backgroundColor: 'rgba(2,6,23,0.92)' }}
+        style={{ backgroundColor: 'var(--color-bg-base)' }}
       />
       <Controls
-        className="!bg-neutral-900/90 !border-white/10 !rounded-xl !shadow-xl [&>button]:!bg-transparent [&>button]:!border-white/10 [&>button]:!text-white hover:[&>button]:!bg-white/10 [&>button]:transition-colors"
+        className="!bg-[var(--color-bg-elevated)]/90 !border-white/10 !rounded-xl !shadow-xl [&>button]:!bg-transparent [&>button]:!border-white/10 [&>button]:!text-white hover:[&>button]:!bg-white/10 [&>button]:transition-colors"
       />
     </ReactFlow>
   )
@@ -135,10 +135,10 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
           target: task.id,
           type: 'smoothstep',
           animated: true,
-          style: { stroke: '#6366f1', strokeWidth: 1.8 },
+          style: { stroke: '#882ECA', strokeWidth: 1.8 },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: '#6366f1',
+            color: '#882ECA',
             width: 14,
             height: 14,
           },
@@ -163,7 +163,7 @@ export const DagPreview: React.FC<DagPreviewProps> = ({ tasks }) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="w-full h-96 rounded-2xl overflow-hidden border border-[color-mix(in_srgb,var(--color-bg-elevated)_65%,rgba(255,255,255,0.12))] relative"
-      style={{ background: 'rgba(2,6,23,0.92)' }}
+      style={{ background: 'var(--color-bg-base)' }}
     >
       {/* Overlay label */}
       <div className="absolute top-3 left-4 z-10 flex items-center gap-2 pointer-events-none">

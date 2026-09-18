@@ -228,21 +228,21 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
           <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 20 }}>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#1e293b"
-              opacity={0.7}
+              stroke="rgba(180, 149, 164, 0.18)"
+              opacity={0.8}
             />
             <XAxis
               type="number"
               dataKey="x"
               name="Cost"
-              stroke="#475569"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              stroke="rgba(180, 149, 164, 0.35)"
+              tick={{ fill: '#B495A4', fontSize: 11 }}
               tickFormatter={(v: number) => `$${v.toFixed(3)}`}
               label={{
                 value: 'Total Workflow Cost (USD)',
                 position: 'insideBottom',
                 offset: -15,
-                fill: '#64748b',
+                fill: '#B495A4',
                 fontSize: 11,
               }}
             />
@@ -250,20 +250,20 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
               type="number"
               dataKey="y"
               name="Makespan"
-              stroke="#475569"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              stroke="rgba(180, 149, 164, 0.35)"
+              tick={{ fill: '#B495A4', fontSize: 11 }}
               tickFormatter={(v: number) => (v >= 60 ? `${(v / 60).toFixed(0)}m` : `${v.toFixed(0)}s`)}
               label={{
                 value: 'Makespan',
                 angle: -90,
                 position: 'insideLeft',
                 offset: 10,
-                fill: '#64748b',
+                fill: '#B495A4',
                 fontSize: 11,
               }}
             />
             <ZAxis range={[60, 240]} />
-            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3', stroke: '#334155' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3', stroke: 'rgba(136, 46, 202, 0.45)' }} />
 
             {/* Pareto frontier dashed line */}
             {frontierLinePoints.length > 1 && (
@@ -271,7 +271,7 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
                 type="monotone"
                 data={frontierLinePoints}
                 dataKey="y"
-                stroke="#818cf8"
+                stroke="#882ECA"
                 strokeWidth={1.5}
                 strokeDasharray="5 4"
                 dot={false}
@@ -286,8 +286,8 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
               <Scatter
                 name="Dominated"
                 data={dominated}
-                fill="#334155"
-                opacity={0.35}
+                fill="rgba(180, 149, 164, 0.3)"
+                opacity={0.4}
                 isAnimationActive={chartVisible}
                 animationBegin={0}
                 animationDuration={600}
@@ -335,14 +335,14 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
             <Legend
               verticalAlign="top"
               height={36}
-              wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }}
+              wrapperStyle={{ fontSize: '11px', color: '#B495A4' }}
             />
           </ScatterChart>
         </ResponsiveContainer>
       </motion.div>
 
       {/* Custom provider legend row */}
-      <div className="flex flex-wrap items-center justify-between text-xs text-neutral-400 pt-3 border-t border-white/10 gap-3">
+      <div className="flex flex-wrap items-center justify-between text-xs text-[var(--color-text-muted)] pt-3 border-t border-white/10 gap-3">
         <div className="flex items-center gap-5">
           {Object.entries(PROVIDER_LABELS).map(([key, label]) => (
             <span key={key} className="flex items-center gap-1.5">
@@ -354,7 +354,7 @@ export const ParetoScatterChart: React.FC<ParetoScatterChartProps> = ({ result }
             </span>
           ))}
           <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0 border-t border-dashed border-indigo-400" />
+            <span className="w-4 h-0 border-t border-dashed border-[var(--color-accent-primary)]" />
             Pareto Frontier
           </span>
         </div>

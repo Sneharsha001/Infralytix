@@ -33,6 +33,7 @@ const config: Config = {
           elevated: 'var(--color-bg-elevated)',
           accent: 'var(--color-accent-primary)',
           muted: 'var(--color-text-muted)',
+          mutedLight: 'var(--color-text-muted-accessible, #C7ADB9)',
           success: 'var(--color-success)',
         },
         palette: {
@@ -40,6 +41,7 @@ const config: Config = {
           elevated: 'var(--color-bg-elevated)',
           accent: 'var(--color-accent-primary)',
           muted: 'var(--color-text-muted)',
+          mutedLight: 'var(--color-text-muted-accessible, #C7ADB9)',
           success: 'var(--color-success)',
         },
         // Neutral palette for backgrounds and text

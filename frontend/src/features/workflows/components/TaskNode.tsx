@@ -53,9 +53,9 @@ export const TaskNode: React.FC<NodeProps<WorkflowTaskInput>> = memo(({ data }) 
     <div
       className={[
         'relative min-w-[210px] max-w-[240px] rounded-xl border backdrop-blur-sm',
-        'bg-neutral-900/90 shadow-lg',
+        'bg-[var(--color-bg-base)]/90 shadow-lg',
         'transition-all duration-200',
-        'hover:border-white/25 hover:bg-neutral-800/90',
+        'hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-bg-elevated)]/60',
         meta.border,
       ].join(' ')}
       style={{
@@ -78,7 +78,7 @@ export const TaskNode: React.FC<NodeProps<WorkflowTaskInput>> = memo(({ data }) 
           width: 10,
           height: 10,
           background: meta.handleColor,
-          border: '2px solid #0f172a',
+          border: '2px solid var(--color-bg-base)',
           left: -5,
         }}
       />
@@ -89,7 +89,7 @@ export const TaskNode: React.FC<NodeProps<WorkflowTaskInput>> = memo(({ data }) 
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${meta.badge}`}>
             {meta.label}
           </span>
-          <span className="text-[10px] font-mono text-neutral-500 shrink-0">
+          <span className="text-[10px] font-mono text-[var(--color-text-muted)] shrink-0">
             {data.baseline_time_seconds}s
           </span>
         </div>
@@ -100,14 +100,14 @@ export const TaskNode: React.FC<NodeProps<WorkflowTaskInput>> = memo(({ data }) 
         </div>
 
         {/* Task ID */}
-        <div className="text-[10px] font-mono text-neutral-500 truncate">
+        <div className="text-[10px] font-mono text-[var(--color-text-muted)] truncate">
           {data.id}
         </div>
 
         {/* Resource footer */}
         <div className="flex items-center justify-between text-[11px] pt-2 border-t border-white/[0.07] font-mono">
-          <span className="text-neutral-400">{data.baseline_vcpu} vCPU</span>
-          <span className="text-neutral-400">{data.baseline_ram_gb} GB</span>
+          <span className="text-[var(--color-text-muted)]">{data.baseline_vcpu} vCPU</span>
+          <span className="text-[var(--color-text-muted)]">{data.baseline_ram_gb} GB</span>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export const TaskNode: React.FC<NodeProps<WorkflowTaskInput>> = memo(({ data }) 
           width: 10,
           height: 10,
           background: meta.handleColor,
-          border: '2px solid #0f172a',
+          border: '2px solid var(--color-bg-base)',
           right: -5,
         }}
       />

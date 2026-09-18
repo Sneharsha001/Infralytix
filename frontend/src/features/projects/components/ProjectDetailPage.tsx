@@ -250,7 +250,7 @@ export const ProjectDetailPage: React.FC = () => {
           <div className="text-[10px] uppercase font-semibold tracking-wider text-neutral-400 mb-2">
             Detected Frameworks
           </div>
-          <div className="text-3xl font-bold text-emerald-400">
+          <div className="text-3xl font-bold text-[var(--color-success)]">
             {analysis?.detected_frameworks ? analysis.detected_frameworks.length : '0'}
           </div>
           <div className="text-[11px] text-neutral-500 mt-1">Identified via dependencies</div>
@@ -341,7 +341,7 @@ export const ProjectDetailPage: React.FC = () => {
                     key={fw}
                     className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-medium text-white flex items-center gap-1.5 shadow-sm"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
                     {fw}
                   </span>
                 ))}
@@ -354,7 +354,7 @@ export const ProjectDetailPage: React.FC = () => {
           {/* Manifests Card */}
           <div className="glass-card p-6">
             <h4 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="w-2 h-2 rounded-full bg-[var(--color-success)]" />
               Dependency Manifests
             </h4>
             {analysis.dependency_files.length > 0 ? (
@@ -365,7 +365,7 @@ export const ProjectDetailPage: React.FC = () => {
                     className="p-3 rounded-xl bg-white/[0.02] border border-white/10 text-xs"
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="font-mono text-emerald-400 font-semibold">
+                      <span className="font-mono text-[var(--color-success)] font-semibold">
                         {man.filename}
                       </span>
                       <span className="badge-neutral text-[10px] uppercase">

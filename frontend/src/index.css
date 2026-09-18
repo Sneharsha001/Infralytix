@@ -246,7 +246,12 @@
   }
 
   /* â”€â”€ Status Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  .badge-success { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30; }
+  .badge-success {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
+    background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+    color: var(--color-success);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-success) 30%, transparent);
+  }
   .badge-warning { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30; }
   .badge-danger  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400 ring-1 ring-red-500/30; }
   .badge-info    { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/15 text-brand-400 ring-1 ring-brand-500/30; }
@@ -255,7 +260,8 @@
   /* â”€â”€ Code Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .code-block {
     @apply font-mono text-sm bg-neutral-950 border border-white/10 rounded-xl p-4
-           text-emerald-400 overflow-x-auto;
+           overflow-x-auto;
+    color: var(--color-success);
     box-shadow: var(--shadow-elev-1);
   }
 
@@ -344,9 +350,9 @@
   background: linear-gradient(
     to right,
     transparent,
-    rgba(52,211,153,0.08),
-    rgba(52,211,153,0.18),
-    rgba(52,211,153,0.08),
+    color-mix(in srgb, var(--color-success) 8%, transparent),
+    color-mix(in srgb, var(--color-success) 20%, transparent),
+    color-mix(in srgb, var(--color-success) 8%, transparent),
     transparent
   );
   animation: shimmer-sweep 2.8s ease-in-out infinite;

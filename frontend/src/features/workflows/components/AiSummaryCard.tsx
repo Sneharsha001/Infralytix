@@ -177,7 +177,7 @@ const StrategyCard: React.FC<StrategyCardProps> = ({
       <div className="flex items-baseline gap-3 pt-1 border-t border-white/[0.07]">
         <div>
           <div className="text-[9px] text-neutral-500 uppercase tracking-wider">Cost</div>
-          <div className="text-xl font-extrabold text-emerald-300 font-mono">
+          <div className="text-xl font-extrabold text-[var(--color-success)] font-mono">
             ${animatedCost.toFixed(4)}
           </div>
         </div>

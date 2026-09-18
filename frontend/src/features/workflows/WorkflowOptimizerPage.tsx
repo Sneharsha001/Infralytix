@@ -78,7 +78,7 @@ const StagedLoader: React.FC = () => {
               className={[
                 'w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500',
                 idx < activeStage
-                  ? 'bg-emerald-400'
+                  ? 'bg-[var(--color-success)]'
                   : idx === activeStage
                   ? 'bg-brand-400 animate-pulse'
                   : 'bg-neutral-700',
@@ -341,7 +341,7 @@ export const WorkflowOptimizerPage: React.FC = () => {
 
               {/* Success Metrics Banner */}
               {validation.isValid && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-300 flex flex-wrap items-center justify-between gap-2 font-mono">
+                <div className="p-3 rounded-xl bg-[var(--color-success)]/10 border border-[var(--color-success)]/25 text-xs text-[var(--color-success)] flex flex-wrap items-center justify-between gap-2 font-mono">
                   <span>Tasks: {validation.taskCount}</span>
                   <span>Peak: {validation.peakVcpu} vCPU • {validation.peakRamGb} GB</span>
                   <span>Baseline: {validation.totalBaselineSeconds}s</span>

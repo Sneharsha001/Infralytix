@@ -386,11 +386,11 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
             Architectural Verdict
           </span>
           <span className="text-neutral-500">·</span>
-          <span className="text-emerald-400 font-medium">Verified Lowest TCO</span>
+          <span className="text-[var(--color-success)] font-medium">Verified Lowest TCO</span>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
           <span>Calculated across 3 regional catalogs</span>
         </div>
       </div>
@@ -409,7 +409,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
             <winnerStyle.Icon size={42} />
           </div>
           {/* Winner Crown Check Badge */}
-          <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-neutral-950 flex items-center justify-center shadow-md font-bold text-xs">
+          <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[var(--color-success)] text-neutral-950 flex items-center justify-center shadow-md font-bold text-xs">
             ✓
           </div>
         </div>
@@ -424,7 +424,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
               <>
                 <span style={{ color: winnerStyle.brandColor }}>{winnerDisplayName}</span> is your
                 best fit — save{' '}
-                <span className="text-emerald-400 underline decoration-emerald-500/40 underline-offset-4">
+                <span className="text-[var(--color-success)] underline decoration-[var(--color-success)]/40 underline-offset-4">
                   ${formattedSavings}/mo
                 </span>
               </>
@@ -464,11 +464,11 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
         <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
           <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 mb-1.5">
             <span>Cost Advantage</span>
-            <span className="text-emerald-400 font-bold">{costAdvantage.badge}</span>
+            <span className="text-[var(--color-success)] font-bold">{costAdvantage.badge}</span>
           </div>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mb-1.5">
             <div
-              className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+              className="h-full rounded-full bg-[var(--color-success)] transition-all duration-500"
               style={{ width: `${costAdvantage.bar}%` }}
             />
           </div>
@@ -506,7 +506,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
             <span>Region Presence</span>
             <span
               className={`font-bold ${
-                regionCriteria.badge === 'Live API' ? 'text-emerald-400' : 'text-amber-400'
+                regionCriteria.badge === 'Live API' ? 'text-[var(--color-success)]' : 'text-amber-400'
               }`}
             >
               {regionCriteria.badge}
@@ -515,7 +515,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mb-1.5">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
-                regionCriteria.badge === 'Live API' ? 'bg-emerald-400' : 'bg-amber-400'
+                regionCriteria.badge === 'Live API' ? 'bg-[var(--color-success)]' : 'bg-amber-400'
               }`}
               style={{ width: `${regionCriteria.bar}%` }}
             />

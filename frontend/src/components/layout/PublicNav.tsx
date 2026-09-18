@@ -159,7 +159,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
 
               {/* Living indicator dot */}
               <span
-                className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400 ring-1 ring-neutral-950 shadow-sm"
+                className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--color-success)] ring-1 ring-neutral-950 shadow-sm"
                 title="System Operational"
               />
             </motion.div>
@@ -198,7 +198,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                 activeStep === 1
                   ? 'bg-[var(--color-accent-primary)]/20 text-white font-semibold border border-[var(--color-accent-primary)]/40 shadow-[0_0_8px_rgba(136,46,202,0.30)]'
                   : activeStep > 1
-                  ? 'text-emerald-400 hover:text-emerald-300'
+                  ? 'text-[var(--color-success)] hover:text-[var(--color-success)]'
                   : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'
               }`}
             >
@@ -207,7 +207,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                   activeStep === 1
                     ? 'bg-[var(--color-accent-primary)] text-white'
                     : activeStep > 1
-                    ? 'bg-emerald-500/20 text-emerald-400'
+                    ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
                     : 'bg-white/10 text-neutral-400'
                 }`}
               >
@@ -225,7 +225,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                 activeStep === 2
                   ? 'bg-[var(--color-accent-primary)]/20 text-white font-semibold border border-[var(--color-accent-primary)]/40 shadow-[0_0_8px_rgba(136,46,202,0.30)]'
                   : activeStep > 2
-                  ? 'text-emerald-400 hover:text-emerald-300'
+                  ? 'text-[var(--color-success)] hover:text-[var(--color-success)]'
                   : 'text-neutral-400 hover:text-white hover:bg-[var(--color-accent-primary)]/10'
               }`}
             >
@@ -234,7 +234,7 @@ export const PublicNav: React.FC<PublicNavProps> = ({
                   activeStep === 2
                     ? 'bg-[var(--color-accent-primary)] text-white'
                     : activeStep > 2
-                    ? 'bg-emerald-500/20 text-emerald-400'
+                    ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
                     : 'bg-white/10 text-neutral-400'
                 }`}
               >

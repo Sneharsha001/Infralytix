@@ -368,7 +368,7 @@ export const CostComparisonPage: React.FC = () => {
             <div className="flex flex-col items-end gap-2">
               {/* Auto-detected badge */}
               {autoDetectedBadge && inferredState?.justification && (
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--color-success)]/10 border border-[var(--color-success)]/20 text-[var(--color-success)] text-xs font-medium">
                   <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -382,7 +382,7 @@ export const CostComparisonPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setAutoDetectedBadge(false)}
-                    className="text-emerald-600 hover:text-emerald-300 ml-1 transition-colors"
+                    className="text-[var(--color-success)]/70 hover:text-[var(--color-success)] ml-1 transition-colors"
                     aria-label="Dismiss auto-detected badge"
                   >
                     ✕
@@ -867,7 +867,7 @@ export const CostComparisonPage: React.FC = () => {
                       'relative flex flex-col justify-between rounded-2xl p-6 overflow-hidden',
                       'backdrop-blur-sm border',
                       isCheapest
-                        ? 'border-emerald-500/50 shadow-[0_0_32px_-4px_rgba(16,185,129,0.25)]'
+                        ? 'border-[var(--color-success)]/50 shadow-[0_0_32px_-4px_rgba(97,210,154,0.30)]'
                         : `${meta.borderGradient} elev-1 hover:shadow-[var(--provider-shadow)]`,
                     ].join(' ')}
                     style={{
@@ -910,8 +910,8 @@ export const CostComparisonPage: React.FC = () => {
                       {/* Status badges */}
                       <div className="flex flex-col items-end gap-1 shrink-0 pt-0.5">
                         {isCheapest && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/40 whitespace-nowrap">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] ring-1 ring-[var(--color-success)]/40 whitespace-nowrap">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse shrink-0" />
                             Lowest Cost
                           </span>
                         )}
@@ -943,7 +943,7 @@ export const CostComparisonPage: React.FC = () => {
                           <div className="flex items-baseline gap-1">
                             <span
                               className={`text-3xl md:text-4xl font-extrabold tracking-tight ${
-                                isCheapest ? 'text-emerald-300' : 'text-white'
+                                isCheapest ? 'text-[var(--color-success)]' : 'text-white'
                               }`}
                             >
                               $<AnimatedPrice value={est.monthly_cost_low} delayMs={idx * 110 + 150} />

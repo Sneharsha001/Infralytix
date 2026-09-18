@@ -230,7 +230,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
                   relative rounded-2xl p-5 border transition-all duration-300 overflow-hidden flex flex-col justify-between
                   ${
                     isLocked
-                      ? 'bg-neutral-900/90 border-emerald-500/40 shadow-[0_0_24px_-4px_rgba(16,185,129,0.25)]'
+                      ? 'bg-neutral-900/90 border-[var(--color-success)]/40 shadow-[0_0_24px_-4px_rgba(97,210,154,0.25)]'
                       : 'bg-neutral-900/60 border-white/10'
                   }
                 `}
@@ -256,9 +256,9 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
                         className="w-12 h-12 rounded-xl flex items-center justify-center border shadow-lg"
                         style={{
                           background: `${provider.brandColor}18`,
-                          borderColor: isLocked ? 'rgba(16, 185, 129, 0.5)' : `${provider.brandColor}50`,
+                          borderColor: isLocked ? 'rgba(97, 210, 154, 0.5)' : `${provider.brandColor}50`,
                           boxShadow: isLocked
-                            ? '0 0 16px rgba(16, 185, 129, 0.3)'
+                            ? '0 0 16px rgba(97, 210, 154, 0.3)'
                             : `0 0 16px ${provider.brandColor}33`,
                         }}
                       >
@@ -275,7 +275,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: [0, 1.25, 1], opacity: 1 }}
                             transition={{ type: 'spring', stiffness: 450, damping: 18 }}
-                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--color-success)]/20 text-[var(--color-success)] border border-[var(--color-success)]/40"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -328,7 +328,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
                           transition={{ duration: 0.3 }}
                           className="flex items-center justify-between w-full"
                         >
-                          <span className="text-xs font-mono font-bold text-emerald-300 truncate max-w-[140px]">
+                          <span className="text-xs font-mono font-bold text-[var(--color-success)] truncate max-w-[140px]">
                             {provider.matchedInstance}
                           </span>
                           {provider.costLow !== undefined && provider.costLow > 0 && (
@@ -356,7 +356,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
                       className="h-full rounded-full"
                       style={{
                         background: isLocked
-                          ? '#10b981'
+                          ? '#61D29A'
                           : `linear-gradient(90deg, ${provider.brandColor}66, ${provider.brandColor})`,
                       }}
                       initial={{ width: '10%' }}
@@ -380,7 +380,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full ${
-                allLocked ? 'bg-emerald-400' : 'bg-cyan-400 animate-ping'
+                allLocked ? 'bg-[var(--color-success)]' : 'bg-cyan-400 animate-ping'
               }`}
             />
             <span className="font-medium text-neutral-300">

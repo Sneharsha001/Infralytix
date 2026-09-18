@@ -190,7 +190,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                 </div>
                 {selectedFile ? (
                   <div>
-                    <div className="text-xs font-medium text-emerald-400">{selectedFile.name}</div>
+                    <div className="text-xs font-medium text-[var(--color-success)]">{selectedFile.name}</div>
                     <div className="text-[10px] text-neutral-400">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to analyze
                     </div>

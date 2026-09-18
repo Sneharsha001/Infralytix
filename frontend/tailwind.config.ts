@@ -49,7 +49,7 @@ const config: Config = {
           950: '#070714',   // OLED black
         },
         // Semantic colors
-        success: '#10b981',
+        success: 'var(--color-success)',
         warning: '#f59e0b',
         danger:  '#ef4444',
         info:    '#3b82f6',

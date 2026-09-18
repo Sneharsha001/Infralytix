@@ -210,7 +210,7 @@ export const WorkloadUploadPage: React.FC = () => {
                 ${isDragging
                   ? 'border-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 scale-[1.01]'
                   : selectedFile
-                    ? 'border-emerald-500/50 bg-emerald-500/5'
+                    ? 'border-[var(--color-success)]/50 bg-[var(--color-success)]/5'
                     : 'border-white/15 hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-accent-primary)]/[0.03]'
                 }
               `}
@@ -234,8 +234,8 @@ export const WorkloadUploadPage: React.FC = () => {
                     className="flex flex-col items-center gap-4"
                   >
                     {/* Zip icon */}
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--color-success)]/15 border border-[var(--color-success)]/30 flex items-center justify-center">
+                      <svg className="w-7 h-7 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>

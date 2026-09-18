@@ -147,7 +147,7 @@ export const AppShell: React.FC = () => {
 
           <div className="flex items-center gap-4">
             <span className="badge-success text-[11px] flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-ping" />
               API Connected
             </span>
           </div>

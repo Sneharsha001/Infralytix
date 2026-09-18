@@ -97,7 +97,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
       <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-white/10">
         <div>
           <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-0.5">Total Cost</div>
-          <div className="font-mono text-sm font-bold text-emerald-400">${data.x.toFixed(4)}</div>
+          <div className="font-mono text-sm font-bold text-[var(--color-success)]">${data.x.toFixed(4)}</div>
         </div>
         <div>
           <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-0.5">Makespan</div>

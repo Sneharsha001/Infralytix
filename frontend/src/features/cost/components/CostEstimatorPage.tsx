@@ -131,7 +131,7 @@ export const CostEstimatorPage: React.FC = () => {
                          border-dashed border-white/10"
             >
               <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-500/8 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-emerald-500/8 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-[var(--color-success)]/[0.08] rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative z-10 max-w-sm mx-auto">
                 <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10

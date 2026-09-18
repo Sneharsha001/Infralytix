@@ -86,7 +86,7 @@ export const ComparisonTable: React.FC<Props> = ({ providers, cheapestProvider }
                   <div className="text-[10px] text-neutral-500">vCPUs</div>
                 </div>
                 <div>
-                  <div className="text-base font-bold text-emerald-300">{est.instance.memory_gb} GB</div>
+                  <div className="text-base font-bold text-[var(--color-success)]">{est.instance.memory_gb} GB</div>
                   <div className="text-[10px] text-neutral-500">RAM</div>
                 </div>
                 <div>

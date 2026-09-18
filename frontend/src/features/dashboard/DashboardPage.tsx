@@ -87,7 +87,7 @@ export const DashboardPage: React.FC = () => {
             <span>ANALYZED REPOSITORIES</span>
             <span className="badge-success text-[10px]">Static</span>
           </div>
-          <div className="text-3xl font-bold text-emerald-400 mb-1">
+          <div className="text-3xl font-bold text-[var(--color-success)] mb-1">
             {isLoading ? '...' : totalAnalyzed}
           </div>
           <div className="text-xs text-neutral-400">Completed intelligence runs</div>
@@ -175,7 +175,7 @@ export const DashboardPage: React.FC = () => {
         /* Empty State Hero */
         <div className="glass-card p-12 text-center relative overflow-hidden border-dashed border-white/15 elev-2">
           <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-[var(--color-success)]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-md mx-auto relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -216,7 +216,7 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="glass-card p-6 elev-1">
           <h4 className="text-base font-semibold mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="w-2 h-2 rounded-full bg-[var(--color-success)]" />
             Backend Engine Status
           </h4>
           <p className="text-xs text-neutral-400 mb-4">

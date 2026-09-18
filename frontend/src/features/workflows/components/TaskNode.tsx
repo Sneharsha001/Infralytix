@@ -32,10 +32,10 @@ const CATEGORY_STYLES: Record<
   },
   memory_bound: {
     label: 'Memory Bound',
-    badge: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
-    border: 'border-emerald-500/35',
-    handleColor: '#34d399',
-    glow: '0 0 16px -2px rgba(52,211,153,0.18)',
+    badge: 'bg-[rgba(97,210,154,0.15)] text-[#61D29A] ring-1 ring-[rgba(97,210,154,0.3)]',
+    border: 'border-[rgba(97,210,154,0.35)]',
+    handleColor: '#61D29A',
+    glow: '0 0 16px -2px rgba(97,210,154,0.18)',
   },
   gpu_bound: {
     label: 'GPU Bound',

@@ -333,14 +333,14 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
                   <div className="code-line h-2 w-16 rounded bg-brand-500/25" />
                   <div className="code-line h-2 w-20 rounded bg-cyan-500/25" />
                   <div className="code-line h-2 w-14 rounded bg-purple-500/25" />
-                  <div className="code-line h-2 w-24 rounded bg-emerald-500/25" />
+                  <div className="code-line h-2 w-24 rounded bg-[var(--color-success)]/25" />
                 </div>
               </div>
 
               {/* Right column: abstract code block skeleton */}
               <div className="col-span-7 pl-1 space-y-2">
                 <div className="flex items-center gap-1.5 mb-1 text-[10px] text-neutral-500 uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500/60" />
+                  <span className="w-2 h-2 rounded-full bg-[var(--color-success)]/60" />
                   <span>AST Parse Stream</span>
                 </div>
                 <div className="space-y-1.5">
@@ -359,7 +359,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
             <div className="absolute left-[27px] top-4 bottom-5 w-0.5 bg-white/10 rounded-full">
               {/* Dynamic filled line */}
               <motion.div
-                className="w-full bg-gradient-to-b from-brand-400 via-cyan-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] rounded-full origin-top"
+                className="w-full bg-gradient-to-b from-brand-400 via-cyan-400 to-[var(--color-success)] shadow-[0_0_8px_rgba(97,210,154,0.5)] rounded-full origin-top"
                 initial={{ height: '0%' }}
                 animate={{ height: progressLineHeight }}
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
@@ -449,7 +449,7 @@ const StageRow: React.FC<StageRowProps> = ({
         <motion.div
           animate={
             isCompleted
-              ? { scale: [1, 1.15, 1], backgroundColor: 'rgba(16, 185, 129, 0.15)' }
+              ? { scale: [1, 1.15, 1], backgroundColor: 'rgba(97, 210, 154, 0.15)' }
               : isActive
               ? { scale: [1, 1.08, 1] }
               : { scale: 1 }
@@ -459,7 +459,7 @@ const StageRow: React.FC<StageRowProps> = ({
             w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-300
             ${
               isCompleted
-                ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                ? 'border-[var(--color-success)]/60 bg-[var(--color-success)]/20 text-[var(--color-success)] shadow-[0_0_12px_rgba(97,210,154,0.3)]'
                 : isActive
                 ? 'border-cyan-400/80 bg-cyan-500/15 text-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.35)]'
                 : 'border-white/10 bg-neutral-900/50 text-neutral-500'
@@ -474,7 +474,7 @@ const StageRow: React.FC<StageRowProps> = ({
                 initial={{ scale: 0, rotate: -45 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="text-emerald-400"
+                className="text-[var(--color-success)]"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -547,7 +547,7 @@ const StageRow: React.FC<StageRowProps> = ({
             </span>
           )}
           {isCompleted && (
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="text-[10px] font-mono text-[var(--color-success)] bg-[var(--color-success)]/10 px-2 py-0.5 rounded-full border border-[var(--color-success)]/20">
               Done
             </span>
           )}
@@ -577,7 +577,7 @@ const StageRow: React.FC<StageRowProps> = ({
                     inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md border
                     ${
                       isCompleted
-                        ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/25'
+                        ? 'bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/25'
                         : 'bg-cyan-500/10 text-cyan-200 border-cyan-500/25'
                     }
                   `}

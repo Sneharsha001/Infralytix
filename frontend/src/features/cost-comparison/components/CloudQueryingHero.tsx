@@ -177,9 +177,9 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
       className="w-full max-w-5xl my-8 relative z-20 select-none"
     >
       {/* ── Ambient Gradient Mesh Background ─────────────────────────────── */}
-      <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-blue-600/10 rounded-3xl blur-2xl pointer-events-none -z-10" />
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-amber-500/8 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-cyan-500/8 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-[var(--color-bg-elevated)]/25 via-[var(--color-accent-primary)]/15 to-[var(--color-bg-base)]/30 rounded-3xl blur-2xl pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-[var(--color-bg-elevated)]/15 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-[var(--color-accent-primary)]/12 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="glass-card border border-[var(--color-accent-primary)]/30 bg-neutral-950/90 p-6 md:p-10 rounded-3xl shadow-2xl shadow-[var(--color-accent-primary)]/15 relative overflow-hidden">
         {/* Subtle particle grid background */}
@@ -188,11 +188,11 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
         {/* ── Header Row ─────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30 mb-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[var(--color-accent-primary)]/15 text-[var(--color-accent-primary)] ring-1 ring-[var(--color-accent-primary)]/30 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-accent-primary)] animate-ping" />
               <span>Multi-Cloud Intelligence Engine</span>
               <span className="text-neutral-500">·</span>
-              <span className="text-neutral-400 font-mono text-[11px]">Concurrent Execution</span>
+              <span className="px-2 py-0.5 rounded-full bg-white/5 text-[var(--color-accent-primary)] border border-[var(--color-accent-primary)]/20 font-mono text-[10px]">Concurrent Execution</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
               Querying Cloud APIs in Parallel
@@ -380,7 +380,7 @@ export const CloudQueryingHero: React.FC<CloudQueryingHeroProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full ${
-                allLocked ? 'bg-[var(--color-success)]' : 'bg-cyan-400 animate-ping'
+                allLocked ? 'bg-[var(--color-success)]' : 'bg-[var(--color-accent-primary)] animate-ping'
               }`}
             />
             <span className="font-medium text-neutral-300">

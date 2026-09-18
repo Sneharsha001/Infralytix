@@ -38,7 +38,7 @@ const PROVIDER_STYLES: Record<string, ProviderStyle> = {
     tag: 'AWS EC2 & EBS',
     Icon: AwsIcon,
     brandColor: '#FF9900',
-    bgGradient: 'from-amber-500/15 via-neutral-900/90 to-neutral-950',
+    bgGradient: 'from-amber-500/15 via-[var(--color-bg-base)]/90 to-[var(--color-bg-base)]',
     borderColor: 'border-amber-500/40',
     glowShadow: '0 0 50px -10px rgba(255,153,0,0.28)',
   },
@@ -47,7 +47,7 @@ const PROVIDER_STYLES: Record<string, ProviderStyle> = {
     tag: 'Azure Virtual Machines',
     Icon: AzureIcon,
     brandColor: '#0078D4',
-    bgGradient: 'from-blue-600/15 via-neutral-900/90 to-neutral-950',
+    bgGradient: 'from-blue-600/15 via-[var(--color-bg-base)]/90 to-[var(--color-bg-base)]',
     borderColor: 'border-blue-500/40',
     glowShadow: '0 0 50px -10px rgba(0,120,212,0.28)',
   },
@@ -56,7 +56,7 @@ const PROVIDER_STYLES: Record<string, ProviderStyle> = {
     tag: 'GCP Compute Engine',
     Icon: GcpIcon,
     brandColor: '#4285F4',
-    bgGradient: 'from-blue-500/15 via-neutral-900/90 to-neutral-950',
+    bgGradient: 'from-blue-500/15 via-[var(--color-bg-base)]/90 to-[var(--color-bg-base)]',
     borderColor: 'border-blue-400/40',
     glowShadow: '0 0 50px -10px rgba(66,133,244,0.30)',
   },
@@ -365,8 +365,33 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
           initial={{ x: '-100%', opacity: 0 }}
           animate={{ x: '200%', opacity: [0, 0.8, 0] }}
           transition={{ duration: 1.4, delay: 0.6, ease: 'easeInOut' }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none -skew-x-12"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-accent-primary)]/20 to-transparent pointer-events-none -skew-x-12"
         />
+      )}
+
+      {/* ── Ambient Background Glow in New Palette ──────────────────────── */}
+      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-[var(--color-accent-primary)]/15 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-[var(--color-bg-elevated)]/25 blur-3xl pointer-events-none" />
+
+      {/* ── Entrance Particle-Burst Accents in New Palette ──────────────── */}
+      {!shouldReduce && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[
+            { top: '18%', left: '22%', delay: 0.5, size: 'w-1.5 h-1.5' },
+            { top: '28%', right: '28%', delay: 0.7, size: 'w-1 h-1' },
+            { bottom: '26%', left: '38%', delay: 0.65, size: 'w-1.5 h-1.5' },
+            { bottom: '18%', right: '32%', delay: 0.85, size: 'w-1 h-1' },
+          ].map((pt, i) => (
+            <motion.span
+              key={i}
+              initial={{ scale: 0, opacity: 0, y: 8 }}
+              animate={{ scale: [0, 1.4, 0], opacity: [0, 0.75, 0], y: -16 }}
+              transition={{ duration: 1.5, delay: pt.delay, ease: 'easeOut' }}
+              className={`absolute ${pt.size} rounded-full bg-[var(--color-accent-primary)] shadow-[0_0_10px_rgba(136,46,202,0.8)]`}
+              style={{ top: pt.top, left: pt.left, right: pt.right, bottom: pt.bottom }}
+            />
+          ))}
+        </div>
       )}
 
       {/* Ambient background brand orb */}

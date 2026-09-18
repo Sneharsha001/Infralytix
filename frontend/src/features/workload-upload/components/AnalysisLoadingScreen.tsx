@@ -220,9 +220,9 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center relative overflow-hidden px-4 select-none">
       {/* ── Background Glow Blobs ───────────────────────────────────────── */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/12 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--color-bg-elevated)]/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--color-accent-primary)]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--color-bg-base)]/40 rounded-full blur-3xl pointer-events-none" />
 
       {/* ── Outer Motion Container with Cinematic Exit Handoff ─────────── */}
       <motion.div
@@ -249,37 +249,37 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
                 <motion.div
                   animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0.9, 0.5] }}
                   transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-brand-500 via-cyan-400 to-indigo-500 blur-xl opacity-60"
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[var(--color-bg-elevated)] via-[var(--color-accent-primary)] to-[var(--color-accent-primary)] blur-xl opacity-60"
                 />
 
                 {/* Rotating subtle outer orbital ring */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-                  className="absolute -inset-1 rounded-2xl border border-dashed border-cyan-400/40"
+                  className="absolute -inset-1 rounded-2xl border border-dashed border-[var(--color-accent-primary)]/40"
                 />
 
                 {/* Glass shield container */}
-                <div className="relative w-14 h-14 rounded-2xl bg-neutral-950/80 border border-brand-400/40 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <div className="relative w-14 h-14 rounded-2xl bg-neutral-950/80 border border-[var(--color-accent-primary)]/40 flex items-center justify-center shadow-lg shadow-[var(--color-accent-primary)]/20">
                   {/* AI Glyph SVG */}
-                  <svg className="w-7 h-7 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <svg className="w-7 h-7 text-[var(--color-accent-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={1.75}
                       d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                     />
-                    <circle cx="12" cy="12" r="2" fill="currentColor" className="text-brand-300" />
+                    <circle cx="12" cy="12" r="2" fill="currentColor" className="text-white" />
                   </svg>
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-brand-400">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-accent-primary)]">
                     Infralytix AI Engine
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-ping" />
                 </div>
                 <h2 className="text-xl font-bold text-white tracking-tight leading-tight mt-0.5">
                   Analyzing Workload Profile
@@ -295,7 +295,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
               <button
                 type="button"
                 onClick={handleImmediateSkip}
-                className="hidden sm:inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-cyan-300 transition-colors py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
+                className="hidden sm:inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-[var(--color-accent-primary)] transition-colors py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
               >
                 <span>Skip</span>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,26 +313,26 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
             {/* GSAP Animated Scan-Line Beam */}
             <div
               ref={scanLineRef}
-              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_14px_rgba(34,211,238,0.9)] pointer-events-none z-20"
+              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--color-accent-primary)] to-transparent shadow-[0_0_14px_rgba(136,46,202,0.9)] pointer-events-none z-20"
             />
             {/* Trailing soft wash behind scan line */}
-            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/[0.03] via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-accent-primary)]/[0.04] via-transparent to-transparent pointer-events-none" />
 
             {/* Abstract file hierarchy representation */}
             <div className="grid grid-cols-12 gap-3 text-xs font-mono select-none">
               {/* Left column: abstract folder tree */}
               <div className="col-span-5 border-r border-white/5 pr-3 space-y-2">
                 <div className="flex items-center gap-1.5 text-neutral-400 text-[11px]">
-                  <svg className="w-3.5 h-3.5 text-brand-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-[var(--color-accent-primary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
                   <span className="font-semibold text-neutral-300">root/</span>
                 </div>
                 {/* Indented abstract files */}
                 <div className="pl-4 space-y-1.5">
-                  <div className="code-line h-2 w-16 rounded bg-brand-500/25" />
-                  <div className="code-line h-2 w-20 rounded bg-cyan-500/25" />
-                  <div className="code-line h-2 w-14 rounded bg-purple-500/25" />
+                  <div className="code-line h-2 w-16 rounded bg-[var(--color-accent-primary)]/25" />
+                  <div className="code-line h-2 w-20 rounded bg-[var(--color-bg-elevated)]/60" />
+                  <div className="code-line h-2 w-14 rounded bg-[var(--color-accent-primary)]/20" />
                   <div className="code-line h-2 w-24 rounded bg-[var(--color-success)]/25" />
                 </div>
               </div>
@@ -345,9 +345,9 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
                 </div>
                 <div className="space-y-1.5">
                   <div className="code-line h-2.5 w-11/12 rounded bg-white/10" />
-                  <div className="code-line h-2.5 w-8/12 rounded bg-cyan-400/20 pl-2" />
-                  <div className="code-line h-2.5 w-10/12 rounded bg-brand-400/20" />
-                  <div className="code-line h-2.5 w-6/12 rounded bg-purple-400/20 pl-4" />
+                  <div className="code-line h-2.5 w-8/12 rounded bg-[var(--color-accent-primary)]/20 pl-2" />
+                  <div className="code-line h-2.5 w-10/12 rounded bg-[var(--color-bg-elevated)]/50" />
+                  <div className="code-line h-2.5 w-6/12 rounded bg-[var(--color-accent-primary)]/30 pl-4" />
                 </div>
               </div>
             </div>
@@ -359,7 +359,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
             <div className="absolute left-[27px] top-4 bottom-5 w-0.5 bg-white/10 rounded-full">
               {/* Dynamic filled line */}
               <motion.div
-                className="w-full bg-gradient-to-b from-brand-400 via-cyan-400 to-[var(--color-success)] shadow-[0_0_8px_rgba(97,210,154,0.5)] rounded-full origin-top"
+                className="w-full bg-gradient-to-b from-[var(--color-accent-primary)] via-[var(--color-accent-primary)] to-[var(--color-success)] shadow-[0_0_8px_rgba(97,210,154,0.5)] rounded-full origin-top"
                 initial={{ height: '0%' }}
                 animate={{ height: progressLineHeight }}
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
@@ -411,7 +411,7 @@ export const AnalysisLoadingScreen: React.FC<AnalysisLoadingScreenProps> = ({
           {/* Footer status notice */}
           <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-neutral-500">
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-ping" />
               <span>Multi-Cloud Parity Engine</span>
             </div>
             <span>Crossfade handoff enabled</span>
@@ -461,7 +461,7 @@ const StageRow: React.FC<StageRowProps> = ({
               isCompleted
                 ? 'border-[var(--color-success)]/60 bg-[var(--color-success)]/20 text-[var(--color-success)] shadow-[0_0_12px_rgba(97,210,154,0.3)]'
                 : isActive
-                ? 'border-cyan-400/80 bg-cyan-500/15 text-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.35)]'
+                ? 'border-[var(--color-accent-primary)]/80 bg-[var(--color-accent-primary)]/20 text-[var(--color-accent-primary)] shadow-[0_0_14px_rgba(136,46,202,0.35)]'
                 : 'border-white/10 bg-neutral-900/50 text-neutral-500'
             }
           `}
@@ -532,7 +532,7 @@ const StageRow: React.FC<StageRowProps> = ({
               isCompleted
                 ? 'text-white'
                 : isActive
-                ? 'text-cyan-300'
+                ? 'text-[var(--color-accent-primary)]'
                 : 'text-neutral-400'
             }`}
           >
@@ -541,8 +541,8 @@ const StageRow: React.FC<StageRowProps> = ({
 
           {/* Active status indicator dot */}
           {isActive && (
-            <span className="flex items-center gap-1 text-[10px] uppercase font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="flex items-center gap-1 text-[10px] uppercase font-mono text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 px-2 py-0.5 rounded-full border border-[var(--color-accent-primary)]/25">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />
               Active
             </span>
           )}
@@ -578,7 +578,7 @@ const StageRow: React.FC<StageRowProps> = ({
                     ${
                       isCompleted
                         ? 'bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/25'
-                        : 'bg-cyan-500/10 text-cyan-200 border-cyan-500/25'
+                        : 'bg-[var(--color-accent-primary)]/10 text-[var(--color-accent-primary)] border-[var(--color-accent-primary)]/25'
                     }
                   `}
                 >

@@ -20,6 +20,13 @@
 
 /* â”€â”€ CSS Custom Properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root {
+  /* Palette Tokens */
+  --color-bg-base: #242547;
+  --color-bg-elevated: #36136E;
+  --color-accent-primary: #882ECA;
+  --color-text-muted: #B495A4;
+  --color-success: #61D29A;
+
   --shadow-elev-1: 0 2px 8px -2px rgba(0,0,0,0.40), 0 1px 3px -1px rgba(0,0,0,0.25);
   --shadow-elev-2: 0 8px 24px -4px rgba(0,0,0,0.50), 0 4px 8px -2px rgba(0,0,0,0.30);
   --shadow-elev-3: 0 16px 48px -8px rgba(0,0,0,0.60), 0 8px 16px -4px rgba(0,0,0,0.35);

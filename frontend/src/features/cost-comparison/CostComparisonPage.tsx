@@ -14,6 +14,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { apiClient } from '@/lib/api-client'
 import { PublicNav } from '@/components/layout'
+import { Hero3DCanvas } from '@/components/3d'
 import type { WorkloadInferenceRouteState } from '@/features/workload-upload/types'
 import { AwsIcon, AzureIcon, GcpIcon } from './components/BrandIcons'
 import { CloudQueryingHero } from './components/CloudQueryingHero'
@@ -331,13 +332,16 @@ export const CostComparisonPage: React.FC = () => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12"
+      className="relative min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12 overflow-hidden"
     >
+      {/* ── Signature 3D Multi-Cloud Infrastructure Scene ───────────────── */}
+      <Hero3DCanvas variant="compare" />
+
       {/* ── Top Navigation Bar ─────────────────────────────────────────── */}
       <PublicNav />
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="w-full max-w-5xl text-center mb-10">
+      <header className="w-full max-w-5xl text-center mb-10 relative z-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-[var(--color-accent-primary)]/15 text-violet-200 ring-1 ring-[var(--color-accent-primary)]/30 mb-4">
           <span>Infralytix Multi-Cloud Engine</span>
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />

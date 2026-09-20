@@ -13,6 +13,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { PublicNav } from '@/components/layout'
+import { Hero3DCanvas } from '@/components/3d'
 import { apiClient } from '@/lib/api-client'
 import { AiSummaryCard } from './components/AiSummaryCard'
 import { DagPreview } from './components/DagPreview'
@@ -200,12 +201,15 @@ export const WorkflowOptimizerPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center px-4 py-8 md:py-12">
+    <div className="relative min-h-screen bg-neutral-950 text-white flex flex-col items-center px-4 py-8 md:py-12 overflow-hidden">
+      {/* ── Signature 3D Multi-Cloud Infrastructure Scene ───────────────── */}
+      <Hero3DCanvas variant="optimize" />
+
       {/* ── Top Navigation Header ─────────────────────────────────────────── */}
       <PublicNav subtitle="Multi-Cloud Workflow Optimizer" />
 
       {/* ── Main Container ────────────────────────────────────────────────── */}
-      <main className="w-full max-w-6xl space-y-8">
+      <main className="w-full max-w-6xl space-y-8 relative z-10">
         {/* Title Banner */}
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="badge-info text-xs font-semibold">

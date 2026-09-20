@@ -19,6 +19,7 @@ import { workloadUploadApi } from './api'
 import { AnalysisLoadingScreen } from './components/AnalysisLoadingScreen'
 import type { WorkloadInferenceResult } from './types'
 import { PublicNav } from '@/components/layout'
+import { Hero3DCanvas } from '@/components/3d'
 
 // ─── Types & Constants ────────────────────────────────────────────────────────
 
@@ -138,13 +139,16 @@ export const WorkloadUploadPage: React.FC = () => {
 
   // ─── Render: Idle / Error Phase ──────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12">
+    <div className="relative min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center px-4 py-8 md:py-12 overflow-hidden">
+      {/* ── Signature 3D Multi-Cloud Infrastructure Scene ───────────────── */}
+      <Hero3DCanvas variant="detect" />
+
       {/* Top Navigation Bar */}
       <PublicNav subtitle="Workload Detection" />
 
       {/* Page Header */}
-      <header className="w-full max-w-3xl text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30 mb-4">
+      <header className="w-full max-w-3xl text-center mb-10 relative z-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-[var(--color-accent-primary)]/15 text-violet-200 ring-1 ring-[var(--color-accent-primary)]/30 mb-4">
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M13 10V3L4 14h7v7l9-11h-7z" />

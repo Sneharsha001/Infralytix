@@ -27,7 +27,7 @@ const AnimatedRoutes: React.FC = () => {
     <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
         {/* Public Tools */}
-        <Route path="/" element={<PageTransition routeKey={location.pathname}><CostComparisonPage /></PageTransition>} />
+        <Route path="/" element={<Navigate to="/cost-comparison" replace />} />
         <Route path="/cost-comparison" element={<PageTransition routeKey={location.pathname}><CostComparisonPage /></PageTransition>} />
         <Route path="/workflows" element={<PageTransition routeKey={location.pathname}><WorkflowOptimizerPage /></PageTransition>} />
         <Route path="/upload-workload" element={<PageTransition routeKey={location.pathname}><WorkloadUploadPage /></PageTransition>} />

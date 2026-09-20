@@ -162,7 +162,7 @@ const FieldTooltip: React.FC<FieldTooltipProps> = ({ label, content }) => {
         onMouseLeave={() => setIsOpen(false)}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setIsOpen(false)}
-        className="w-3.5 h-3.5 rounded-full bg-white/10 hover:bg-brand-500/25 text-neutral-400 hover:text-brand-300 text-[10px] font-mono flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-1 focus-visible:ring-offset-neutral-950"
+        className="w-3.5 h-3.5 rounded-full bg-white/10 hover:bg-[var(--color-accent-primary)]/25 text-neutral-400 hover:text-white text-[10px] font-mono flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-neutral-950"
       >
         i
       </button>
@@ -338,9 +338,9 @@ export const CostComparisonPage: React.FC = () => {
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="w-full max-w-5xl text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30 mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-[var(--color-accent-primary)]/15 text-violet-200 ring-1 ring-[var(--color-accent-primary)]/30 mb-4">
           <span>Infralytix Multi-Cloud Engine</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />
         </div>
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">
           Multi-Cloud <span className="gradient-text">Cost Comparison</span>
@@ -396,9 +396,9 @@ export const CostComparisonPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => applyPreset(2, 4, 50)}
-                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] ${
                     activePreset === 'micro'
-                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      ? 'bg-[var(--color-accent-primary)]/25 text-white border border-[var(--color-accent-primary)]/50 shadow-sm shadow-[var(--color-accent-primary)]/20 font-semibold'
                       : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
                   }`}
                   aria-pressed={activePreset === 'micro'}
@@ -408,9 +408,9 @@ export const CostComparisonPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => applyPreset(4, 16, 100)}
-                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] ${
                     activePreset === 'standard'
-                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      ? 'bg-[var(--color-accent-primary)]/25 text-white border border-[var(--color-accent-primary)]/50 shadow-sm shadow-[var(--color-accent-primary)]/20 font-semibold'
                       : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
                   }`}
                   aria-pressed={activePreset === 'standard'}
@@ -420,9 +420,9 @@ export const CostComparisonPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => applyPreset(8, 32, 250)}
-                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] ${
                     activePreset === 'high-mem'
-                      ? 'bg-brand-600/30 text-brand-200 border border-brand-500/50 shadow-sm shadow-brand-500/20 font-semibold'
+                      ? 'bg-[var(--color-accent-primary)]/25 text-white border border-[var(--color-accent-primary)]/50 shadow-sm shadow-[var(--color-accent-primary)]/20 font-semibold'
                       : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-transparent'
                   }`}
                   aria-pressed={activePreset === 'high-mem'}
@@ -463,7 +463,7 @@ export const CostComparisonPage: React.FC = () => {
                     required
                     value={formData.vcpu}
                     onChange={handleInputChange}
-                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)]"
                     placeholder="e.g. 4"
                     aria-describedby="vcpu-helper"
                   />
@@ -473,7 +473,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('vcpu', -1, 1, 256)}
                       disabled={formData.vcpu <= 1}
                       aria-label="Decrease vCPU"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       –
                     </button>
@@ -482,7 +482,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('vcpu', 1, 1, 256)}
                       disabled={formData.vcpu >= 256}
                       aria-label="Increase vCPU"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       +
                     </button>
@@ -530,7 +530,7 @@ export const CostComparisonPage: React.FC = () => {
                     required
                     value={formData.ram_gb}
                     onChange={handleInputChange}
-                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)]"
                     placeholder="e.g. 16"
                     aria-describedby="ram-helper"
                   />
@@ -540,7 +540,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('ram_gb', formData.ram_gb <= 8 ? -2 : -4, 1, 3904)}
                       disabled={formData.ram_gb <= 1}
                       aria-label="Decrease RAM"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       –
                     </button>
@@ -549,7 +549,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('ram_gb', formData.ram_gb < 8 ? 2 : 4, 1, 3904)}
                       disabled={formData.ram_gb >= 3904}
                       aria-label="Increase RAM"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       +
                     </button>
@@ -596,7 +596,7 @@ export const CostComparisonPage: React.FC = () => {
                     max="65536"
                     value={formData.storage_gb}
                     onChange={handleInputChange}
-                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)]"
                     placeholder="e.g. 100"
                     aria-describedby="storage-helper"
                   />
@@ -606,7 +606,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('storage_gb', -25, 0, 65536)}
                       disabled={formData.storage_gb <= 0}
                       aria-label="Decrease Storage"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       –
                     </button>
@@ -615,7 +615,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('storage_gb', 25, 0, 65536)}
                       disabled={formData.storage_gb >= 65536}
                       aria-label="Increase Storage"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       +
                     </button>
@@ -658,7 +658,7 @@ export const CostComparisonPage: React.FC = () => {
                   name="region"
                   value={formData.region}
                   onChange={handleInputChange}
-                  className="input-field bg-neutral-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                  className="input-field bg-neutral-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)]"
                   aria-describedby="region-helper"
                 >
                   {REGION_OPTIONS.map((opt) => (
@@ -700,7 +700,7 @@ export const CostComparisonPage: React.FC = () => {
                     required
                     value={formData.hours_per_month}
                     onChange={handleInputChange}
-                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    className="input-field pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)]"
                     placeholder="730 (24x7)"
                     aria-describedby="hours-helper"
                   />
@@ -710,7 +710,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('hours_per_month', -24, 1, 744)}
                       disabled={formData.hours_per_month <= 1}
                       aria-label="Decrease Hours"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       –
                     </button>
@@ -719,7 +719,7 @@ export const CostComparisonPage: React.FC = () => {
                       onClick={() => stepField('hours_per_month', 24, 1, 744)}
                       disabled={formData.hours_per_month >= 744}
                       aria-label="Increase Hours"
-                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400"
+                      className="w-5 h-6 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-xs font-bold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent-primary)]"
                     >
                       +
                     </button>
@@ -754,7 +754,10 @@ export const CostComparisonPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full sm:w-auto px-8 py-3 text-sm font-semibold shadow-lg shadow-brand-600/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                style={{
+                  background: 'linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-bg-elevated) 100%)',
+                }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-white text-sm font-semibold transition-all duration-200 ease-out hover:opacity-95 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_20px_-2px_color-mix(in_srgb,var(--color-accent-primary)_35%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

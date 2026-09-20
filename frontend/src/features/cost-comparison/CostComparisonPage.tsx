@@ -19,6 +19,7 @@ import type { WorkloadInferenceRouteState } from '@/features/workload-upload/typ
 import { AwsIcon, AzureIcon, GcpIcon } from './components/BrandIcons'
 import { CloudQueryingHero } from './components/CloudQueryingHero'
 import { AIVerdictCard } from './components/AIVerdictCard'
+import { PhysicalTiltCard } from './components/PhysicalTiltCard'
 
 export interface CloudCostEstimate {
   provider: string
@@ -825,8 +826,11 @@ export const CostComparisonPage: React.FC = () => {
               </span>
             </div>
 
-            {/* Provider cards — 3D tilt-and-settle staggered entrance */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" style={{ perspective: 1200 }}>
+            {/* Provider cards — asymmetric 50 / 25 / 25 composition */}
+            <div
+              className="flex flex-col lg:flex-row lg:items-end gap-4 mb-8"
+              style={{ perspective: 1400 }}
+            >
               {data.estimates.map((est, idx) => {
                 const key = est.provider.toLowerCase()
                 const meta = PROVIDER_META[key] ?? {
@@ -849,10 +853,10 @@ export const CostComparisonPage: React.FC = () => {
                     key={est.provider}
                     initial={{
                       opacity: 0,
-                      y: 44,
+                      y: isCheapest ? 60 : 44,
                       rotateX: 14,
-                      rotateY: idx === 0 ? -6 : idx === 2 ? 6 : 0,
-                      scale: 0.93,
+                      rotateY: idx === 0 ? -8 : idx === 2 ? 8 : 0,
+                      scale: isCheapest ? 0.90 : 0.93,
                     }}
                     animate={{
                       opacity: 1,
@@ -862,119 +866,135 @@ export const CostComparisonPage: React.FC = () => {
                       scale: 1,
                     }}
                     transition={{
-                      duration: 0.55,
-                      delay: idx * 0.11,
+                      duration: 0.60,
+                      delay: idx * 0.13,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    whileHover={{
-                      y: -4,
-                      transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
-                    }}
                     className={[
-                      'relative flex flex-col justify-between rounded-2xl p-6 overflow-hidden',
-                      'backdrop-blur-sm border',
+                      'flex-shrink-0',
                       isCheapest
-                        ? 'border-[var(--color-success)]/50 shadow-[0_0_32px_-4px_rgba(97,210,154,0.30)]'
-                        : `${meta.borderGradient} elev-1 hover:shadow-[var(--provider-shadow)]`,
+                        ? 'lg:w-[50%] lg:-translate-y-4'  /* winner elevated */
+                        : 'lg:w-[25%]',                    /* runners-up compact */
                     ].join(' ')}
-                    style={{
-                      '--provider-shadow': meta.hoverShadow,
-                      background: 'color-mix(in srgb, var(--color-bg-elevated) 28%, rgba(15,15,35,0.75))',
-                      transformStyle: 'preserve-3d',
-                    } as React.CSSProperties}
-                    onMouseEnter={(e) => {
-                      if (!isCheapest)
-                        (e.currentTarget as HTMLElement).style.boxShadow = meta.hoverShadow
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isCheapest)
-                        (e.currentTarget as HTMLElement).style.boxShadow = ''
-                    }}
                   >
-                    {/* Cheapest animated shimmer border */}
-                    {isCheapest && <div className="cheapest-shimmer" aria-hidden />}
+                    <PhysicalTiltCard
+                      isWinner={isCheapest}
+                      depthSheets={isCheapest ? 3 : 2}
+                      maxTilt={isCheapest ? 8 : 6}
+                      className={[
+                        'flex flex-col justify-between rounded-2xl overflow-hidden',
+                        'backdrop-blur-sm border',
+                        isCheapest
+                          ? 'border-transparent p-6 md:p-7 shadow-[0_0_48px_-8px_rgba(97,210,154,0.35),0_16px_40px_-8px_rgba(0,0,0,0.6)]'
+                          : `${meta.borderGradient} elev-1 p-5`,
+                      ].join(' ')}
+                      style={{
+                        background: isCheapest
+                          ? 'color-mix(in srgb, var(--color-bg-elevated) 45%, rgba(10,10,30,0.85))'
+                          : 'color-mix(in srgb, var(--color-bg-elevated) 22%, rgba(15,15,35,0.80))',
+                      }}
+                    >
+                      {/* Cheapest shimmer overlay */}
+                      {isCheapest && <div className="cheapest-shimmer" aria-hidden />}
 
-                    {/* ── Top row: icon + tag + badges ── */}
-                    <div className="flex items-start justify-between gap-2 mb-5 relative z-10">
-                      {/* Icon + name block */}
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-                          style={{ background: `${meta.iconColor}1A` }}
-                        >
-                          <meta.Icon size={22} />
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase font-semibold tracking-widest text-neutral-500 leading-none mb-0.5">
-                            {meta.tag}
+                      {/* ── Top row: icon + tag + badges ── */}
+                      <div className="flex items-start justify-between gap-2 mb-4 relative z-10">
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className="flex items-center justify-center rounded-xl shrink-0"
+                            style={{
+                              background: `${meta.iconColor}1A`,
+                              width: isCheapest ? 44 : 36,
+                              height: isCheapest ? 44 : 36,
+                            }}
+                          >
+                            <meta.Icon size={isCheapest ? 24 : 20} />
                           </div>
-                          <div className="text-[13px] font-semibold text-neutral-200 leading-snug">
-                            {meta.name}
+                          <div>
+                            <div className="text-[10px] uppercase font-semibold tracking-widest text-neutral-500 leading-none mb-0.5">
+                              {meta.tag}
+                            </div>
+                            <div className={`font-semibold text-neutral-200 leading-snug ${isCheapest ? 'text-sm' : 'text-[12px]'}`}>
+                              {meta.name}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Status badges */}
-                      <div className="flex flex-col items-end gap-1 shrink-0 pt-0.5">
-                        {isCheapest && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] ring-1 ring-[var(--color-success)]/40 whitespace-nowrap">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse shrink-0" />
-                            Lowest Cost
-                          </span>
-                        )}
-                        {isStaticGCP && (
-                          <span className="badge-warning text-[10px]" title="Static fallback dataset active">
-                            Reference Pricing
-                          </span>
-                        )}
-                        {est.error && <span className="badge-danger text-[10px]">Unavailable</span>}
-                      </div>
-                    </div>
-
-                    {/* ── Instance type ── */}
-                    <div className="mb-4 relative z-10">
-                      <div className="text-[10px] uppercase tracking-widest text-neutral-600 font-semibold mb-1">
-                        Matched instance
-                      </div>
-                      <div className="text-base md:text-lg font-mono font-bold text-white tracking-tight truncate">
-                        {est.error ? <span className="text-red-400/70">—</span> : est.instance_type_matched}
-                      </div>
-                    </div>
-
-                    {/* ── Price section ── */}
-                    <div className="py-3 my-2 border-y border-white/[0.07] relative z-10">
-                      {est.error ? (
-                        <div className="text-xs text-red-400 font-mono py-1">{est.error}</div>
-                      ) : (
-                        <>
-                          <div className="flex items-baseline gap-1">
-                            <span
-                              className={`text-3xl md:text-4xl font-extrabold tracking-tight ${
-                                isCheapest ? 'text-[var(--color-success)]' : 'text-white'
-                              }`}
-                            >
-                              $<AnimatedPrice value={est.monthly_cost_low} delayMs={idx * 110 + 150} />
+                        <div className="flex flex-col items-end gap-1 shrink-0 pt-0.5">
+                          {isCheapest && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] ring-1 ring-[var(--color-success)]/40 whitespace-nowrap">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse shrink-0" />
+                              Lowest Cost
                             </span>
-                            <span className="text-xs text-neutral-500">/ mo</span>
-                          </div>
-                          <div className="text-[11px] text-neutral-600 mt-1">
-                            {est.monthly_cost_low === est.monthly_cost_high
-                              ? `On-demand estimate (${est.currency})`
-                              : `Range: $${est.monthly_cost_low.toFixed(2)} – $${est.monthly_cost_high.toFixed(2)} ${est.currency}`}
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* ── Line-item notes ── */}
-                    {est.notes && !est.error && (
-                      <div className="mt-3 text-xs text-neutral-400 bg-white/[0.03] p-2.5 rounded-lg border border-white/[0.05] space-y-1 relative z-10">
-                        <div className="text-[10px] uppercase font-semibold tracking-wider text-neutral-600">
-                          Line Item Notes
+                          )}
+                          {isStaticGCP && (
+                            <span className="badge-warning text-[10px]" title="Static fallback dataset active">
+                              Reference
+                            </span>
+                          )}
+                          {est.error && <span className="badge-danger text-[10px]">Unavailable</span>}
                         </div>
-                        <p className="line-clamp-3 leading-relaxed text-neutral-300">{est.notes}</p>
                       </div>
-                    )}
+
+                      {/* ── Rank indicator for runner-ups ── */}
+                      {!isCheapest && !est.error && (
+                        <div className="mb-3 relative z-10">
+                          <span className="text-[10px] font-mono font-semibold uppercase tracking-widest text-neutral-600">
+                            #{idx + 1} · Runner-up
+                          </span>
+                        </div>
+                      )}
+
+                      {/* ── Instance type ── */}
+                      <div className="mb-4 relative z-10">
+                        <div className="text-[10px] uppercase tracking-widest text-neutral-600 font-semibold mb-1">
+                          Matched instance
+                        </div>
+                        <div className={`font-mono font-bold text-white tracking-tight truncate ${isCheapest ? 'text-base md:text-lg' : 'text-sm'}`}>
+                          {est.error ? <span className="text-red-400/70">—</span> : est.instance_type_matched}
+                        </div>
+                      </div>
+
+                      {/* ── Price section ── */}
+                      <div className={`py-3 border-y border-white/[0.07] relative z-10 ${isCheapest ? 'my-3' : 'my-2'}`}>
+                        {est.error ? (
+                          <div className="text-xs text-red-400 font-mono py-1">{est.error}</div>
+                        ) : (
+                          <>
+                            <div className="flex items-baseline gap-1">
+                              <span
+                                className={[
+                                  'font-display-price font-extrabold tracking-tight',
+                                  isCheapest
+                                    ? 'text-4xl md:text-5xl text-[var(--color-success)]'
+                                    : 'text-2xl md:text-3xl text-white',
+                                ].join(' ')}
+                              >
+                                $<AnimatedPrice value={est.monthly_cost_low} delayMs={idx * 110 + 150} />
+                              </span>
+                              <span className="text-xs text-neutral-500">/ mo</span>
+                            </div>
+                            <div className="text-[11px] text-neutral-600 mt-1">
+                              {est.monthly_cost_low === est.monthly_cost_high
+                                ? `On-demand estimate (${est.currency})`
+                                : `Range: $${est.monthly_cost_low.toFixed(2)} – $${est.monthly_cost_high.toFixed(2)} ${est.currency}`}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* ── Line-item notes ── */}
+                      {est.notes && !est.error && (
+                        <div className="mt-3 text-xs text-neutral-400 bg-white/[0.03] p-2.5 rounded-lg border border-white/[0.05] space-y-1 relative z-10">
+                          <div className="text-[10px] uppercase font-semibold tracking-wider text-neutral-600">
+                            Line Item Notes
+                          </div>
+                          <p className={`leading-relaxed text-neutral-300 ${isCheapest ? '' : 'line-clamp-3'}`}>
+                            {est.notes}
+                          </p>
+                        </div>
+                      )}
+                    </PhysicalTiltCard>
                   </motion.div>
                 )
               })}

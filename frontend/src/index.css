@@ -378,3 +378,95 @@
   ::-webkit-scrollbar-thumb { transition: none; }
 }
 
+/* ── Display-Price Typography ──────────────────────────────────────────────
+   Space Grotesk: for large price numerals only.
+   Tabular figures (tnum) prevent layout shift during AnimatedPrice counter.  */
+.font-display-price {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-feature-settings: 'tnum' 1, 'ss01' 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Aurora Rotating Border ───────────────────────────────────────────────
+   Conic-gradient angle spin for the winner card championship border.         */
+@keyframes aurora-border-spin {
+  from { --aurora-angle: 0deg; }
+  to   { --aurora-angle: 360deg; }
+}
+
+@property --aurora-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.aurora-border-card {
+  --aurora-angle: 0deg;
+  position: relative;
+}
+.aurora-border-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(1rem + 2px);
+  padding: 2px;
+  background: conic-gradient(
+    from var(--aurora-angle),
+    #61D29A 0%,
+    #882ECA 25%,
+    #4285F4 50%,
+    #0078D4 65%,
+    #882ECA 80%,
+    #61D29A 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: aurora-border-spin 4s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Physical Depth Sheets ─────────────────────────────────────────────────
+   Stacked "ghost cards" behind the main card for a tangible physical depth.  */
+.depth-card-host {
+  position: relative;
+}
+
+.depth-sheet {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-bg-elevated) 28%, rgba(15, 15, 35, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.depth-sheet-1 {
+  transform: translateY(5px) translateX(3px) scale(0.97);
+  opacity: 0.55;
+  filter: blur(1px);
+  z-index: -1;
+}
+.depth-sheet-2 {
+  transform: translateY(10px) translateX(6px) scale(0.94);
+  opacity: 0.35;
+  filter: blur(2px);
+  z-index: -2;
+}
+.depth-sheet-3 {
+  transform: translateY(15px) translateX(9px) scale(0.91);
+  opacity: 0.18;
+  filter: blur(3px);
+  z-index: -3;
+}
+
+/* Reduce-motion: stop aurora spin */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-border-card::before { animation: none; }
+}

@@ -13,6 +13,7 @@ import React, { useMemo } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { AwsIcon, AzureIcon, GcpIcon } from './BrandIcons'
 import type { CloudCostEstimate } from '../CostComparisonPage'
+import { PhysicalTiltCard } from './PhysicalTiltCard'
 
 interface AIVerdictCardProps {
   estimates: CloudCostEstimate[]
@@ -344,20 +345,25 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
   if (!winner) return null
 
   return (
-    <motion.div
-      initial={shouldReduce ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 34, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: shouldReduce ? 0 : 0.65,
-        delay: shouldReduce ? 0 : 0.48, // Enters last after the 3 cards have settled
-        ease: [0.22, 1, 0.36, 1],
-      }}
+    <PhysicalTiltCard
+      depthSheets={3}
+      maxTilt={5}
       className={`
         relative w-full rounded-3xl p-6 md:p-8 border bg-gradient-to-br
         overflow-hidden shadow-2xl transition-all duration-300
         ${winnerStyle.bgGradient} ${winnerStyle.borderColor}
       `}
       style={{ boxShadow: winnerStyle.glowShadow }}
+    >
+    <motion.div
+      initial={shouldReduce ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 34, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: shouldReduce ? 0 : 0.65,
+        delay: shouldReduce ? 0 : 0.48,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className="relative w-full h-full"
     >
       {/* ── Perimeter Highlight Glow Sweep on Entrance ────────────────────── */}
       {!shouldReduce && (
@@ -449,7 +455,7 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
               <>
                 <span style={{ color: winnerStyle.brandColor }}>{winnerDisplayName}</span> is your
                 best fit — save{' '}
-                <span className="text-[var(--color-success)] underline decoration-[var(--color-success)]/40 underline-offset-4">
+                <span className="text-[var(--color-success)] underline decoration-[var(--color-success)]/40 underline-offset-4 font-display-price">
                   ${formattedSavings}/mo
                 </span>
               </>
@@ -617,5 +623,6 @@ export const AIVerdictCard: React.FC<AIVerdictCardProps> = ({
         )}
       </div>
     </motion.div>
+    </PhysicalTiltCard>
   )
 }

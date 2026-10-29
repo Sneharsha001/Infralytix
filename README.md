@@ -23,7 +23,7 @@
 
 **Infralytix** is an intelligent developer infrastructure operating system built to solve multi-cloud fragmentation, cost opacity, and workflow inefficiencies across **Amazon Web Services (AWS)**, **Microsoft Azure**, and **Google Cloud Platform (GCP)**.
 
-Modern engineering teams struggle with cloud pricing opacity, non-linear storage billing, complex computational dependency scheduling, and architectural blind spots. Infralytix tackles these challenges with four core pillars:.............
+Modern engineering teams struggle with cloud pricing opacity, non-linear storage billing, complex computational dependency scheduling, and architectural blind spots. Infralytix tackles these challenges with four core pillars:....................
 
 1. **Multi-Cloud Cost Comparison Engine**: Concurrently queries official AWS, Azure, and GCP price catalogs with sub-second response times, attached storage parity, and cheapest-first rankings.
 2. **Multi-Cloud Workflow DAG Optimizer (FR11)**: Validates computational Directed Acyclic Graphs (DAGs) with NetworkX, simulates critical-path execution makespan and cost scaling, and sweeps cloud instance pools to construct the **Pareto-optimal frontier** (Latency vs. Cost trade-off).

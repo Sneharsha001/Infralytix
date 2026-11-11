@@ -5,7 +5,7 @@
 **AI-Powered Developer Infrastructure OS & Multi-Cloud Optimization Platform**
 
 *An enterprise-grade platform unifying live multi-cloud cost comparison, DAG workflow makespan/cost Pareto optimization, repository intelligence, and developer infrastructure governance.*
-
+'kjhgfdsadfghjkl
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -17,20 +17,17 @@
 
 </div>
 
----
-
 ## 📖 Executive Overview
 
 **Infralytix** is an intelligent developer infrastructure operating system built to solve multi-cloud fragmentation, cost opacity, and workflow inefficiencies across **Amazon Web Services (AWS)**, **Microsoft Azure**, and **Google Cloud Platform (GCP)**.
 
-Modern engineering teams struggle with cloud pricing opacity, non-linear storage billing, complex computational dependency scheduling, and architectural blind spots. Infralytix tackles these challenges with four core pillars:
+Modern engineering teams struggle with cloud pricing opacity, non-linear storage billing, complex computational dependency scheduling, and architectural blind spots. Infralytix tackles these challenges with four core pillars:.........................
 
 1. **Multi-Cloud Cost Comparison Engine**: Concurrently queries official AWS, Azure, and GCP price catalogs with sub-second response times, attached storage parity, and cheapest-first rankings.
 2. **Multi-Cloud Workflow DAG Optimizer (FR11)**: Validates computational Directed Acyclic Graphs (DAGs) with NetworkX, simulates critical-path execution makespan and cost scaling, and sweeps cloud instance pools to construct the **Pareto-optimal frontier** (Latency vs. Cost trade-off).
 3. **Repository Intelligence & AI Agent Pipeline**: Performs deep static analysis and AST code review on uploaded software repositories, orchestrating Google Gemini 1.5 Flash to generate architectural insights and code health scores.
 4. **Enterprise Security & Governance**: Production-grade JWT access/refresh token rotation with reuse detection, bcrypt password hashing, and granular Role-Based Access Control (`USER`, `EVALUATOR`, `ADMINISTRATOR`).
 
----
 
 ## 🏛️ System Architecture
 

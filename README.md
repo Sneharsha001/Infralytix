@@ -1,7 +1,7 @@
 <div align="center">
 
 # Infralytix
----
+
 **AI-Powered Developer Infrastructure OS & Multi-Cloud Optimization Platform**
 
 *An enterprise-grade platform unifying live multi-cloud cost comparison, DAG workflow makespan/cost Pareto optimization, repository intelligence, and developer infrastructure governance.*

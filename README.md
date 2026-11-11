@@ -28,7 +28,6 @@ Modern engineering teams struggle with cloud pricing opacity, non-linear storage
 3. **Repository Intelligence & AI Agent Pipeline**: Performs deep static analysis and AST code review on uploaded software repositories, orchestrating Google Gemini 1.5 Flash to generate architectural insights and code health scores.
 4. **Enterprise Security & Governance**: Production-grade JWT access/refresh token rotation with reuse detection, bcrypt password hashing, and granular Role-Based Access Control (`USER`, `EVALUATOR`, `ADMINISTRATOR`).
 
----
 
 ## 🏛️ System Architecture
 

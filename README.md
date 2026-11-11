@@ -17,8 +17,6 @@
 
 </div>
 -------------
--------------
-
 ## 📖 Executive Overview
 
 **Infralytix** is an intelligent developer infrastructure operating system built to solve multi-cloud fragmentation, cost opacity, and workflow inefficiencies across **Amazon Web Services (AWS)**, **Microsoft Azure**, and **Google Cloud Platform (GCP)**.
